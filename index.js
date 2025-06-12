@@ -12,17 +12,23 @@ const app = express();
 
 const PORT = process.env.PORT || 3500;
 
-// Connect to MongoDB
 connectDB();
 
+// Middleware to handle CORS
 app.use(cors(corsOptions));
 
+// Middleware to parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware to parse JSON bodies
 app.use(express.json());
 
+// Middleware to parse cookies
 app.use(cookieParser());
 
+app.use('/register', require('./routes/api/register')); // Register route
+
+// Start the server after connecting to the database
 mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB');
     app.listen(PORT, () => {
