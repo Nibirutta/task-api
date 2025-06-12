@@ -26,7 +26,8 @@ app.use(express.json());
 // Middleware to parse cookies
 app.use(cookieParser());
 
-app.use('/register', require('./routes/api/register')); // Register route
+app.use('/user/register', require('./routes/api/register')); // Register route
+app.use('/user/login', require('./routes/api/auth')); // Login route
 
 // Start the server after connecting to the database
 mongoose.connection.once('open', () => {
