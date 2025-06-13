@@ -28,6 +28,7 @@ app.use(cookieParser());
 
 app.use('/user/register', require('./routes/api/register')); // Register route
 app.use('/user/login', require('./routes/api/auth')); // Login route
+app.use('/user/refresh', require('./routes/api/refreshToken')); // Refresh token route
 
 // Start the server after connecting to the database
 mongoose.connection.once('open', () => {

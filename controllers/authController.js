@@ -34,9 +34,9 @@ const loginUser = async (req, res) => {
             );
 
             const refreshToken = jwt.sign(
-                { "id": foundUser._id },
+                { "username": foundUser.username },
                 process.env.REFRESH_TOKEN_SECRET,
-                { expiresIn: '1d' }
+                { expiresIn: '3d' }
             );
 
             // Remove the old refresh token from the array if it exists
@@ -63,7 +63,7 @@ const loginUser = async (req, res) => {
 
             res.status(200).json({ accessToken });
         }
-    } catch (error) {
+    } catch (err) {
         return res.status(500).json({ message: 'Internal server error.' });
     }
 };

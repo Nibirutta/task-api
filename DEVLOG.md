@@ -6,3 +6,4 @@
 - *Started the server to test if the connection to MongoDB was working correctly*.
 - *Created the user registration route and it's working perfectly*.
 - *User authentication is done, I used JWT tokens for security measures, including multi-platform support*
+- *The refresh token route is fully implemented, and I added some extra lines of code to ensure user security*.
