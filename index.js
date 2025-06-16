@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 
 const connectDB = require('./config/dbConnection');
 const corsOptions = require('./config/corsOptions');
+const verifyJWT = require('./middlewares/verifyJWT');
 
 const app = express();
 
@@ -30,6 +31,8 @@ app.use('/user/register', require('./routes/api/register')); // Register route
 app.use('/user/login', require('./routes/api/auth')); // Login route
 app.use('/user/refresh', require('./routes/api/refreshToken')); // Refresh token route
 app.use('/user/logout', require('./routes/api/logout')); // Logout route
+
+app.use('/tasks', verifyJWT, require('./routes/api/tasks')); // Tasks route
 
 // Start the server after connecting to the database
 mongoose.connection.once('open', () => {

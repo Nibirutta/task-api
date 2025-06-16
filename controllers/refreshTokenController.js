@@ -54,6 +54,8 @@ const refreshToken = async (req, res) => {
             const accessToken = jwt.sign(
                 {
                     "UserInfo": {
+                        "_id": foundUser._id,
+                        "username": foundUser.username,
                         "firstname": foundUser.firstname,
                         "lastname": foundUser.lastname
                     }
@@ -63,7 +65,7 @@ const refreshToken = async (req, res) => {
             );
 
             const newRefreshToken = jwt.sign(
-                { "username": foundUser.username},
+                { "username": foundUser.username },
                 process.env.REFRESH_TOKEN_SECRET,
                 { expiresIn: '3d' }
             );

@@ -5,10 +5,13 @@ const taskSchema = new Schema({
     title: {
         type: String,
         required: true,
+        minlength: 1,
+        maxlength: 50,
         trim: true
     },
     description: {
         type: String,
+        maxlength: 500,
         trim: true
     },
     status: {
@@ -22,6 +25,11 @@ const taskSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
 });
 

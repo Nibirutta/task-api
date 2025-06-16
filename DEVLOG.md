@@ -9,3 +9,4 @@
 - *The refresh token route is fully implemented, and I added some extra lines of code to ensure user security.*
 - *Logout route is done. This command deletes the cookie from the browser and, if there was a user linked to it, removes the refresh token from the database as well.*
 - *Added a middleware to verify the access token before accessing a protected route.*
+- *The routes required to add and get the tasks are now complete, but I still need to analyze how I'll build the others.*
