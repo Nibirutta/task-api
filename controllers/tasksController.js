@@ -92,8 +92,31 @@ const updateTask = async (req, res) => {
     }
 };
 
+const deleteTask = async (req, res) => {
+    const userInfo = req.user; // Assuming user info is attached to req by verifyJWT middleware
+
+    if (!userInfo) {
+        return res.sendStatus(401); // Unauthorized
+    }
+
+    const { id } = req.params;
+
+    try {
+        const deletedTask = await Task.findByIdAndDelete(id).exec();
+
+        if (!deletedTask) {
+            return res.status(404).json({ message: 'Task not found.' });
+        }
+
+        return res.status(200).json({ message: 'Task deleted successfully.' }); // Return success message
+    } catch (error) {
+        return res.sendStatus(500); // Internal Server Error
+    }
+}
+
 module.exports = {
     getAllTasks,
     createTask,
-    updateTask
+    updateTask,
+    deleteTask
 };

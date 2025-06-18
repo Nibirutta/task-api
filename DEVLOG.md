@@ -11,3 +11,4 @@
 - *Added a middleware to verify the access token before accessing a protected route.*
 - *The routes required to add and get the tasks are now complete, but I still need to analyze how I'll build the others.*
 - **😷SICKDAY** *- Thankfully i was able to complete at least one new route, and was the route to manage tasks updates, it's working perfectly!*
+- *Delete route is done. This route gets the task id from URL params, searchs for it, and deletes it if found.*

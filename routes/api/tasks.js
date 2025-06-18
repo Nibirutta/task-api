@@ -8,5 +8,6 @@ router.route('/')
 
 router.route('/:id')
     .put(tasksController.updateTask) // Update a task
+    .delete(tasksController.deleteTask); // Delete a task
 
 module.exports = router;
