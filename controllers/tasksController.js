@@ -1,14 +1,30 @@
 const Task = require('../model/Task');
 
-const getAllTasks = async (req, res) => {
+const getTasks = async (req, res) => {
     const userInfo = req.user; // Assuming user info is attached to req by verifyJWT middleware
 
     if (!userInfo) {
         return res.sendStatus(401); // Unauthorized
     }
 
+    const { title, status } = req.query; // Get query parameters
+
+    let filter = { owner: userInfo._id }; // Filter by user ID
+
+    if (title) {
+        filter.title = { $regex: title, $options: 'i' }; // Case-insensitive search for title
+    }
+
+    if (status) {
+        const validStatuses = ['pending', 'in-progress', 'completed'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({ message: `Status must be one of: ${validStatuses.join(', ')}` });
+        }
+        filter.status = status; // Filter by status
+    }
+
     try {
-        const tasks = await Task.find({ owner: userInfo._id }).sort({ createdAt: -1 }).exec();
+        const tasks = await Task.find(filter).sort({ createdAt: -1 }).exec();
 
         return res.status(200).json(tasks); // Return tasks in JSON format
     } catch (error) {
@@ -25,13 +41,13 @@ const createTask = async (req, res) => {
 
     const { title, description, status, dueDate } = req.body;
 
-    const validStatuses = ['pending', 'in-progress', 'completed'];
-
-    if (!title || !status) {
-        return res.status(400).json({ message: 'Title and status are required.' });
+    if (!title || !dueDate) {
+        return res.status(400).json({ message: 'Title and due date are required.' });
     }
 
-    if (!validStatuses.includes(status)) {
+    const validStatuses = ['pending', 'in-progress', 'completed'];
+
+    if (!validStatuses.includes(status) && status !== undefined) {
         return res.status(400).json({ message: `Status must be one of: ${validStatuses.join(', ')}` });
     }
 
@@ -73,7 +89,7 @@ const updateTask = async (req, res) => {
 
     try {
         const updatedTask = await Task.findByIdAndUpdate(
-            id,
+            { _id: id, owner: userInfo._id }, // Ensure the task belongs to the user
             { title, description, status, dueDate },
             { new: true, runValidators: true }
         ).exec();
@@ -102,7 +118,7 @@ const deleteTask = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const deletedTask = await Task.findByIdAndDelete(id).exec();
+        const deletedTask = await Task.findOneAndDelete({ _id: id, owner: userInfo._id }).exec(); // Ensure the task belongs to the user
 
         if (!deletedTask) {
             return res.status(404).json({ message: 'Task not found.' });
@@ -115,7 +131,7 @@ const deleteTask = async (req, res) => {
 }
 
 module.exports = {
-    getAllTasks,
+    getTasks,
     createTask,
     updateTask,
     deleteTask
