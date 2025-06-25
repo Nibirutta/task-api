@@ -26,6 +26,7 @@ const loginUser = async (req, res) => {
                 {
                     "UserInfo": {
                         "_id": foundUser._id,
+                        "email": foundUser.email,
                         "username": foundUser.username,
                         "firstname": foundUser.firstname,
                         "lastname": foundUser.lastname

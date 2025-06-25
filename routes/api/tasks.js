@@ -3,7 +3,7 @@ const router = express.Router();
 const tasksController = require('../../controllers/tasksController');
 
 router.route('/')
-    .get(tasksController.getTasks) // Get all tasks
+    .get(tasksController.getTasks) // Get tasks
     .post(tasksController.createTask); // Create a new task
 
 router.route('/:id')

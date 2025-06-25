@@ -7,7 +7,7 @@ const getTasks = async (req, res) => {
         return res.sendStatus(401); // Unauthorized
     }
 
-    const { title, status } = req.query; // Get query parameters
+    const { title, status, priority } = req.query; // Get query parameters
 
     let filter = { owner: userInfo._id }; // Filter by user ID
 
@@ -21,6 +21,14 @@ const getTasks = async (req, res) => {
             return res.status(400).json({ message: `Status must be one of: ${validStatuses.join(', ')}` });
         }
         filter.status = status; // Filter by status
+    }
+
+    if (priority) {
+        const validPriorities = ['low', 'medium', 'high'];
+        if (!validPriorities.includes(priority)) {
+            return res.status(400).json({ message: `Priority must be one of: ${validPriorities.join(', ')}` });
+        }
+        filter.priority = priority; // Filter by priority
     }
 
     try {
@@ -39,8 +47,8 @@ const createTask = async (req, res) => {
         return res.sendStatus(401); // Unauthorized
     }
 
-    const { title, description, status, dueDate } = req.body;
-
+    const { title, description, status, priority, dueDate } = req.body;
+    
     if (!title || !dueDate) {
         return res.status(400).json({ message: 'Title and due date are required.' });
     }
@@ -51,11 +59,18 @@ const createTask = async (req, res) => {
         return res.status(400).json({ message: `Status must be one of: ${validStatuses.join(', ')}` });
     }
 
+    const validPriorities = ['low', 'medium', 'high'];
+
+    if (!validPriorities.includes(priority) && priority !== undefined) {
+        return res.status(400).json({ message: `Priority must be one of: ${validPriorities.join(', ')}` });
+    }
+
     try {
         const newTask = new Task({
             title,
             description,
             status,
+            priority,
             dueDate,
             owner: userInfo._id
         });
@@ -79,7 +94,7 @@ const updateTask = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { title, description, status, dueDate } = req.body;
+    const { title, description, status, priority, dueDate } = req.body;
 
     const validStatuses = ['pending', 'in-progress', 'completed'];
 
@@ -87,10 +102,16 @@ const updateTask = async (req, res) => {
         return res.status(400).json({ message: `Status must be one of: ${validStatuses.join(', ')}` });
     }
 
+    const validPriorities = ['low', 'medium', 'high'];
+
+    if ((!validPriorities.includes(priority) && priority !== undefined)) {
+        return res.status(400).json({ message: `Priority must be one of: ${validPriorities.join(', ')}` });
+    }
+
     try {
         const updatedTask = await Task.findByIdAndUpdate(
             { _id: id, owner: userInfo._id }, // Ensure the task belongs to the user
-            { title, description, status, dueDate },
+            { title, description, status, priority, dueDate },
             { new: true, runValidators: true }
         ).exec();
 
