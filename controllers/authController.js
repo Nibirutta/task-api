@@ -9,13 +9,19 @@ const loginUser = async (req, res) => {
     const insertedPassword = req.body.password;
 
     if (!insertedUsername || !insertedPassword) {
-        return res.status(400).json({ message: 'Username and password are required.' });
+        return res.status(400).json({
+            code: 'MISSING_CREDENTIALS',
+            message: 'Username and password are required.'
+        });
     }
 
     const foundUser = await User.findOne({ username: insertedUsername }).exec();
 
     if (!foundUser) {
-        return res.status(401).json({ message: 'Username or password are invalid' });
+        return res.status(401).json({
+            code: 'INVALID_CREDENTIALS',
+            message: 'Username or password are invalid'
+        });
     }
 
     try {
@@ -67,7 +73,7 @@ const loginUser = async (req, res) => {
             res.status(200).json({ accessToken });
         }
     } catch (err) {
-        return res.status(500).json({ message: 'Internal server error.' });
+        return res.sendStatus(500); // Internal Server Error
     }
 };
 
