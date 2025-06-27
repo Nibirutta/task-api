@@ -1,30 +1,5 @@
 const Task = require('../model/Task');
 
-const validStatuses = ['pending', 'in-progress', 'completed'];
-const validPriorities = ['low', 'medium', 'high'];
-
-function isValidStatus(status) {
-    if (status !== undefined && !validStatuses.includes(status)) {
-        return {
-            code: 'INVALID_STATUS',
-            message: `Status must be one of: ${validStatuses.join(', ')}`
-        };
-    }
-
-    return null;
-}
-
-function isValidPriority(priority) {
-    if (priority !== undefined && !validPriorities.includes(priority)) {
-        return {
-            code: 'INVALID_PRIORITY',
-            message: `Priority must be one of: ${validPriorities.join(', ')}`
-        };
-    }
-
-    return null;
-}
-
 const getTasks = async (req, res) => {
     const userInfo = req.user; // Assuming user info is attached to req by verifyJWT middleware
 
@@ -40,13 +15,13 @@ const getTasks = async (req, res) => {
         filter.title = { $regex: title, $options: 'i' }; // Case-insensitive search for title
     }
 
-    const statusError = isValidStatus(status);
-    if (statusError) return res.status(400).json(statusError);
-    filter.status = status; // Filter by status
+    if (status) {
+        filter.status = status; // Filter by status
+    }
 
-    const priorityError = isValidPriority(priority);
-    if (priorityError) return res.status(400).json(priorityError);
-    filter.priority = priority; // Filter by priority
+    if (priority) {
+        filter.priority = priority; // Filter by priority
+    }
 
     if (from || to) {
         filter.dueDate = {};
@@ -78,12 +53,6 @@ const createTask = async (req, res) => {
             message: 'Title and due date are required.'
         });
     }
-
-    const statusError = isValidStatus(status);
-    if (statusError) return res.status(400).json(statusError);
-
-    const priorityError = isValidPriority(priority);
-    if (priorityError) return res.status(400).json(priorityError);
 
     try {
         const newTask = new Task({
@@ -118,12 +87,6 @@ const updateTask = async (req, res) => {
 
     const { id } = req.params;
     const { title, description, status, priority, dueDate } = req.body;
-
-    const statusError = isValidStatus(status);
-    if (statusError) return res.status(400).json(statusError);
-
-    const priorityError = isValidPriority(priority);
-    if (priorityError) return res.status(400).json(priorityError);
 
     try {
         const updatedTask = await Task.findByIdAndUpdate(

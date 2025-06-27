@@ -38,6 +38,10 @@ const userSchema = new Schema({
     refreshToken: {
         type: [String],
         default: []
+    },
+    resetToken: {
+        type: String,
+        default: null,
     }
 });
 

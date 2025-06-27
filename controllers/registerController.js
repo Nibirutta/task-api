@@ -73,6 +73,13 @@ const registerNewUser = async (req, res) => {
             });
         }
     } catch (err) {
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({
+                code: 'VALIDATION_ERROR',
+                message: err.message
+            });
+        }
+
         return res.sendStatus(500); // Internal Server Error
     }
 }

@@ -31,6 +31,7 @@ app.use('/user/register', require('./routes/api/register')); // Register route
 app.use('/user/login', require('./routes/api/auth')); // Login route
 app.use('/user/refresh', require('./routes/api/refreshToken')); // Refresh token route
 app.use('/user/logout', require('./routes/api/logout')); // Logout route
+app.use('/user/reset', require('./routes/api/reset')); // Password reset route
 
 app.use('/tasks', verifyJWT, require('./routes/api/tasks')); // Tasks route
 

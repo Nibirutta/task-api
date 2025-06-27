@@ -15,3 +15,4 @@
 - *Modified the get route to accept queries, such as status condition or title.*
 - *Made some changes to the Userschema and TaskSchema to accept email and priority, respectively, because I'll implement a method to allow users to reset their password if needed.*
 - *Modified some validation errors to be easier to use in the front end, and also added a verification method to the user email. However, I also need to think about the security layers in my API; perhaps I'm doing some unnecessary things here.*
+- *Already started creating a route to allow users to reset their password if they forget it, deleted some unnecessary code from the tasks controller, and modified the user schema to add a field for the reset password tokens.*
