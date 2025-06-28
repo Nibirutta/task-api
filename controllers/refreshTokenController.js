@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const User = require('../model/User');
+const RefreshToken = require('../model/RefreshToken');
 
 const refreshToken = async (req, res) => {
     const cookies = req.cookies;
@@ -9,16 +10,16 @@ const refreshToken = async (req, res) => {
         return res.sendStatus(401); // Unauthorized
     }
 
-    const refreshToken = cookies.jwt;
+    const oldRefreshToken = cookies.jwt;
+    const foundToken = await RefreshToken.findOneAndDelete({ token: oldRefreshToken }).exec();
 
     res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
 
-    const foundUser = await User.findOne({ refreshToken: refreshToken }).exec();
-
-    // If no user found with the refresh token, possible token reuse attempt
-    if (!foundUser) {
+    // If no token is found, it might be a sign of a hacked user or an invalid token
+    // We should verify the old refresh token to ensure it's valid and then delete all tokens for that user
+    if (!foundToken) {
         jwt.verify(
-            refreshToken,
+            oldRefreshToken,
             process.env.REFRESH_TOKEN_SECRET,
             async (err, decoded) => {
                 if (err) return res.sendStatus(403); // Forbidden
@@ -27,26 +28,23 @@ const refreshToken = async (req, res) => {
 
                 if (!hackedUser) return res.sendStatus(403); // Forbidden
 
-                hackedUser.refreshToken = [];
-                await hackedUser.save();
+                await RefreshToken.deleteMany({ userId: hackedUser._id }).exec();
             }
         );
 
         return res.sendStatus(403); // Forbidden
     }
 
-    const newRefreshTokenArray = foundUser.refreshToken.filter(rt => rt !== refreshToken);
+    const foundUser = await User.findOne({ _id: foundToken.userId }).exec();
+
+    if (!foundUser) {
+        return res.sendStatus(403); // Forbidden
+    }
 
     jwt.verify(
-        refreshToken,
+        foundToken.token,
         process.env.REFRESH_TOKEN_SECRET,
         async (err, decoded) => {
-            // If the token is invalid, we delete it from the user's refresh token array
-            if (err) {
-                foundUser.refreshToken = newRefreshTokenArray;
-                await foundUser.save();
-            }
-
             if (err || foundUser.username !== decoded.username) {
                 return res.sendStatus(403); // Forbidden
             }
@@ -71,13 +69,23 @@ const refreshToken = async (req, res) => {
                 { expiresIn: '3d' }
             );
 
-            foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
-            await foundUser.save();
+            const expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 3); // Set expiration to 3 days
+
+            const newRefreshTokenEntry = new RefreshToken({
+                            userId: foundUser._id,
+                            token: newRefreshToken,
+                            createdAt: new Date(),
+                            expiresAt: expirationDate
+            });
+            
+            await newRefreshTokenEntry.save();
 
             res.cookie('jwt', newRefreshToken, {
                 httpOnly: true, // Not accessible to JavaScript
                 sameSite: 'None', // for cross-site requests
-                secure: true // set to true if using HTTPS
+                secure: true, // set to true if using HTTPS
+                maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days in milliseconds
             });
 
             res.json({ accessToken });

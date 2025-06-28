@@ -4,6 +4,7 @@ const validator = require('validator');
 const nodemailer = require('nodemailer');
 
 const User = require('../model/User');
+const RefreshToken = require('../model/RefreshToken');
 
 const requestReset = async (req, res) => {
     const { email } = req.body;
@@ -32,7 +33,7 @@ const requestReset = async (req, res) => {
             });
         }
 
-        foundUser.refreshToken = []; // Logout the user from all devices by clearing the refresh token
+        await RefreshToken.deleteMany({ userId: foundUser._id }).exec(); // Clear any existing tokens
 
         const resetToken = jwt.sign(
             { "username": foundUser.username },

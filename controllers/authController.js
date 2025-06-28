@@ -51,21 +51,21 @@ const loginUser = async (req, res) => {
             const expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 3); // Set expiration to 3 days
 
-            const newRefreshToken = new RefreshToken({
+            const newRefreshTokenEntry = new RefreshToken({
                 userId: foundUser._id,
                 token: refreshToken,
                 createdAt: new Date(),
                 expiresAt: expirationDate
             });
 
-            await newRefreshToken.save();
+            await newRefreshTokenEntry.save();
 
             // Set the refresh token in an HTTP-only cookie
             res.cookie('jwt', refreshToken, {
                 httpOnly: true, // Not accessible to JavaScript
                 sameSite: 'None', // for cross-site requests
                 secure: true, // set to true if using HTTPS
-                maxAge: 24 * 60 * 60 * 1000 // 1 day
+                maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days in milliseconds
             });
 
             res.status(200).json({ 

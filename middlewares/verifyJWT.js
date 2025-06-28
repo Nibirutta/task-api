@@ -6,14 +6,14 @@ const verifyJWT = (req, res, next) => {
         return res.sendStatus(401); // Unauthorized
     }
 
-    const token = authHeader.split(' ')[1];
+    const accessToken = authHeader.split(' ')[1];
 
-    if (!token) {
+    if (!accessToken) {
         return res.sendStatus(401); // Unauthorized
     }
 
     jwt.verify(
-        token,
+        accessToken,
         process.env.ACCESS_TOKEN_SECRET,
         (err, decoded) => {
             if (err) {
