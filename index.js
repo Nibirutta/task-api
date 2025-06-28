@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const connectDB = require('./config/dbConnection');
 const corsOptions = require('./config/corsOptions');
 const verifyJWT = require('./middlewares/verifyJWT');
+const blockIfAuthenticated = require('./middlewares/blockIfAuthenticated');
 
 const app = express();
 
@@ -27,11 +28,11 @@ app.use(express.json());
 // Middleware to parse cookies
 app.use(cookieParser());
 
-app.use('/user/register', require('./routes/api/register')); // Register route
-app.use('/user/login', require('./routes/api/auth')); // Login route
+app.use('/user/register', blockIfAuthenticated, require('./routes/api/register')); // Register route
+app.use('/user/login', blockIfAuthenticated, require('./routes/api/auth')); // Login route
 app.use('/user/refresh', require('./routes/api/refreshToken')); // Refresh token route
 app.use('/user/logout', require('./routes/api/logout')); // Logout route
-app.use('/user/reset', require('./routes/api/reset')); // Password reset route
+app.use('/user/reset', blockIfAuthenticated, require('./routes/api/reset')); // Password reset route
 
 app.use('/tasks', verifyJWT, require('./routes/api/tasks')); // Tasks route
 

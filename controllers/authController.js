@@ -2,9 +2,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const User = require('../model/User');
+const RefreshToken = require('../model/RefreshToken');
 
 const loginUser = async (req, res) => {
-    const cookie = req.cookies;
     const insertedUsername = req.body.username;
     const insertedPassword = req.body.password;
 
@@ -48,19 +48,17 @@ const loginUser = async (req, res) => {
                 { expiresIn: '3d' }
             );
 
-            // Remove the old refresh token from the array if it exists
-            // and add the new one
-            const newRefreshTokenArray = !cookie?.jwt
-                ? foundUser.refreshToken
-                : foundUser.refreshToken.filter(rt => rt !== cookie.jwt);
+            const expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 3); // Set expiration to 3 days
 
-            if (cookie?.jwt) {
-                res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
-            }
+            const newRefreshToken = new RefreshToken({
+                userId: foundUser._id,
+                token: refreshToken,
+                createdAt: new Date(),
+                expiresAt: expirationDate
+            });
 
-            foundUser.refreshToken = [...newRefreshTokenArray, refreshToken];
-
-            await foundUser.save();
+            await newRefreshToken.save();
 
             // Set the refresh token in an HTTP-only cookie
             res.cookie('jwt', refreshToken, {
@@ -70,7 +68,10 @@ const loginUser = async (req, res) => {
                 maxAge: 24 * 60 * 60 * 1000 // 1 day
             });
 
-            res.status(200).json({ accessToken });
+            res.status(200).json({ 
+                message: 'Login successful',
+                accessToken: accessToken
+            });
         }
     } catch (err) {
         return res.sendStatus(500); // Internal Server Error

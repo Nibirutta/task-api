@@ -35,10 +35,6 @@ const userSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    refreshToken: {
-        type: [String],
-        default: []
-    },
     resetToken: {
         type: String,
         default: null,

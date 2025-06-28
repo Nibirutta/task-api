@@ -66,11 +66,6 @@ const registerNewUser = async (req, res) => {
                 code: 'USER_REGISTERED',
                 message: 'User registered successfully.'
             });
-        } else {
-            return res.status(400).json({
-                code: 'USER_REGISTRATION_FAILED',
-                message: 'Invalid user data.'
-            });
         }
     } catch (err) {
         if (err.name === 'ValidationError') {

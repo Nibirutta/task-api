@@ -32,7 +32,6 @@ const requestReset = async (req, res) => {
             });
         }
 
-        
         foundUser.refreshToken = []; // Logout the user from all devices by clearing the refresh token
 
         const resetToken = jwt.sign(
@@ -51,7 +50,7 @@ const requestReset = async (req, res) => {
             }
         });
 
-        const emailSent = await transporter.sendMail({
+        await transporter.sendMail({
             from: `"Task Manager" <${process.env.DEV_EMAIL}>`, // sender address
             to: foundUser.email, // list of receivers
             subject: 'Password Reset Request', // Subject line
@@ -61,13 +60,6 @@ const requestReset = async (req, res) => {
             text: `Please click the link below to reset your password:\n
                    ${process.env.FRONTEND_URL}=${resetToken}\n`
         });
-
-        if (!emailSent) {
-            return res.status(500).json({
-                code: 'EMAIL_SEND_ERROR',
-                message: 'Failed to send reset email.'
-            });
-        }
 
         foundUser.resetToken = resetToken; // Store the reset token in the user document
 
