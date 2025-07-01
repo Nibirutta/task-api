@@ -1,4 +1,3 @@
-const User = require('../model/User');
 const RefreshToken = require('../model/RefreshToken');
 
 const logoutUser = async (req, res) => {

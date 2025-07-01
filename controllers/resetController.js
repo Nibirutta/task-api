@@ -5,6 +5,7 @@ const nodemailer = require('nodemailer');
 
 const User = require('../model/User');
 const RefreshToken = require('../model/RefreshToken');
+const emailTemplate = require('../template/emailTemplate');
 
 const requestReset = async (req, res) => {
     const { email } = req.body;
@@ -35,11 +36,16 @@ const requestReset = async (req, res) => {
 
         await RefreshToken.deleteMany({ userId: foundUser._id }).exec(); // Clear any existing tokens
 
+
         const resetToken = jwt.sign(
             { "username": foundUser.username },
             process.env.RESET_TOKEN_SECRET,
             { expiresIn: '30m' } // Token valid for 30 minutes
         );
+
+        let html = emailTemplate
+            .replace(/{{USER}}/g, foundUser.username)
+            .replace(/{{RESET_TOKEN}}/g, resetToken);
 
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
@@ -55,9 +61,7 @@ const requestReset = async (req, res) => {
             from: `"Task Manager" <${process.env.DEV_EMAIL}>`, // sender address
             to: foundUser.email, // list of receivers
             subject: 'Password Reset Request', // Subject line
-            html: `Please click the link below to reset your password:<br>
-                   <a href="${process.env.FRONTEND_URL}=${resetToken}">Reset Password</a><br>
-                   This link will expire in 30 minutes.`,
+            html: html, // html body
             text: `Please click the link below to reset your password:\n
                    ${process.env.FRONTEND_URL}=${resetToken}\n`
         });

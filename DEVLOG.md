@@ -18,3 +18,4 @@
 - *Already started creating a route to allow users to reset their password if they forget it, deleted some unnecessary code from the tasks controller, and modified the user schema to add a field for the reset password tokens.*
 - *EXTRA DAY - After thinking a lot about the utility of refresh tokens and how to use them, I think I finally found the best way: using TTL to delete all invalid refresh tokens from the database. However, I needed to make several changes, starting by adding a schema for the refresh tokens and updating almost all the routes that use them.*
 - *EXTRA DAY - I think I finally finished the refresh token implementation. It was hard to get everything in the right place and make it work the way I wanted, but it's done (I think).*
+- *After a few bugs and discoveries, I created a simple and customizable email body to be sent when the user requests a password reset, with two fields that can be replaced with user's name and reset token.*
