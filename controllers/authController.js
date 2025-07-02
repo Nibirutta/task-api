@@ -72,6 +72,11 @@ const loginUser = async (req, res) => {
                 message: 'Login successful',
                 accessToken: accessToken
             });
+        } else {
+            return res.status(401).json({
+                code: 'INVALID_CREDENTIALS',
+                message: 'Username or password are invalid'
+            });
         }
     } catch (err) {
         return res.sendStatus(500); // Internal Server Error

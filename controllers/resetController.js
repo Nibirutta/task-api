@@ -24,39 +24,39 @@ const requestReset = async (req, res) => {
         });
     }
 
-    try {
-        const foundUser = await User.findOne({ email: email.toLowerCase() }).exec();
 
-        if (!foundUser) {
-            return res.status(404).json({
-                code: 'USER_NOT_FOUND',
-                message: 'No user found with this email.'
-            });
-        }
+    const foundUser = await User.findOne({ email: email.toLowerCase() }).exec();
 
-        await RefreshToken.deleteMany({ userId: foundUser._id }).exec(); // Clear any existing tokens
-
-
-        const resetToken = jwt.sign(
-            { "username": foundUser.username },
-            process.env.RESET_TOKEN_SECRET,
-            { expiresIn: '30m' } // Token valid for 30 minutes
-        );
-
-        let html = emailTemplate
-            .replace(/{{USER}}/g, foundUser.username)
-            .replace(/{{RESET_TOKEN}}/g, resetToken);
-
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // true for 465, false for other ports
-            auth: {
-                user: process.env.DEV_EMAIL, // Your email address
-                pass: process.env.DEV_PASSWORD // Your email password or app password
-            }
+    if (!foundUser) {
+        return res.status(404).json({
+            code: 'USER_NOT_FOUND',
+            message: 'No user found with this email.'
         });
+    }
 
+    await RefreshToken.deleteMany({ userId: foundUser._id }).exec(); // Clear any existing tokens
+
+    const resetToken = jwt.sign(
+        { "username": foundUser.username },
+        process.env.RESET_TOKEN_SECRET,
+        { expiresIn: '30m' } // Token valid for 30 minutes
+    );
+
+    let html = emailTemplate
+        .replace(/{{USER}}/g, foundUser.username)
+        .replace(/{{RESET_TOKEN}}/g, resetToken);
+
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, // true for 465, false for other ports
+        auth: {
+            user: process.env.DEV_EMAIL, // Your email address
+            pass: process.env.DEV_PASSWORD // Your email password or app password
+        }
+    });
+
+    try {
         await transporter.sendMail({
             from: `"Task Manager" <${process.env.DEV_EMAIL}>`, // sender address
             to: foundUser.email, // list of receivers
@@ -82,6 +82,60 @@ const requestReset = async (req, res) => {
     }
 }
 
+const resetPassword = async (req, res) => {
+    const { newPassword } = req.body;
+    const { resetToken } = req.params;
+
+    if (!newPassword || !resetToken) {
+        return res.status(400).json({
+            code: 'MISSING_FIELDS',
+            message: 'New password and reset token are required.'
+        });
+    }
+
+    if (newPassword.length < 8) {
+        return res.status(400).json({
+            code: 'INVALID_PASSWORD_LENGTH',
+            message: 'Password must be at least 8 characters long.'
+        });
+    }
+
+    jwt.verify(
+        resetToken,
+        process.env.RESET_TOKEN_SECRET,
+        async (err, decoded) => {
+            if (err) {
+                return res.status(403).json({
+                    code: 'INVALID_TOKEN',
+                    message: 'Invalid or expired reset token.'
+                });
+            }
+
+            const foundUser = await User.findOne({ username: decoded.username }).exec();
+
+            if (!foundUser) {
+                return res.status(404).json({
+                    code: 'USER_NOT_FOUND',
+                    message: 'No user found with this username.'
+                });
+            }
+
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+            foundUser.password = hashedPassword;
+            foundUser.resetToken = null;
+
+            await foundUser.save();
+
+            return res.status(200).json({
+                code: 'PASSWORD_RESET_SUCCESS',
+                message: 'Your password has been successfully reset.'
+            });
+        }
+    )
+}
+
 module.exports = {
-    requestReset
+    requestReset,
+    resetPassword
 };
