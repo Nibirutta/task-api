@@ -12,7 +12,7 @@ The API currently offers a few main routes, divided into two categories: user ac
 
 ---
 
-* **`/user/register`**
+* **`/user/register`** (POST)
     * **Description:** Allows for the registration of new users.
     * **Required Information (in the request body, JSON format):**
         * `firstname` (mandatory)
@@ -20,22 +20,40 @@ The API currently offers a few main routes, divided into two categories: user ac
         * `username` (mandatory)
         * `password` (mandatory)
         * `lastname` (optional)
+    * **Note:** This route cannot be accessed if the user is already logged in.
 
-* **`/user/login`**
+* **`/user/login`** (POST)
     * **Description:** Used for user login. Logging in is necessary to access the task routes.
     * **Required Information (in the request body, JSON format):**
-        * `username`
-        * `password`
+        * `username` (mandatory)
+        * `password` (mandatory)
+    * **Response:** Returns an access token upon successful login and sets a refresh token cookie.
+    * **Note:** This route cannot be accessed if the user is already logged in.
 
-* **`/user/refresh`**
-    * **Description:** Keeps the user logged in. Requires a token, which is generated after the initial login.
+* **`/user/refresh`** (GET)
+    * **Description:** Keeps the user logged in by generating a new access token using the refresh token.
+    * **Authentication:** Requires a valid refresh token stored in HTTP-only cookies.
+    * **Response:** Returns a new access token and updates the refresh token cookie.
 
-* **`/user/logout`**
+* **`/user/logout`** (GET)
     * **Description:** Allows the user to log out of the application, invalidating the session token.
+    * **Effect:** Clears the refresh token cookie and removes the token from the database.
 
-* **`/user/reset`**
-    * **Description:** Allows the user to request a password reset if they've forgotten it. A recovery email request will be generated and sent.
+* **`/user/reset/request`** (POST)
+    * **Description:** Allows the user to request a password reset if they've forgotten it.
+    * **Required Information (in the request body, JSON format):**
+        * `email` (mandatory)
+    * **Effect:** Sends a recovery email with a reset link to the provided email address.
+    * **Note:** This route cannot be accessed if the user is already logged in.
 
+* **`/user/reset/:resetToken`** (POST)
+    * **Description:** Resets the user's password using the token received via email.
+    * **Parameters:**
+        * `resetToken` - The token received in the reset email, must be a query parameter.
+    * **Required Information (in the request body, JSON format):**
+        * `newPassword` (mandatory)
+    * **Effect:** Updates the user's password and invalidates all existing refresh tokens.
+    
 ## Task Routes
 
 ---
