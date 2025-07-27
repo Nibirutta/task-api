@@ -1,123 +1,98 @@
-# **Nibirutta-Task Test API**
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+</p>
 
----
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-**Note:** This API is currently available **for test purposes only**.
+  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+    <p align="center">
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
+<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
+<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
+<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
+<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
+  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
+    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
+  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+</p>
+  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
+  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-To start using the API, simply access the following URL: `https://nibirutta-task-api.up.railway.app/`
+## Description
 
-The API currently offers a few main routes, divided into two categories: user access control and task management.
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## User Routes
+## Project setup
 
----
-
-* **`/user/register`** (POST)
-    * **Description:** Allows for the registration of new users.
-    * **Required Information (in the request body, JSON format):**
-        * `firstname` (mandatory)
-        * `email` (mandatory)
-        * `username` (mandatory)
-        * `password` (mandatory)
-        * `lastname` (optional)
-    * **Note:** This route cannot be accessed if the user is already logged in.
-
-* **`/user/login`** (POST)
-    * **Description:** Used for user login. Logging in is necessary to access the task routes.
-    * **Required Information (in the request body, JSON format):**
-        * `username` (mandatory)
-        * `password` (mandatory)
-    * **Response:** Returns an access token upon successful login and sets a refresh token cookie.
-    * **Note:** This route cannot be accessed if the user is already logged in.
-
-* **`/user/refresh`** (GET)
-    * **Description:** Keeps the user logged in by generating a new access token using the refresh token.
-    * **Authentication:** Requires a valid refresh token stored in HTTP-only cookies.
-    * **Response:** Returns a new access token and updates the refresh token cookie.
-
-* **`/user/logout`** (GET)
-    * **Description:** Allows the user to log out of the application, invalidating the session token.
-    * **Effect:** Clears the refresh token cookie and removes the token from the database.
-
-* **`/user/reset/request`** (POST)
-    * **Description:** Allows the user to request a password reset if they've forgotten it.
-    * **Required Information (in the request body, JSON format):**
-        * `email` (mandatory)
-    * **Effect:** Sends a recovery email with a reset link to the provided email address.
-    * **Note:** This route cannot be accessed if the user is already logged in.
-
-* **`/user/reset/:resetToken`** (POST)
-    * **Description:** Resets the user's password using the token received via email.
-    * **Parameters:**
-        * `resetToken` - The token received in the reset email, must be a query parameter.
-    * **Required Information (in the request body, JSON format):**
-        * `newPassword` (mandatory)
-    * **Effect:** Updates the user's password and invalidates all existing refresh tokens.
-    
-## Task Routes
-
----
-
-**Note:** All task routes require authentication. You must be logged in to access these endpoints.
-
-* **`/tasks`** (GET)
-    * **Description:** Retrieves all tasks belonging to the authenticated user.
-    * **Query Parameters (optional):**
-        * `title` - Filter tasks by title (case-insensitive search)
-        * `status` - Filter tasks by status
-        * `priority` - Filter tasks by priority level
-        * `from` - Filter tasks due from this date (YYYY-MM-DD format)
-        * `to` - Filter tasks due to this date (YYYY-MM-DD format)
-    * **Example:** `/tasks?status=pending&priority=high&from=2024-01-01&to=2024-12-31`
-
-* **`/tasks`** (POST)
-    * **Description:** Creates a new task for the authenticated user.
-    * **Required Information (in the request body, JSON format):**
-        * `title` (mandatory)
-        * `dueDate` (mandatory)
-        * `description` (optional)
-        * `status` (optional)
-        * `priority` (optional)
-
-* **`/tasks/:id`** (PUT)
-    * **Description:** Updates an existing task. Only the task owner can update their tasks.
-    * **Parameters:**
-        * `id` - The unique identifier of the task to update
-    * **Optional Information (in the request body, JSON format):**
-        * `title`
-        * `description`
-        * `status`
-        * `priority`
-        * `dueDate`
-
-* **`/tasks/:id`** (DELETE)
-    * **Description:** Deletes a specific task. Only the task owner can delete their tasks.
-    * **Parameters:**
-        * `id` - The unique identifier of the task to delete
-    * **Response:** Returns a success message upon successful deletion.
-
----
-
-## Authentication
-
-This API uses JWT (JSON Web Tokens) for authentication. After logging in, you'll receive an access token that must be included in the Authorization header for all task-related requests:
-
-```
-Authorization: Bearer <your-access-token>
+```bash
+$ npm install
 ```
 
-The API also uses refresh tokens stored in HTTP-only cookies to maintain user sessions securely.
+## Compile and run the project
 
----
+```bash
+# development
+$ npm run start
 
-## Error Handling
+# watch mode
+$ npm run start:dev
 
-The API returns appropriate HTTP status codes and error messages:
+# production mode
+$ npm run start:prod
+```
 
-* **400** - Bad Request (missing required fields, validation errors)
-* **401** - Unauthorized (not logged in or invalid token)
-* **403** - Forbidden (access denied)
-* **404** - Not Found (resource doesn't exist)
-* **500** - Internal Server Error
+## Run tests
 
-Error responses include a `code` and `message` field for easier handling on the frontend.
+```bash
+# unit tests
+$ npm run test
+
+# e2e tests
+$ npm run test:e2e
+
+# test coverage
+$ npm run test:cov
+```
+
+## Deployment
+
+When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+
+If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+
+```bash
+$ npm install -g @nestjs/mau
+$ mau deploy
+```
+
+With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+
+## Resources
+
+Check out a few resources that may come in handy when working with NestJS:
+
+- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
+- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
+- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
+- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
+- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
+- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
+- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
+- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+
+## Support
+
+Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+
+## Stay in touch
+
+- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
+- Website - [https://nestjs.com](https://nestjs.com/)
+- Twitter - [@nestframework](https://twitter.com/nestframework)
+
+## License
+
+Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
