@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { ENV_KEYS } from 'libs/common/src/constants/env-keys.constants';
+import { ENV_KEYS } from 'libs/common/src/constants/ENV_KEYS.constants';
 
 @Injectable()
 export class ConfigUsersService {
@@ -13,7 +13,9 @@ export class ConfigUsersService {
     );
 
     if (!usersPort) {
-      throw new Error(`${ENV_KEYS.USERS_CLIENT_PORT} is missing or invalid, please check the config module, .env file or the env_keys.`);
+      throw new Error(
+        `${ENV_KEYS.USERS_CLIENT_PORT} is missing or invalid, please check the config module, .env file or the env_keys.`,
+      );
     }
 
     return usersPort;

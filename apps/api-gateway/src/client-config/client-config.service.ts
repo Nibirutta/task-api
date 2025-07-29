@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientOptions, Transport } from '@nestjs/microservices';
 
-import { ENV_KEYS } from 'libs/common/src/constants/env-keys.constants';
+import { ENV_KEYS } from 'libs/common/src/constants/ENV_KEYS.constants';
 
 @Injectable()
 export class ClientConfigService {
@@ -12,7 +12,9 @@ export class ClientConfigService {
     const port = this.configService.get<number>(key);
 
     if (!port) {
-      throw new Error(`${key} is missing or invalid, please check the config module, .env file or the env_keys.`);
+      throw new Error(
+        `${key} is missing or invalid, please check the config module, .env file or the env_keys.`,
+      );
     }
 
     return port;
