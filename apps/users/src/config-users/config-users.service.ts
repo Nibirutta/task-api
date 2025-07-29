@@ -13,7 +13,7 @@ export class ConfigUsersService {
     );
 
     if (!usersPort) {
-      throw new Error(`${ENV_KEYS.USERS_CLIENT_PORT} is required`);
+      throw new Error(`${ENV_KEYS.USERS_CLIENT_PORT} is missing or invalid, please check the config module, .env file or the env_keys.`);
     }
 
     return usersPort;

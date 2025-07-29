@@ -12,7 +12,7 @@ export class ClientConfigService {
     const port = this.configService.get<number>(key);
 
     if (!port) {
-      throw new Error(`${key} is required`);
+      throw new Error(`${key} is missing or invalid, please check the config module, .env file or the env_keys.`);
     }
 
     return port;
