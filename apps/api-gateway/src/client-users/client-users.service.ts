@@ -11,6 +11,6 @@ export class ClientUsersService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap() {
     await this.usersClient.connect();
-    console.log('Connected successfully!');
+    console.log('Users microservice connected');
   }
 }

@@ -14,7 +14,7 @@ import { ClientConfigModule } from '../client-config/client-config.module';
     {
       provide: USERS_CLIENT,
       useFactory: (configService: ClientConfigService) => {
-        const clientOptions = configService.booksClientOptions;
+        const clientOptions = configService.usersClientOptions;
         return ClientProxyFactory.create(clientOptions);
       },
       inject: [ClientConfigService],

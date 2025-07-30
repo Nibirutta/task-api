@@ -20,11 +20,20 @@ export class ClientConfigService {
     return port;
   }
 
-  get booksClientOptions(): ClientOptions {
+  get usersClientOptions(): ClientOptions {
     return {
       transport: Transport.TCP,
       options: {
         port: this.getClientPort(ENV_KEYS.USERS_CLIENT_PORT),
+      },
+    };
+  }
+
+  get authClientOptions(): ClientOptions {
+    return {
+      transport: Transport.TCP,
+      options: {
+        port: this.getClientPort(ENV_KEYS.AUTH_CLIENT_PORT),
       },
     };
   }

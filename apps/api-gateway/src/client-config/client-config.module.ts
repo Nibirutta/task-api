@@ -10,6 +10,7 @@ import { ClientConfigService } from './client-config.service';
       isGlobal: false,
       validationSchema: joi.object({
         USERS_CLIENT_PORT: joi.number().default(3001),
+        AUTH_CLIENT_PORT: joi.number().default(3002),
       }),
     }),
   ],
