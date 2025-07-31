@@ -5,7 +5,7 @@ import { ClientConfigModule } from '../client-config/client-config.module';
 import { ClientConfigService } from '../client-config/client-config.service';
 import { ClientAuthService } from './client-auth.service';
 import { ClientAuthController } from './client-auth.controller';
-import { AUTH_CLIENT } from 'libs/common/src/constants/MS_PROVIDES.constants';
+import { AUTH_CLIENT } from '@app/common';
 
 @Module({
   imports: [ClientConfigModule],

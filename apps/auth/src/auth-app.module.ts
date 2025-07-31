@@ -4,7 +4,9 @@ import { Connection } from 'mongoose';
 
 import { ConfigAuthModule } from './config-auth/config-auth.module';
 import { ConfigAuthService } from './config-auth/config-auth.service';
-import { ENV_KEYS } from 'libs/common/src/constants/ENV_KEYS.constants';
+import { ENV_KEYS } from '@app/common';
+import { AuthCredentialsModule } from './auth-credentials/auth-credentials.module';
+import { AuthTokensModule } from './auth-tokens/auth-tokens.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { ENV_KEYS } from 'libs/common/src/constants/ENV_KEYS.constants';
       }),
       inject: [ConfigAuthService],
     }),
+    AuthCredentialsModule,
+    AuthTokensModule,
   ],
   controllers: [],
   providers: [],

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientOptions, Transport } from '@nestjs/microservices';
 
-import { ENV_KEYS } from 'libs/common/src/constants/ENV_KEYS.constants';
+import { ENV_KEYS } from '@app/common';
 
 @Injectable()
 export class ClientConfigService {

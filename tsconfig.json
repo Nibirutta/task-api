@@ -18,11 +18,11 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/commons": [
-        "libs/commons/src"
+      "@app/common": [
+        "libs/common/src"
       ],
-      "@app/commons/*": [
-        "libs/commons/src/*"
+      "@app/common/*": [
+        "libs/common/src/*"
       ]
     }
   }

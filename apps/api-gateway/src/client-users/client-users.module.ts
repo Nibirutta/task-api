@@ -4,7 +4,7 @@ import { ClientProxyFactory } from '@nestjs/microservices';
 import { ClientConfigService } from '../client-config/client-config.service';
 import { ClientUsersController } from './client-users.controller';
 import { ClientUsersService } from './client-users.service';
-import { USERS_CLIENT } from 'libs/common/src/constants/MS_PROVIDES.constants';
+import { USERS_CLIENT } from '@app/common';
 import { ClientConfigModule } from '../client-config/client-config.module';
 
 @Module({

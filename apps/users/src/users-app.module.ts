@@ -4,7 +4,7 @@ import { Connection } from 'mongoose';
 
 import { ConfigUsersModule } from './config-users/config-users.module';
 import { ConfigUsersService } from './config-users/config-users.service';
-import { ENV_KEYS } from 'libs/common/src/constants/ENV_KEYS.constants';
+import { ENV_KEYS } from '@app/common';
 
 @Module({
   imports: [

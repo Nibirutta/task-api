@@ -1,7 +1,7 @@
 import { Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
-import { AUTH_CLIENT } from 'libs/common/src/constants/MS_PROVIDES.constants';
+import { AUTH_CLIENT } from '@app/common';
 
 @Injectable()
 export class ClientAuthService implements OnApplicationBootstrap {

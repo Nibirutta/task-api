@@ -3,7 +3,7 @@ import { Transport, AsyncMicroserviceOptions } from '@nestjs/microservices';
 
 import { UsersAppModule } from './users-app.module';
 import { ConfigUsersService } from './config-users/config-users.service';
-import { ENV_KEYS } from 'libs/common/src/constants/ENV_KEYS.constants';
+import { ENV_KEYS } from '@app/common';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
