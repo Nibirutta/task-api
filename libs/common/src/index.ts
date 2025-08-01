@@ -9,3 +9,6 @@ export * from './dto/credential.dto';
 
 // Decorators
 export * from './decorators/is-object-id.decorator';
+
+// Patterns
+export * from './patterns/auth.patterns';

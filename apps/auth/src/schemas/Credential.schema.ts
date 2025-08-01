@@ -1,7 +1,17 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { CredentialDto } from '@app/common';
 
-@Schema()
+@Schema({
+  toObject: {
+    transform(doc, ret: any, options) {
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.__v;
+      return ret;
+    },
+  }
+})
 export class Credential {
   @Prop({
     unique: true,
@@ -25,7 +35,5 @@ export class Credential {
   })
   hashedPassword: string;
 }
-
-export type CredentialDocument = HydratedDocument<Credential>;
 
 export const CredentialSchema = SchemaFactory.createForClass(Credential);
