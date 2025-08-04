@@ -4,9 +4,8 @@ import { ClientProxy } from '@nestjs/microservices';
 import {
   AUTH_CLIENT,
   AUTH_PATTERNS,
-  CredentialDto,
-  CreateCredentialDto,
-  UpdateCredentialDto,
+  RegisterRequestDto,
+  UpdateRequestDto,
 } from '@app/common';
 
 @Injectable()
@@ -18,7 +17,11 @@ export class ClientAuthService implements OnApplicationBootstrap {
     console.log('Auth microservice connected');
   }
 
-  create(createCredentialDto: CreateCredentialDto) {
-    return this.authClient.send(AUTH_PATTERNS.CREATE, createCredentialDto);
+  create(registerRequestDto: RegisterRequestDto) {
+    return this.authClient.send(AUTH_PATTERNS.CREATE, registerRequestDto);
+  }
+
+  update(updateRequestDto: UpdateRequestDto) {
+    return this.authClient.send(AUTH_PATTERNS.UPDATE, updateRequestDto);
   }
 }

@@ -1,7 +1,5 @@
 import { PartialType, OmitType } from '@nestjs/mapped-types';
-
-import { CreateCredentialDto } from './create-credential.dto';
-import { IsObjectId } from '../decorators/is-object-id.decorator';
+import { IsObjectId, CreateCredentialDto } from '@app/common';
 
 export class UpdateCredentialDto extends PartialType(
   OmitType(CreateCredentialDto, ['username']),

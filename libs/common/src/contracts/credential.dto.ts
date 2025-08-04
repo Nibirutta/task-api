@@ -1,6 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
-
-import { IsObjectId } from '../decorators/is-object-id.decorator';
+import { IsObjectId } from '@app/common';
 
 export class CredentialDto {
   @IsNotEmpty()

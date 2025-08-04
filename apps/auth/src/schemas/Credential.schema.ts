@@ -1,6 +1,4 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-import { CredentialDto } from '@app/common';
 
 @Schema({
   toObject: {
@@ -10,7 +8,7 @@ import { CredentialDto } from '@app/common';
       delete ret.__v;
       return ret;
     },
-  }
+  },
 })
 export class Credential {
   @Prop({

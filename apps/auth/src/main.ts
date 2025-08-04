@@ -25,8 +25,8 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
     }),
-  )
-  
+  );
+
   await app.listen();
 }
 bootstrap();

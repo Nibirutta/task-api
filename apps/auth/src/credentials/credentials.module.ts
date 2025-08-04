@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { AuthCredentialsService } from './auth-credentials.service';
-import { AuthCredentialsController } from './auth-credentials.controller';
+import { CredentialsService } from './credentials.service';
+import { CredentialsController } from './credentials.controller';
 import { Credential, CredentialSchema } from '../schemas/Credential.schema';
 
 @Module({
@@ -14,7 +14,7 @@ import { Credential, CredentialSchema } from '../schemas/Credential.schema';
       },
     ]),
   ],
-  providers: [AuthCredentialsService],
-  controllers: [AuthCredentialsController],
+  providers: [CredentialsService],
+  controllers: [CredentialsController],
 })
 export class AuthCredentialsModule {}

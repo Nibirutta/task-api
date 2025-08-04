@@ -5,7 +5,7 @@ import { Connection } from 'mongoose';
 import { ConfigAuthModule } from './config-auth/config-auth.module';
 import { ConfigAuthService } from './config-auth/config-auth.service';
 import { ENV_KEYS } from '@app/common';
-import { AuthCredentialsModule } from './auth-credentials/auth-credentials.module';
+import { AuthCredentialsModule } from './credentials/credentials.module';
 import { AuthTokensModule } from './auth-tokens/auth-tokens.module';
 
 @Module({
