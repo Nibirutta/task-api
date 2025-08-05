@@ -1,6 +1,10 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { AUTH_PATTERNS, UpdateRequestDto, RegisterRequestDto } from '@app/common';
+import {
+  AUTH_PATTERNS,
+  UpdateRequestDto,
+  RegisterRequestDto,
+} from '@app/common';
 
 import { CredentialsService } from './credentials.service';
 

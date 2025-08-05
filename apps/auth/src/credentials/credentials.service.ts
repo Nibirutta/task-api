@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { RpcException } from '@nestjs/microservices';
@@ -33,7 +33,8 @@ export class CredentialsService {
       ],
     });
 
-    if (foundUser) throw new RpcException('User already exist');
+    if (foundUser)
+      throw new RpcException(new ConflictException('Usuário já existe'));
 
     const hashedPassword = await this.hash(registerRequestDto.password);
     const newCredentialData: CreateCredentialDto = {
@@ -63,7 +64,7 @@ export class CredentialsService {
 
     if (updatedCredential) return updatedCredential.toObject();
 
-    throw new RpcException('Invalid credentials');
+    throw new RpcException(new NotFoundException("Usuário não existe"));
   }
 
   async login() {}
