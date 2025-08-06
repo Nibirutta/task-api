@@ -4,6 +4,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import {
   AUTH_CLIENT,
   AUTH_PATTERNS,
+  LoginRequestDto,
   RegisterRequestDto,
   UpdateRequestDto,
 } from '@app/common';
@@ -23,5 +24,13 @@ export class ClientAuthService implements OnApplicationBootstrap {
 
   update(updateRequestDto: UpdateRequestDto) {
     return this.authClient.send(AUTH_PATTERNS.UPDATE, updateRequestDto);
+  }
+
+  login(loginRequestDto: LoginRequestDto) {
+    return this.authClient.send(AUTH_PATTERNS.LOGIN, loginRequestDto);
+  }
+
+  delete(id: string) {
+    return this.authClient.send(AUTH_PATTERNS.DELETE, id);
   }
 }

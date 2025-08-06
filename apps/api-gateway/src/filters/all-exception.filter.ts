@@ -1,4 +1,4 @@
-import { ArgumentsHost, Catch } from '@nestjs/common';
+import { ArgumentsHost, Catch, HttpException, HttpStatus } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 import { RpcException } from '@nestjs/microservices';
 import { Response } from 'express';
@@ -25,6 +25,12 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
       console.log(exception.getError());
       responseObject.statusCode = error.status;
       responseObject.response = error.response;
+    } else if (exception instanceof HttpException) {
+      responseObject.statusCode = exception.getStatus();
+      responseObject.response = exception.getResponse();
+    } else {
+      responseObject.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+      responseObject.response = 'Internal Server Error';
     }
 
     response.status(responseObject.statusCode).json(responseObject.response);

@@ -1,11 +1,11 @@
-import { IsUsernameOrEmail } from '@app/common';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, ValidateIf } from 'class-validator';
 
 export class LoginRequestDto {
-  @IsUsernameOrEmail()
+  @IsOptional()
   @IsString()
   username?: string;
 
+  @ValidateIf((obj) => obj.username === undefined)
   @IsString()
   @IsEmail()
   email?: string;

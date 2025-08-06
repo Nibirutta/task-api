@@ -1,9 +1,9 @@
 export const AUTH_PATTERNS = {
-  LOGIN: 'auth.login',
-  LOGOUT: 'auth.logout',
-  REFRESH: 'auth.refresh',
-  RESET: 'auth.reset',
-  CREATE: 'auth.create',
-  UPDATE: 'auth.update',
-  DELETE: 'auth.delete',
+  LOGIN: 'auth.login', // credential
+  LOGOUT: 'auth.logout', // token
+  REFRESH: 'auth.refresh', // token
+  RESET: 'auth.reset', // token
+  CREATE: 'auth.create', // credential
+  UPDATE: 'auth.update', // credential
+  DELETE: 'auth.delete', // credential
 };

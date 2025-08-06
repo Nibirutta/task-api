@@ -4,7 +4,6 @@ export * from './constants/MS_PROVIDES.constants';
 
 // Decorators
 export * from './decorators/is-object-id.decorator';
-export * from './decorators/is-username-or-email.decorator';
 
 // Patterns
 export * from './patterns/auth.patterns';
