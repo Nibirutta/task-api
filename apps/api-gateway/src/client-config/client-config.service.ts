@@ -8,7 +8,7 @@ import { ENV_KEYS } from '@app/common';
 export class ClientConfigService {
   constructor(private readonly configService: ConfigService) {}
 
-  getClientPort(key: string): number {
+  getMicroservicePort(key: string): number {
     const port = this.configService.get<number>(key);
 
     if (!port) {
@@ -24,7 +24,7 @@ export class ClientConfigService {
     return {
       transport: Transport.TCP,
       options: {
-        port: this.getClientPort(ENV_KEYS.USERS_CLIENT_PORT),
+        port: this.getMicroservicePort(ENV_KEYS.USERS_MICROSERVICE_PORT),
       },
     };
   }
@@ -33,7 +33,7 @@ export class ClientConfigService {
     return {
       transport: Transport.TCP,
       options: {
-        port: this.getClientPort(ENV_KEYS.AUTH_CLIENT_PORT),
+        port: this.getMicroservicePort(ENV_KEYS.AUTH_MICROSERVICE_PORT),
       },
     };
   }

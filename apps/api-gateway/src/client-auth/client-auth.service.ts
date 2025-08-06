@@ -1,6 +1,5 @@
 import { Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { lastValueFrom } from 'rxjs';
+import { ClientProxy } from '@nestjs/microservices';
 
 import {
   AUTH_CLIENT,
@@ -18,23 +17,11 @@ export class ClientAuthService implements OnApplicationBootstrap {
     console.log('Auth microservice connected');
   }
 
-  async create(registerRequestDto: RegisterRequestDto) {
-    try {
-      return await lastValueFrom(
-        this.authClient.send(AUTH_PATTERNS.CREATE, registerRequestDto),
-      );
-    } catch (error) {
-      throw new RpcException(error);
-    }
+  create(registerRequestDto: RegisterRequestDto) {
+    return this.authClient.send(AUTH_PATTERNS.CREATE, registerRequestDto);
   }
 
-  async update(updateRequestDto: UpdateRequestDto) {
-    try {
-      return await lastValueFrom(
-        this.authClient.send(AUTH_PATTERNS.UPDATE, updateRequestDto)  
-      );
-    } catch (error) {
-      throw new RpcException(error);
-    }
+  update(updateRequestDto: UpdateRequestDto) {
+    return this.authClient.send(AUTH_PATTERNS.UPDATE, updateRequestDto);
   }
 }

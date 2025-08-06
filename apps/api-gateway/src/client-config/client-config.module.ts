@@ -9,8 +9,8 @@ import { ClientConfigService } from './client-config.service';
     ConfigModule.forRoot({
       isGlobal: false,
       validationSchema: joi.object({
-        USERS_CLIENT_PORT: joi.number().default(3001),
-        AUTH_CLIENT_PORT: joi.number().default(3002),
+        USERS_MICROSERVICE_PORT: joi.number().default(3001),
+        AUTH_MICROSERVICE_PORT: joi.number().default(3002),
       }),
     }),
   ],

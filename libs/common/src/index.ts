@@ -18,3 +18,6 @@ export * from './contracts/login-request.dto';
 export * from './contracts/update-request.dto';
 
 // Interfaces
+
+// Pipes
+export * from './pipes/validation.pipe';

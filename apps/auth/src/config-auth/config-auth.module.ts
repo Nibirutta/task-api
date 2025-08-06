@@ -9,7 +9,7 @@ import { ConfigAuthService } from './config-auth.service';
     ConfigModule.forRoot({
       isGlobal: false,
       validationSchema: joi.object({
-        AUTH_CLIENT_PORT: joi.number().default(3002),
+        AUTH_MICROSERVICE_PORT: joi.number().default(3002),
         DATABASE_URL: joi.string(),
       }),
     }),

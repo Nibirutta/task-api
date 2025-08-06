@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { RpcException } from '@nestjs/microservices';
@@ -9,6 +13,7 @@ import {
   UpdateCredentialDto,
 } from '@app/common';
 import * as bcrypt from 'bcrypt';
+import { omit } from 'lodash';
 
 import { Credential } from '../schemas/Credential.schema';
 
@@ -19,7 +24,7 @@ export class CredentialsService {
     private readonly credentialModel: Model<Credential>,
   ) {}
 
-  private async hash(password: string): Promise<string> {
+  private async hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, 10);
   }
 
@@ -34,11 +39,11 @@ export class CredentialsService {
     });
 
     if (foundUser)
-      throw new RpcException(new ConflictException('Usuário já existe'));
+      throw new RpcException(new ConflictException('User already exists'));
 
-    const hashedPassword = await this.hash(registerRequestDto.password);
+    const hashedPassword = await this.hashPassword(registerRequestDto.password);
     const newCredentialData: CreateCredentialDto = {
-      ...registerRequestDto,
+      ...omit(registerRequestDto, ['password']),
       hashedPassword,
     };
 
@@ -54,7 +59,7 @@ export class CredentialsService {
     };
 
     if (updateRequestDto.password) {
-      updateData.hashedPassword = await this.hash(updateRequestDto.password);
+      updateData.hashedPassword = await this.hashPassword(updateRequestDto.password);
     }
 
     const updatedCredential = await this.credentialModel.findByIdAndUpdate(
@@ -64,7 +69,7 @@ export class CredentialsService {
 
     if (updatedCredential) return updatedCredential.toObject();
 
-    throw new RpcException(new NotFoundException("Usuário não existe"));
+    throw new RpcException(new NotFoundException('Usuário não existe'));
   }
 
   async login() {}

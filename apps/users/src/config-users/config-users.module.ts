@@ -9,7 +9,7 @@ import { ConfigUsersService } from './config-users.service';
     ConfigModule.forRoot({
       isGlobal: false,
       validationSchema: joi.object({
-        USERS_CLIENT_PORT: joi.number().default(3001),
+        USERS_MICROSERVICE_PORT: joi.number().default(3001),
         DATABASE_URL: joi.string(),
       }),
     }),

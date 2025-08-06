@@ -8,18 +8,6 @@ type ResponseObject = {
   response: string | object;
 };
 
-type CustomErrorResponse = {
-  response: {
-    message: string;
-    error: string;
-    statusCode: number;
-  };
-  status: number;
-  options: {};
-  message: string;
-  name: string;
-};
-
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
@@ -33,12 +21,11 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
     };
 
     if (exception instanceof RpcException) {
-      const rpcException = exception.getError() as CustomErrorResponse;
-      responseObject.statusCode = rpcException.status;
-      responseObject.response = rpcException.response;
+      const error: any = exception.getError();
+      console.log(exception.getError());
+      responseObject.statusCode = error.status;
+      responseObject.response = error.response;
     }
-
-    console.log(exception);
 
     response.status(responseObject.statusCode).json(responseObject.response);
 
