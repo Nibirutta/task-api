@@ -5,8 +5,8 @@ import { Connection } from 'mongoose';
 import { ConfigAuthModule } from './config-auth/config-auth.module';
 import { ConfigAuthService } from './config-auth/config-auth.service';
 import { ENV_KEYS } from '@app/common';
-import { AuthCredentialsModule } from './credentials/credentials.module';
-import { AuthTokensModule } from './auth-tokens/auth-tokens.module';
+import { CredentialsModule } from './credentials/credentials.module';
+import { TokensModule } from './tokens/tokens.module';
 
 @Module({
   imports: [
@@ -23,8 +23,8 @@ import { AuthTokensModule } from './auth-tokens/auth-tokens.module';
       }),
       inject: [ConfigAuthService],
     }),
-    AuthCredentialsModule,
-    AuthTokensModule,
+    CredentialsModule,
+    TokensModule
   ],
   controllers: [],
   providers: [],

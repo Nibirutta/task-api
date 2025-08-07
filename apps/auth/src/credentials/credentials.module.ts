@@ -17,4 +17,4 @@ import { Credential, CredentialSchema } from '../schemas/Credential.schema';
   providers: [CredentialsService],
   controllers: [CredentialsController],
 })
-export class AuthCredentialsModule {}
+export class CredentialsModule {}
