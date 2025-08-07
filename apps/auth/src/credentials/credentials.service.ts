@@ -15,7 +15,7 @@ import {
   LoginRequestDto,
 } from '@app/common';
 import * as bcrypt from 'bcrypt';
-import { omit } from 'lodash';
+import { omit, pick } from 'lodash';
 
 import { Credential } from '../schemas/Credential.schema';
 
@@ -41,7 +41,7 @@ export class CredentialsService {
     });
 
     if (foundUser)
-      throw new RpcException(new ConflictException('User already exists'));
+      throw new RpcException(new ConflictException('Username or email is already used'));
 
     const hashedPassword = await this.hashPassword(registerRequestDto.password);
     const newCredentialData: CreateCredentialDto = {
@@ -52,25 +52,28 @@ export class CredentialsService {
     const newCredential = new this.credentialModel(newCredentialData);
     await newCredential.save();
 
-    return newCredential.toObject();
+    return pick(newCredential.toObject(), ['id']);
   }
 
   // Tokens logic it'll be implemented here, but until there i'll keep this simple login function
-  async updateCredential(updateRequestDto: UpdateRequestDto) {
+  async updateCredential(id: string, updateRequestDto: UpdateRequestDto) {
     const updateData: UpdateCredentialDto = {
       ...updateRequestDto,
+      id,
     };
 
     if (updateRequestDto.password) {
-      updateData.hashedPassword = await this.hashPassword(updateRequestDto.password);
+      updateData.hashedPassword = await this.hashPassword(
+        updateRequestDto.password,
+      );
     }
 
-    const updatedCredential = await this.credentialModel.findByIdAndUpdate(
-      updateData.id,
-      updateData,
-    ).exec();
+    const updatedCredential = await this.credentialModel
+      .findByIdAndUpdate(updateData.id, updateData)
+      .exec();
 
-    if (!updatedCredential) throw new RpcException(new NotFoundException('User not found'));
+    if (!updatedCredential)
+      throw new RpcException(new NotFoundException('User not found'));
 
     return updatedCredential.toObject();
   }
@@ -82,25 +85,31 @@ export class CredentialsService {
           email: loginRequestDto.email,
         },
         {
-          username: loginRequestDto.username
+          username: loginRequestDto.username,
         },
       ],
     });
 
-    if (!foundUser) throw new RpcException(new NotFoundException('User not found'));
+    if (!foundUser)
+      throw new RpcException(new NotFoundException('User not found'));
 
-    const isValidPassword = await bcrypt.compare(loginRequestDto.password, foundUser.hashedPassword);
+    const isValidPassword = await bcrypt.compare(
+      loginRequestDto.password,
+      foundUser.hashedPassword,
+    );
 
-    if (!isValidPassword) throw new RpcException(new UnauthorizedException('Invalid credentials'));
+    if (!isValidPassword)
+      throw new RpcException(new UnauthorizedException('Invalid credentials'));
 
-    return { 'login': 'successful' };
+    return { login: 'successful' };
   }
 
   // Tokens logic it'll be implemented here, but until there i'll keep this simple delete function
   async delete(id: string) {
-    const foundUser = await this.credentialModel.findOneAndDelete({ _id: id })
+    const foundUser = await this.credentialModel.findByIdAndDelete({ id });
 
-    if (!foundUser) throw new RpcException(new NotFoundException('User not found'));
+    if (!foundUser)
+      throw new RpcException(new NotFoundException('User not found'));
 
     return foundUser;
   }

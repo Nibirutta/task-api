@@ -7,6 +7,7 @@ export * from './decorators/is-object-id.decorator';
 
 // Patterns
 export * from './patterns/auth.patterns';
+export * from './patterns/user.patterns';
 
 // DTOs
 export * from './contracts/register-request.dto';

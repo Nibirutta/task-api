@@ -8,6 +8,7 @@ import {
 } from '@app/common';
 
 import { CredentialsService } from './credentials.service';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
 
 @Controller()
 export class CredentialsController {
@@ -19,17 +20,20 @@ export class CredentialsController {
   }
 
   @MessagePattern(AUTH_PATTERNS.UPDATE)
-  update(@Payload() updateRequestDto: UpdateRequestDto) {
-    return this.authService.updateCredential(updateRequestDto);
+  update(
+    @Payload('id', ParseObjectIdPipe) id: string,
+    @Payload('updateRequestDto') updateRequestDto: UpdateRequestDto,
+  ) {
+    return this.authService.updateCredential(id, updateRequestDto);
+  }
+
+  @MessagePattern(AUTH_PATTERNS.DELETE)
+  delete(@Payload('id', ParseObjectIdPipe) id: string) {
+    return this.authService.delete(id);
   }
 
   @MessagePattern(AUTH_PATTERNS.LOGIN)
   login(@Payload() loginRequestDto: LoginRequestDto) {
     return this.authService.login(loginRequestDto);
-  }
-
-  @MessagePattern(AUTH_PATTERNS.DELETE)
-  delete(@Payload() id: string) {
-    return this.authService.delete(id);
   }
 }

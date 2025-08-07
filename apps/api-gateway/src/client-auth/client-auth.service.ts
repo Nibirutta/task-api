@@ -1,5 +1,5 @@
 import { Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 
 import {
   AUTH_CLIENT,
@@ -8,6 +8,7 @@ import {
   RegisterRequestDto,
   UpdateRequestDto,
 } from '@app/common';
+import { lastValueFrom, Observable } from 'rxjs';
 
 @Injectable()
 export class ClientAuthService implements OnApplicationBootstrap {
@@ -18,19 +19,35 @@ export class ClientAuthService implements OnApplicationBootstrap {
     console.log('Auth microservice connected');
   }
 
+  async handleMicroserviceCall<T>(observable: Observable<T>): Promise<T> {
+    try {
+      return await lastValueFrom(observable);
+    } catch (error) {
+      throw new RpcException(error);
+    }
+  }
+
   create(registerRequestDto: RegisterRequestDto) {
-    return this.authClient.send(AUTH_PATTERNS.CREATE, registerRequestDto);
+    return this.handleMicroserviceCall(
+      this.authClient.send(AUTH_PATTERNS.CREATE, registerRequestDto),
+    );
   }
 
-  update(updateRequestDto: UpdateRequestDto) {
-    return this.authClient.send(AUTH_PATTERNS.UPDATE, updateRequestDto);
-  }
-
-  login(loginRequestDto: LoginRequestDto) {
-    return this.authClient.send(AUTH_PATTERNS.LOGIN, loginRequestDto);
+  update(id: string, updateRequestDto: UpdateRequestDto) {
+    return this.handleMicroserviceCall(
+      this.authClient.send(AUTH_PATTERNS.UPDATE, { id, updateRequestDto }),
+    );
   }
 
   delete(id: string) {
-    return this.authClient.send(AUTH_PATTERNS.DELETE, id);
+    return this.handleMicroserviceCall(
+      this.authClient.send(AUTH_PATTERNS.DELETE, id),
+    );
+  }
+
+  login(loginRequestDto: LoginRequestDto) {
+    return this.handleMicroserviceCall(
+      this.authClient.send(AUTH_PATTERNS.LOGIN, loginRequestDto),
+    );
   }
 }

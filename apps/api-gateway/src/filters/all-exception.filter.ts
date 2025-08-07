@@ -1,4 +1,9 @@
-import { ArgumentsHost, Catch, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 import { RpcException } from '@nestjs/microservices';
 import { Response } from 'express';
@@ -22,7 +27,6 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
 
     if (exception instanceof RpcException) {
       const error: any = exception.getError();
-      console.log(exception.getError());
       responseObject.statusCode = error.status;
       responseObject.response = error.response;
     } else if (exception instanceof HttpException) {
@@ -33,8 +37,10 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
       responseObject.response = 'Internal Server Error';
     }
 
-    response.status(responseObject.statusCode).json(responseObject.response);
+    if (responseObject.statusCode >= 500) {
+      super.catch(exception, host); // Perhaps I will build my own log
+    }
 
-    super.catch(exception, host);
+    response.status(responseObject.statusCode).json(responseObject.response);
   }
 }
