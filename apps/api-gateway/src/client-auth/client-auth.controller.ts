@@ -5,7 +5,6 @@ import {
   UpdateRequestDto,
 } from '@app/common';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
-
 import { ClientAuthService } from './client-auth.service';
 
 @Controller('auth')

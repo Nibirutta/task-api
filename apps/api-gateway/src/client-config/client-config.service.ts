@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientOptions, Transport } from '@nestjs/microservices';
-
 import { ENV_KEYS } from '@app/common';
 
 @Injectable()

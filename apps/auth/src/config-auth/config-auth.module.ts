@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as joi from 'joi';
-
 import { ConfigAuthService } from './config-auth.service';
 
 @Module({

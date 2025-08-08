@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
-
 import { ClientConfigModule } from '../client-config/client-config.module';
 import { ClientConfigService } from '../client-config/client-config.service';
 import { ClientAuthService } from './client-auth.service';

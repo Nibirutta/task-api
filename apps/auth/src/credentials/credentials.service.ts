@@ -16,7 +16,6 @@ import {
 } from '@app/common';
 import * as bcrypt from 'bcrypt';
 import { omit, pick } from 'lodash';
-
 import { Credential } from '../schemas/Credential.schema';
 
 @Injectable()
@@ -41,7 +40,9 @@ export class CredentialsService {
     });
 
     if (foundUser)
-      throw new RpcException(new ConflictException('Username or email is already used'));
+      throw new RpcException(
+        new ConflictException('Username or email is already used'),
+      );
 
     const hashedPassword = await this.hashPassword(registerRequestDto.password);
     const newCredentialData: CreateCredentialDto = {

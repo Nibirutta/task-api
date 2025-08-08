@@ -1,6 +1,5 @@
 import { Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-
 import {
   AUTH_CLIENT,
   AUTH_PATTERNS,
@@ -8,7 +7,7 @@ import {
   RegisterRequestDto,
   UpdateRequestDto,
 } from '@app/common';
-import { lastValueFrom, Observable } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class ClientAuthService implements OnApplicationBootstrap {
@@ -19,35 +18,41 @@ export class ClientAuthService implements OnApplicationBootstrap {
     console.log('Auth microservice connected');
   }
 
-  async handleMicroserviceCall<T>(observable: Observable<T>): Promise<T> {
+  create(registerRequestDto: RegisterRequestDto) {
     try {
-      return await lastValueFrom(observable);
+      return lastValueFrom(
+        this.authClient.send(AUTH_PATTERNS.CREATE, registerRequestDto),
+      );
     } catch (error) {
       throw new RpcException(error);
     }
   }
 
-  create(registerRequestDto: RegisterRequestDto) {
-    return this.handleMicroserviceCall(
-      this.authClient.send(AUTH_PATTERNS.CREATE, registerRequestDto),
-    );
-  }
-
   update(id: string, updateRequestDto: UpdateRequestDto) {
-    return this.handleMicroserviceCall(
-      this.authClient.send(AUTH_PATTERNS.UPDATE, { id, updateRequestDto }),
-    );
+    try {
+      return lastValueFrom(
+        this.authClient.send(AUTH_PATTERNS.UPDATE, { id, updateRequestDto }),
+      );
+    } catch (error) {
+      throw new RpcException(error);
+    }
   }
 
   delete(id: string) {
-    return this.handleMicroserviceCall(
-      this.authClient.send(AUTH_PATTERNS.DELETE, id),
-    );
+    try {
+      return lastValueFrom(this.authClient.send(AUTH_PATTERNS.DELETE, id));
+    } catch (error) {
+      throw new RpcException(error);
+    }
   }
 
   login(loginRequestDto: LoginRequestDto) {
-    return this.handleMicroserviceCall(
-      this.authClient.send(AUTH_PATTERNS.LOGIN, loginRequestDto),
-    );
+    try {
+      return lastValueFrom(
+        this.authClient.send(AUTH_PATTERNS.LOGIN, loginRequestDto),
+      );
+    } catch (error) {
+      throw new RpcException(error);
+    }
   }
 }

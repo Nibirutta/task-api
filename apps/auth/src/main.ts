@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { Transport, AsyncMicroserviceOptions } from '@nestjs/microservices';
 import { ENV_KEYS, ValidationPipe } from '@app/common';
-
 import { AuthAppModule } from './auth-app.module';
 import { ConfigAuthService } from './config-auth/config-auth.service';
 

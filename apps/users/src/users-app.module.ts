@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
-
 import { ConfigUsersModule } from './config-users/config-users.module';
 import { ConfigUsersService } from './config-users/config-users.service';
 import { ENV_KEYS } from '@app/common';
