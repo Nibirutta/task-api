@@ -1,8 +1,8 @@
 import { Controller, Post, Body, Patch, Delete, Param } from '@nestjs/common';
 import {
   LoginRequestDto,
-  RegisterRequestDto,
-  UpdateRequestDto,
+  CreateCredentialDto,
+  UpdateCredentialDto,
 } from '@app/common';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { ClientAuthService } from './client-auth.service';
@@ -12,8 +12,8 @@ export class ClientAuthController {
   constructor(private readonly authClient: ClientAuthService) {}
 
   @Post('register')
-  create(@Body() registerRequestDto: RegisterRequestDto) {
-    return this.authClient.create(registerRequestDto);
+  create(@Body() createCredentialDto: CreateCredentialDto) {
+    return this.authClient.create(createCredentialDto);
   }
 
   @Post('login')
@@ -24,9 +24,9 @@ export class ClientAuthController {
   @Patch(':id')
   update(
     @Param('id', ParseObjectIdPipe) id: string,
-    @Body() updateRequestDto: UpdateRequestDto,
+    @Body() updateCredentialDto: UpdateCredentialDto,
   ) {
-    return this.authClient.update(id, updateRequestDto);
+    return this.authClient.update(id, updateCredentialDto);
   }
 
   @Delete(':id')

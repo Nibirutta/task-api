@@ -10,14 +10,9 @@ export * from './patterns/auth.patterns';
 export * from './patterns/user.patterns';
 
 // DTOs
-export * from './contracts/register-request.dto';
-export * from './contracts/credential.dto';
 export * from './contracts/create-credential.dto';
-export * from './contracts/update-credential.dto';
 export * from './contracts/login-request.dto';
-export * from './contracts/update-request.dto';
-
-// Interfaces
+export * from './contracts/update-credential.dto';
 
 // Pipes
 export * from './pipes/validation.pipe';

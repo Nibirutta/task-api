@@ -1,4 +1,10 @@
-import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import {
+  IsStrongPassword,
+  IsString,
+  Length,
+  IsEmail,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class CreateCredentialDto {
   @IsNotEmpty()
@@ -11,5 +17,7 @@ export class CreateCredentialDto {
   email: string;
 
   @IsNotEmpty()
-  hashedPassword: string;
+  @IsString()
+  @IsStrongPassword()
+  password: string;
 }

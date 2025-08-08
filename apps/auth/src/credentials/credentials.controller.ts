@@ -2,8 +2,8 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
   AUTH_PATTERNS,
-  UpdateRequestDto,
-  RegisterRequestDto,
+  UpdateCredentialDto,
+  CreateCredentialDto,
   LoginRequestDto,
 } from '@app/common';
 import { CredentialsService } from './credentials.service';
@@ -14,16 +14,16 @@ export class CredentialsController {
   constructor(private readonly authService: CredentialsService) {}
 
   @MessagePattern(AUTH_PATTERNS.CREATE)
-  create(@Payload() registerRequestDto: RegisterRequestDto) {
-    return this.authService.createCredential(registerRequestDto);
+  create(@Payload() createCredentialDto: CreateCredentialDto) {
+    return this.authService.createCredential(createCredentialDto);
   }
 
   @MessagePattern(AUTH_PATTERNS.UPDATE)
   update(
     @Payload('id', ParseObjectIdPipe) id: string,
-    @Payload('updateRequestDto') updateRequestDto: UpdateRequestDto,
+    @Payload('updateRequestDto') updateCredentialDto: UpdateCredentialDto,
   ) {
-    return this.authService.updateCredential(id, updateRequestDto);
+    return this.authService.updateCredential(id, updateCredentialDto);
   }
 
   @MessagePattern(AUTH_PATTERNS.DELETE)

@@ -8,10 +8,8 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { RpcException } from '@nestjs/microservices';
 import {
-  CreateCredentialDto,
-  UpdateRequestDto,
-  RegisterRequestDto,
   UpdateCredentialDto,
+  CreateCredentialDto,
   LoginRequestDto,
 } from '@app/common';
 import * as bcrypt from 'bcrypt';
@@ -29,13 +27,13 @@ export class CredentialsService {
     return bcrypt.hash(password, 10);
   }
 
-  async createCredential(registerRequestDto: RegisterRequestDto) {
+  async createCredential(createCredentialDto: CreateCredentialDto) {
     const foundUser = await this.credentialModel.findOne({
       $or: [
         {
-          username: registerRequestDto.username,
+          username: createCredentialDto.username,
         },
-        { email: registerRequestDto.email },
+        { email: createCredentialDto.email },
       ],
     });
 
@@ -44,10 +42,9 @@ export class CredentialsService {
         new ConflictException('Username or email is already used'),
       );
 
-    const hashedPassword = await this.hashPassword(registerRequestDto.password);
-    const newCredentialData: CreateCredentialDto = {
-      ...omit(registerRequestDto, ['password']),
-      hashedPassword,
+    const newCredentialData = {
+      ...omit(createCredentialDto, ['password']),
+      hashedPassword: await this.hashPassword(createCredentialDto.password),
     };
 
     const newCredential = new this.credentialModel(newCredentialData);
@@ -56,27 +53,27 @@ export class CredentialsService {
     return pick(newCredential.toObject(), ['id']);
   }
 
-  // Tokens logic it'll be implemented here, but until there i'll keep this simple login function
-  async updateCredential(id: string, updateRequestDto: UpdateRequestDto) {
-    const updateData: UpdateCredentialDto = {
-      ...updateRequestDto,
-      id,
+  async updateCredential(id: string, updateCredentialDto: UpdateCredentialDto) {
+    const updateData = {
+      ...omit(updateCredentialDto, ['password']),
+      ...(updateCredentialDto.password && {
+        hashedPassword: await this.hashPassword(updateCredentialDto.password),
+      }),
     };
 
-    if (updateRequestDto.password) {
-      updateData.hashedPassword = await this.hashPassword(
-        updateRequestDto.password,
-      );
-    }
+    const updatedUser = await this.credentialModel.findByIdAndUpdate(
+      id,
+      updateData,
+      {
+        runValidators: true,
+        new: true,
+      }
+    );
 
-    const updatedCredential = await this.credentialModel
-      .findByIdAndUpdate(updateData.id, updateData)
-      .exec();
-
-    if (!updatedCredential)
+    if (!updatedUser)
       throw new RpcException(new NotFoundException('User not found'));
 
-    return updatedCredential.toObject();
+    return updatedUser.toObject();
   }
 
   async login(loginRequestDto: LoginRequestDto) {
@@ -105,7 +102,6 @@ export class CredentialsService {
     return { login: 'successful' };
   }
 
-  // Tokens logic it'll be implemented here, but until there i'll keep this simple delete function
   async delete(id: string) {
     const foundUser = await this.credentialModel.findByIdAndDelete({ id });
 

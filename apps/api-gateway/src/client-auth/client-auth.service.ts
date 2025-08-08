@@ -4,8 +4,8 @@ import {
   AUTH_CLIENT,
   AUTH_PATTERNS,
   LoginRequestDto,
-  RegisterRequestDto,
-  UpdateRequestDto,
+  CreateCredentialDto,
+  UpdateCredentialDto,
 } from '@app/common';
 import { lastValueFrom } from 'rxjs';
 
@@ -18,20 +18,23 @@ export class ClientAuthService implements OnApplicationBootstrap {
     console.log('Auth microservice connected');
   }
 
-  create(registerRequestDto: RegisterRequestDto) {
+  create(createCredentialDto: CreateCredentialDto) {
     try {
       return lastValueFrom(
-        this.authClient.send(AUTH_PATTERNS.CREATE, registerRequestDto),
+        this.authClient.send(AUTH_PATTERNS.CREATE, createCredentialDto),
       );
     } catch (error) {
       throw new RpcException(error);
     }
   }
 
-  update(id: string, updateRequestDto: UpdateRequestDto) {
+  update(id: string, updateCredentialDto: UpdateCredentialDto) {
     try {
       return lastValueFrom(
-        this.authClient.send(AUTH_PATTERNS.UPDATE, { id, updateRequestDto }),
+        this.authClient.send(AUTH_PATTERNS.UPDATE, {
+          id,
+          updateRequestDto: updateCredentialDto,
+        }),
       );
     } catch (error) {
       throw new RpcException(error);
