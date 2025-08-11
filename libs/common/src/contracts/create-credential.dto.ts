@@ -1,23 +1,6 @@
-import {
-  IsStrongPassword,
-  IsString,
-  Length,
-  IsEmail,
-  IsNotEmpty,
-} from 'class-validator';
+import { PickType } from "@nestjs/mapped-types";
+import { CreateUserDto } from "./create-user.dto";
 
-export class CreateCredentialDto {
-  @IsNotEmpty()
-  @IsString()
-  @Length(3, 20)
-  username: string;
+export class CreateCredentialDto extends PickType(CreateUserDto, ['username', 'email', 'password']) {
 
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @IsStrongPassword()
-  password: string;
 }
