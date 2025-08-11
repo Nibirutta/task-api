@@ -18,9 +18,9 @@ export class ClientAuthService implements OnApplicationBootstrap {
     console.log('Auth microservice connected');
   }
 
-  create(createCredentialDto: CreateCredentialDto) {
+  async create(createCredentialDto: CreateCredentialDto) {
     try {
-      return lastValueFrom(
+      return await lastValueFrom(
         this.authClient.send(AUTH_PATTERNS.CREATE, createCredentialDto),
       );
     } catch (error) {
@@ -28,9 +28,9 @@ export class ClientAuthService implements OnApplicationBootstrap {
     }
   }
 
-  update(id: string, updateCredentialDto: UpdateCredentialDto) {
+  async update(id: string, updateCredentialDto: UpdateCredentialDto) {
     try {
-      return lastValueFrom(
+      return await lastValueFrom(
         this.authClient.send(AUTH_PATTERNS.UPDATE, {
           id,
           updateRequestDto: updateCredentialDto,
@@ -41,17 +41,19 @@ export class ClientAuthService implements OnApplicationBootstrap {
     }
   }
 
-  delete(id: string) {
+  async delete(id: string) {
     try {
-      return lastValueFrom(this.authClient.send(AUTH_PATTERNS.DELETE, id));
+      return await lastValueFrom(
+        this.authClient.send(AUTH_PATTERNS.DELETE, id),
+      );
     } catch (error) {
       throw new RpcException(error);
     }
   }
 
-  login(loginRequestDto: LoginRequestDto) {
+  async login(loginRequestDto: LoginRequestDto) {
     try {
-      return lastValueFrom(
+      return await lastValueFrom(
         this.authClient.send(AUTH_PATTERNS.LOGIN, loginRequestDto),
       );
     } catch (error) {

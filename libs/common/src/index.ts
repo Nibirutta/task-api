@@ -16,3 +16,6 @@ export * from './contracts/update-credential.dto';
 
 // Pipes
 export * from './pipes/validation.pipe';
+
+// Filters
+export * from './filters/rpc-exception.filter';

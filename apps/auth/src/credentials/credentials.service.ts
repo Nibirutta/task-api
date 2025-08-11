@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { RpcException } from '@nestjs/microservices';
 import {
   UpdateCredentialDto,
   CreateCredentialDto,
@@ -38,9 +37,7 @@ export class CredentialsService {
     });
 
     if (foundUser)
-      throw new RpcException(
-        new ConflictException('Username or email is already used'),
-      );
+      throw new ConflictException('Username or email is already used');
 
     const newCredentialData = {
       ...omit(createCredentialDto, ['password']),
@@ -67,11 +64,10 @@ export class CredentialsService {
       {
         runValidators: true,
         new: true,
-      }
+      },
     );
 
-    if (!updatedUser)
-      throw new RpcException(new NotFoundException('User not found'));
+    if (!updatedUser) throw new NotFoundException('User not found');
 
     return updatedUser.toObject();
   }
@@ -88,8 +84,7 @@ export class CredentialsService {
       ],
     });
 
-    if (!foundUser)
-      throw new RpcException(new NotFoundException('User not found'));
+    if (!foundUser) throw new NotFoundException('User not found');
 
     const isValidPassword = await bcrypt.compare(
       loginRequestDto.password,
@@ -97,7 +92,7 @@ export class CredentialsService {
     );
 
     if (!isValidPassword)
-      throw new RpcException(new UnauthorizedException('Invalid credentials'));
+      throw new UnauthorizedException('Invalid credentials');
 
     return { login: 'successful' };
   }
@@ -105,8 +100,7 @@ export class CredentialsService {
   async delete(id: string) {
     const foundUser = await this.credentialModel.findByIdAndDelete({ id });
 
-    if (!foundUser)
-      throw new RpcException(new NotFoundException('User not found'));
+    if (!foundUser) throw new NotFoundException('User not found');
 
     return foundUser;
   }
