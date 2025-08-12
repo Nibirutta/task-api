@@ -22,6 +22,7 @@ export class Token {
   type: TokenType;
 
   @Prop({
+    required: true,
     type: mongoose.Types.ObjectId,
     ref: Credential.name,
   })
