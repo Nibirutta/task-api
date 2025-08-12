@@ -35,7 +35,7 @@ export class ClientAuthService implements OnApplicationBootstrap {
             return await lastValueFrom(
                 this.authClient.send(AUTH_PATTERNS.UPDATE, {
                     id,
-                    updateRequestDto: updateCredentialDto,
+                    updateCredentialDto: updateCredentialDto,
                 }),
             );
         } catch (error) {

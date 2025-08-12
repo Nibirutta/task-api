@@ -4,11 +4,11 @@ import { ClientOptions, Transport } from '@nestjs/microservices';
 import { ENV_KEYS } from '@app/common';
 
 @Injectable()
-export class ClientConfigService {
+export class AppConfigService {
     constructor(private readonly configService: ConfigService) {}
 
-    getMicroservicePort(key: string): number {
-        const port = this.configService.get<number>(key);
+    getData(key: string) {
+        const port = this.configService.get(key);
 
         if (!port) {
             throw new Error(
@@ -23,9 +23,7 @@ export class ClientConfigService {
         return {
             transport: Transport.TCP,
             options: {
-                port: this.getMicroservicePort(
-                    ENV_KEYS.USERS_MICROSERVICE_PORT,
-                ),
+                port: this.getData(ENV_KEYS.USERS_MICROSERVICE_PORT),
             },
         };
     }
@@ -34,7 +32,7 @@ export class ClientConfigService {
         return {
             transport: Transport.TCP,
             options: {
-                port: this.getMicroservicePort(ENV_KEYS.AUTH_MICROSERVICE_PORT),
+                port: this.getData(ENV_KEYS.AUTH_MICROSERVICE_PORT),
             },
         };
     }

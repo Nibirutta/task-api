@@ -1,6 +1,5 @@
 import { Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-
 import { USERS_CLIENT } from '@app/common';
 
 @Injectable()

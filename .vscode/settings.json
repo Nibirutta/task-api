@@ -1,4 +1,7 @@
 {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "GitHub.copilot"
+    "editor.defaultFormatter": "GitHub.copilot",
+    "conventionalCommits.scopes": [
+        "Global"
+    ]
 }

@@ -21,7 +21,8 @@ export class CredentialsController {
     @MessagePattern(AUTH_PATTERNS.UPDATE)
     update(
         @Payload('id', ParseObjectIdPipe) id: string,
-        @Payload('updateRequestDto') updateCredentialDto: UpdateCredentialDto,
+        @Payload('updateCredentialDto')
+        updateCredentialDto: UpdateCredentialDto,
     ) {
         return this.authService.updateCredential(id, updateCredentialDto);
     }

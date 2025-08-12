@@ -1,18 +1,16 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
-import { ConfigAuthModule } from './config-auth/config-auth.module';
-import { ConfigAuthService } from './config-auth/config-auth.service';
-import { ENV_KEYS } from '@app/common';
+import { ENV_KEYS, AppConfigModule, AppConfigService } from '@app/common';
 import { CredentialsModule } from './credentials/credentials.module';
 import { TokensModule } from './tokens/tokens.module';
 
 @Module({
     imports: [
-        ConfigAuthModule,
+        AppConfigModule,
         MongooseModule.forRootAsync({
-            imports: [ConfigAuthModule],
-            useFactory: (configService: ConfigAuthService) => ({
+            imports: [AppConfigModule],
+            useFactory: (configService: AppConfigService) => ({
                 uri: configService.getData(ENV_KEYS.DATABASE_URL),
                 onConnectionCreate: (connection: Connection) => {
                     console.log('Connected to mongoDB');
@@ -20,7 +18,7 @@ import { TokensModule } from './tokens/tokens.module';
                     return connection;
                 },
             }),
-            inject: [ConfigAuthService],
+            inject: [AppConfigService],
         }),
         CredentialsModule,
         TokensModule,

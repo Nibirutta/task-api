@@ -1,14 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { Transport, AsyncMicroserviceOptions } from '@nestjs/microservices';
-import { ENV_KEYS, ValidationPipe, RcpExceptionFilter } from '@app/common';
+import {
+    ENV_KEYS,
+    ValidationPipe,
+    RcpExceptionFilter,
+    AppConfigService,
+} from '@app/common';
 import { UsersAppModule } from './users-app.module';
-import { ConfigUsersService } from './config-users/config-users.service';
 
 async function bootstrap() {
     const app = await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
         UsersAppModule,
         {
-            useFactory: (configService: ConfigUsersService) => ({
+            useFactory: (configService: AppConfigService) => ({
                 transport: Transport.TCP,
                 options: {
                     port: configService.getData(
@@ -16,7 +20,7 @@ async function bootstrap() {
                     ),
                 },
             }),
-            inject: [ConfigUsersService],
+            inject: [AppConfigService],
         },
     );
 
