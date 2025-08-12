@@ -8,24 +8,24 @@ import { CredentialsModule } from './credentials/credentials.module';
 import { TokensModule } from './tokens/tokens.module';
 
 @Module({
-  imports: [
-    ConfigAuthModule,
-    MongooseModule.forRootAsync({
-      imports: [ConfigAuthModule],
-      useFactory: (configService: ConfigAuthService) => ({
-        uri: configService.getData(ENV_KEYS.DATABASE_URL),
-        onConnectionCreate: (connection: Connection) => {
-          console.log('Connected to mongoDB');
+    imports: [
+        ConfigAuthModule,
+        MongooseModule.forRootAsync({
+            imports: [ConfigAuthModule],
+            useFactory: (configService: ConfigAuthService) => ({
+                uri: configService.getData(ENV_KEYS.DATABASE_URL),
+                onConnectionCreate: (connection: Connection) => {
+                    console.log('Connected to mongoDB');
 
-          return connection;
-        },
-      }),
-      inject: [ConfigAuthService],
-    }),
-    CredentialsModule,
-    TokensModule,
-  ],
-  controllers: [],
-  providers: [],
+                    return connection;
+                },
+            }),
+            inject: [ConfigAuthService],
+        }),
+        CredentialsModule,
+        TokensModule,
+    ],
+    controllers: [],
+    providers: [],
 })
 export class AuthAppModule {}

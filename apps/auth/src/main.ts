@@ -5,22 +5,24 @@ import { AuthAppModule } from './auth-app.module';
 import { ConfigAuthService } from './config-auth/config-auth.service';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
-    AuthAppModule,
-    {
-      useFactory: (configService: ConfigAuthService) => ({
-        transport: Transport.TCP,
-        options: {
-          port: configService.getData(ENV_KEYS.AUTH_MICROSERVICE_PORT),
+    const app = await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
+        AuthAppModule,
+        {
+            useFactory: (configService: ConfigAuthService) => ({
+                transport: Transport.TCP,
+                options: {
+                    port: configService.getData(
+                        ENV_KEYS.AUTH_MICROSERVICE_PORT,
+                    ),
+                },
+            }),
+            inject: [ConfigAuthService],
         },
-      }),
-      inject: [ConfigAuthService],
-    },
-  );
+    );
 
-  app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalFilters(new RcpExceptionFilter());
+    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalFilters(new RcpExceptionFilter());
 
-  await app.listen();
+    await app.listen();
 }
 bootstrap();

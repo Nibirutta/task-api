@@ -1,6 +1,6 @@
-import { SchemaFactory, Prop, Schema } from "@nestjs/mongoose";
-import { Credential } from "apps/auth/src/schemas/Credential.schema";
-import mongoose from "mongoose";
+import { SchemaFactory, Prop, Schema } from '@nestjs/mongoose';
+import { Credential } from 'apps/auth/src/schemas/Credential.schema';
+import mongoose from 'mongoose';
 
 @Schema({
     timestamps: true,

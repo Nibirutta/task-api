@@ -5,12 +5,12 @@ import { USERS_CLIENT } from '@app/common';
 
 @Injectable()
 export class ClientUsersService implements OnApplicationBootstrap {
-  constructor(
-    @Inject(USERS_CLIENT) private readonly usersClient: ClientProxy,
-  ) {}
+    constructor(
+        @Inject(USERS_CLIENT) private readonly usersClient: ClientProxy,
+    ) {}
 
-  async onApplicationBootstrap() {
-    await this.usersClient.connect();
-    console.log('Users microservice connected');
-  }
+    async onApplicationBootstrap() {
+        await this.usersClient.connect();
+        console.log('Users microservice connected');
+    }
 }

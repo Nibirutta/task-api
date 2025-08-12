@@ -3,17 +3,17 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ConfigUsersService {
-  constructor(private readonly configService: ConfigService) {}
+    constructor(private readonly configService: ConfigService) {}
 
-  getData(key: string) {
-    const data = this.configService.get(key);
+    getData(key: string) {
+        const data = this.configService.get(key);
 
-    if (!data) {
-      throw new Error(
-        `${key} is missing or invalid, please check the config module, .env file or the env_keys.`,
-      );
+        if (!data) {
+            throw new Error(
+                `${key} is missing or invalid, please check the config module, .env file or the env_keys.`,
+            );
+        }
+
+        return data;
     }
-
-    return data;
-  }
 }

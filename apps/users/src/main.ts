@@ -5,22 +5,24 @@ import { UsersAppModule } from './users-app.module';
 import { ConfigUsersService } from './config-users/config-users.service';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
-    UsersAppModule,
-    {
-      useFactory: (configService: ConfigUsersService) => ({
-        transport: Transport.TCP,
-        options: {
-          port: configService.getData(ENV_KEYS.USERS_MICROSERVICE_PORT),
+    const app = await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
+        UsersAppModule,
+        {
+            useFactory: (configService: ConfigUsersService) => ({
+                transport: Transport.TCP,
+                options: {
+                    port: configService.getData(
+                        ENV_KEYS.USERS_MICROSERVICE_PORT,
+                    ),
+                },
+            }),
+            inject: [ConfigUsersService],
         },
-      }),
-      inject: [ConfigUsersService],
-    },
-  );
+    );
 
-  app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalFilters(new RcpExceptionFilter());
+    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalFilters(new RcpExceptionFilter());
 
-  await app.listen();
+    await app.listen();
 }
 bootstrap();

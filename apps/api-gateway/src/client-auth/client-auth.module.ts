@@ -7,18 +7,18 @@ import { ClientAuthController } from './client-auth.controller';
 import { AUTH_CLIENT } from '@app/common';
 
 @Module({
-  imports: [ClientConfigModule],
-  providers: [
-    ClientAuthService,
-    {
-      provide: AUTH_CLIENT,
-      useFactory: (configService: ClientConfigService) => {
-        const clientOptions = configService.authClientOptions;
-        return ClientProxyFactory.create(clientOptions);
-      },
-      inject: [ClientConfigService],
-    },
-  ],
-  controllers: [ClientAuthController],
+    imports: [ClientConfigModule],
+    providers: [
+        ClientAuthService,
+        {
+            provide: AUTH_CLIENT,
+            useFactory: (configService: ClientConfigService) => {
+                const clientOptions = configService.authClientOptions;
+                return ClientProxyFactory.create(clientOptions);
+            },
+            inject: [ClientConfigService],
+        },
+    ],
+    controllers: [ClientAuthController],
 })
 export class ClientAuthModule {}

@@ -5,15 +5,15 @@ import { TokensController } from './tokens.controller';
 import { TokensService } from './tokens.service';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      {
-        name: Token.name,
-        schema: TokenSchema,
-      },
-    ]),
-  ],
-  controllers: [TokensController],
-  providers: [TokensService],
+    imports: [
+        MongooseModule.forFeature([
+            {
+                name: Token.name,
+                schema: TokenSchema,
+            },
+        ]),
+    ],
+    controllers: [TokensController],
+    providers: [TokensService],
 })
 export class TokensModule {}

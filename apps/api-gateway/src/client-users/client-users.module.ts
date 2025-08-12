@@ -8,18 +8,18 @@ import { USERS_CLIENT } from '@app/common';
 import { ClientConfigModule } from '../client-config/client-config.module';
 
 @Module({
-  imports: [ClientConfigModule],
-  providers: [
-    ClientUsersService,
-    {
-      provide: USERS_CLIENT,
-      useFactory: (configService: ClientConfigService) => {
-        const clientOptions = configService.usersClientOptions;
-        return ClientProxyFactory.create(clientOptions);
-      },
-      inject: [ClientConfigService],
-    },
-  ],
-  controllers: [ClientUsersController],
+    imports: [ClientConfigModule],
+    providers: [
+        ClientUsersService,
+        {
+            provide: USERS_CLIENT,
+            useFactory: (configService: ClientConfigService) => {
+                const clientOptions = configService.usersClientOptions;
+                return ClientProxyFactory.create(clientOptions);
+            },
+            inject: [ClientConfigService],
+        },
+    ],
+    controllers: [ClientUsersController],
 })
 export class ClientUsersModule {}

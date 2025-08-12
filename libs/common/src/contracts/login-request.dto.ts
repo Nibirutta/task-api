@@ -1,22 +1,22 @@
 import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  ValidateIf,
+    IsEmail,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    ValidateIf,
 } from 'class-validator';
 
 export class LoginRequestDto {
-  @IsOptional()
-  @IsString()
-  username?: string;
+    @IsOptional()
+    @IsString()
+    username?: string;
 
-  @ValidateIf((obj) => obj.username === undefined)
-  @IsString()
-  @IsEmail()
-  email?: string;
+    @ValidateIf((obj) => obj.username === undefined)
+    @IsString()
+    @IsEmail()
+    email?: string;
 
-  @IsNotEmpty()
-  @IsString()
-  password: string;
+    @IsNotEmpty()
+    @IsString()
+    password: string;
 }
