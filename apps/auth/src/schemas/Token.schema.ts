@@ -23,7 +23,7 @@ export class Token {
 
     @Prop({
         required: true,
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: Credential.name,
     })
     owner: Credential;

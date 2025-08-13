@@ -5,36 +5,37 @@ import mongoose from 'mongoose';
 export enum Themes {
     LIGHT = 'light',
     DARK = 'dark',
-    LOFI = 'lofi'
+    LOFI = 'lofi',
 }
 
 @Schema({
-    _id: false
+    _id: false,
 })
 export class NotificationPreferences {
     @Prop({
-        default: true
+        default: true,
     })
     email: boolean;
 }
 
 @Schema({
-    _id: false
+    _id: false,
 })
 export class Preferences {
     @Prop({
         default: Themes.LIGHT,
-        enum: Object.values(Themes)
+        enum: Object.values(Themes),
     })
     theme: string;
 
     @Prop({
-        default: 'pt-BR'
+        default: 'pt-BR',
     })
     language: string;
 
     @Prop({
-        type: NotificationPreferences
+        default: () => ({}),
+        type: NotificationPreferences,
     })
     notification: NotificationPreferences;
 }
@@ -53,13 +54,14 @@ export class User {
 
     @Prop({
         required: true,
-        type: mongoose.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: Credential.name,
     })
     owner: Credential;
 
     @Prop({
-        type: Preferences
+        default: () => ({}),
+        type: Preferences,
     })
     preferences: Preferences;
 }
