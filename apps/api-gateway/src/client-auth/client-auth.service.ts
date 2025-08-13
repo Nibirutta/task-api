@@ -6,21 +6,28 @@ import {
     LoginRequestDto,
     CreateCredentialDto,
     UpdateCredentialDto,
+    CreateUserDto,
+    CreatePersonalDataDto,
+    USER_PATTERNS,
 } from '@app/common';
+import { pick } from 'lodash';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class ClientAuthService implements OnApplicationBootstrap {
     constructor(
         @Inject(AUTH_CLIENT) private readonly authClient: ClientProxy,
-    ) {}
+    ) { }
 
     async onApplicationBootstrap() {
         await this.authClient.connect();
         console.log('Auth microservice connected');
     }
 
-    async create(createCredentialDto: CreateCredentialDto) {
+    async create(createUserDto: CreateUserDto) {
+        const createCredentialDto: CreateCredentialDto = pick(createUserDto, ['username', 'email', 'password']);
+        const createPersonalDataDto: CreatePersonalDataDto = pick(createUserDto, ['firstName', 'lastName']);
+
         try {
             return await lastValueFrom(
                 this.authClient.send(AUTH_PATTERNS.CREATE, createCredentialDto),

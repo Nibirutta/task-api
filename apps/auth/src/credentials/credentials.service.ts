@@ -20,7 +20,7 @@ export class CredentialsService {
     constructor(
         @InjectModel(Credential.name)
         private readonly credentialModel: Model<Credential>,
-    ) {}
+    ) { }
 
     private async hashPassword(password: string): Promise<string> {
         return bcrypt.hash(password, 10);
@@ -110,5 +110,10 @@ export class CredentialsService {
         if (!foundUser) throw new NotFoundException('User not found');
 
         return foundUser;
+    }
+
+    async validateUser(id: string) {
+        const foundUser = await this.credentialModel.findById({ id });
+        return !!foundUser;
     }
 }

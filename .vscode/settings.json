@@ -3,6 +3,7 @@
     "editor.defaultFormatter": "GitHub.copilot",
     "conventionalCommits.scopes": [
         "Global",
-        "Users"
+        "Users",
+        "Auth"
     ]
 }
