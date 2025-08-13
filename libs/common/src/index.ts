@@ -3,7 +3,6 @@ export * from './constants/ENV_KEYS.constants';
 export * from './constants/MS_PROVIDES.constants';
 
 // Decorators
-export * from './decorators/is-object-id.decorator';
 
 // Patterns
 export * from './patterns/auth.patterns';
