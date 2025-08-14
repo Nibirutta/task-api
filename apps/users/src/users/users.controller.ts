@@ -9,10 +9,9 @@ export class UsersController {
 
     @MessagePattern(USER_PATTERNS.CREATE)
     create(
-        @Payload('id') id,
-        @Payload('createPersonalDataDto')
+        @Payload()
         createPersonalDataDto: CreatePersonalDataDto,
     ) {
-        return this.usersService.createUser(id, createPersonalDataDto);
+        return this.usersService.createUser(createPersonalDataDto);
     }
 }

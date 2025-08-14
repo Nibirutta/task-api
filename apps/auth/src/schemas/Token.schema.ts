@@ -3,6 +3,7 @@ import { Credential } from './Credential.schema';
 import mongoose from 'mongoose';
 
 export enum TokenType {
+    ACCESS = 'access',
     SESSION = 'session',
     RESET = 'reset',
 }
@@ -29,7 +30,6 @@ export class Token {
     owner: Credential;
 
     @Prop({
-        required: true,
         type: Date,
         default: Date.now,
     })

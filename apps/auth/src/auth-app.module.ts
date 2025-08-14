@@ -7,7 +7,6 @@ import { TokensModule } from './tokens/tokens.module';
 
 @Module({
     imports: [
-        AppConfigModule,
         MongooseModule.forRootAsync({
             imports: [AppConfigModule],
             useFactory: (configService: AppConfigService) => ({

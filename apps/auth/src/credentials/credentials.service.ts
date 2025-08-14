@@ -12,7 +12,7 @@ import {
     LoginRequestDto,
 } from '@app/common';
 import * as bcrypt from 'bcrypt';
-import { omit, pick } from 'lodash';
+import { omit } from 'lodash';
 import { Credential } from '../schemas/Credential.schema';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class CredentialsService {
     constructor(
         @InjectModel(Credential.name)
         private readonly credentialModel: Model<Credential>,
-    ) { }
+    ) {}
 
     private async hashPassword(password: string): Promise<string> {
         return bcrypt.hash(password, 10);
@@ -46,10 +46,10 @@ export class CredentialsService {
             ),
         };
 
-        const newCredential = new this.credentialModel(newCredentialData);
-        await newCredential.save();
+        const newCredential =
+            await this.credentialModel.create(newCredentialData);
 
-        return pick(newCredential.toObject(), ['id']);
+        return newCredential._id;
     }
 
     async updateCredential(

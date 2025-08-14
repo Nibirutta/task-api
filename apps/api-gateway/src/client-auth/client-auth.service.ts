@@ -9,6 +9,7 @@ import {
     CreateUserDto,
     CreatePersonalDataDto,
     USER_PATTERNS,
+    USERS_CLIENT,
 } from '@app/common';
 import { pick } from 'lodash';
 import { lastValueFrom } from 'rxjs';
@@ -17,21 +18,50 @@ import { lastValueFrom } from 'rxjs';
 export class ClientAuthService implements OnApplicationBootstrap {
     constructor(
         @Inject(AUTH_CLIENT) private readonly authClient: ClientProxy,
-    ) { }
+        @Inject(USERS_CLIENT) private readonly usersClient: ClientProxy,
+    ) {}
 
     async onApplicationBootstrap() {
         await this.authClient.connect();
-        console.log('Auth microservice connected');
+        await this.usersClient.connect();
+        console.log('Auth and Users microservice connected');
     }
 
     async create(createUserDto: CreateUserDto) {
-        const createCredentialDto: CreateCredentialDto = pick(createUserDto, ['username', 'email', 'password']);
-        const createPersonalDataDto: CreatePersonalDataDto = pick(createUserDto, ['firstName', 'lastName']);
+        const createCredentialDto: CreateCredentialDto = pick(createUserDto, [
+            'username',
+            'email',
+            'password',
+        ]);
+        let id: string;
+        let userData;
 
         try {
-            return await lastValueFrom(
+            id = await lastValueFrom(
                 this.authClient.send(AUTH_PATTERNS.CREATE, createCredentialDto),
             );
+        } catch (error) {
+            throw new RpcException(error);
+        }
+
+        const createPersonalDataDto: CreatePersonalDataDto = {
+            owner: id,
+            ...pick(createUserDto, ['firstName', 'lastName']),
+        };
+
+        try {
+            userData = await lastValueFrom(
+                this.usersClient.send(
+                    USER_PATTERNS.CREATE,
+                    createPersonalDataDto,
+                ),
+            );
+        } catch (error) {
+            throw new RpcException(error);
+        }
+
+        try {
+            return this.authClient.send(AUTH_PATTERNS.SIGN_IN, userData);
         } catch (error) {
             throw new RpcException(error);
         }

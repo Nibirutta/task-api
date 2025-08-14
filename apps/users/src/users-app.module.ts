@@ -6,7 +6,6 @@ import { UsersModule } from './users/users.module';
 
 @Module({
     imports: [
-        AppConfigModule,
         MongooseModule.forRootAsync({
             imports: [AppConfigModule],
             useFactory: (configService: AppConfigService) => ({
