@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Patch, Delete, Param } from '@nestjs/common';
+import {
+    Controller,
+    Post,
+    Body,
+    Patch,
+    Delete,
+    Param,
+    Res,
+} from '@nestjs/common';
 import {
     LoginRequestDto,
     UpdateCredentialDto,
@@ -6,14 +14,28 @@ import {
 } from '@app/common';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { ClientAuthService } from './client-auth.service';
+import { Response } from 'express';
 
 @Controller('auth')
 export class ClientAuthController {
     constructor(private readonly authClient: ClientAuthService) {}
 
     @Post('register')
-    create(@Body() createUserDto: CreateUserDto) {
-        return this.authClient.create(createUserDto);
+    async create(
+        @Body() createUserDto: CreateUserDto,
+        @Res({ passthrough: true }) response: Response,
+    ) {
+        const { accessToken, sessionToken } =
+            await this.authClient.create(createUserDto);
+
+        response.cookie('sessionToken', sessionToken, {
+            secure: true,
+            httpOnly: true,
+            maxAge: 3 * 24 * 60 * 60 * 1000,
+            sameSite: 'none',
+        });
+
+        return accessToken;
     }
 
     @Post('login')

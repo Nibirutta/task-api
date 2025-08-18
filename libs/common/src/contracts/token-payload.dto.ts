@@ -35,11 +35,11 @@ export class SessionTokenPayloadDto extends BaseTokenPayloadDto {
 
     @IsOptional()
     @IsString()
-    lastName: string;
+    lastName?: string;
 
     @IsNotEmpty()
     @IsObject()
     preferences: IUserPreferences;
 }
 
-export class ResetTokenPayloadDto extends BaseTokenPayloadDto { }
+export class ResetTokenPayloadDto extends BaseTokenPayloadDto {}

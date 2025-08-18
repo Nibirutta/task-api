@@ -34,6 +34,6 @@ export class UsersService implements OnApplicationBootstrap {
 
         const newUser = await this.userModel.create(createPersonalDataDto);
 
-        return newUser;
+        return newUser.toObject();
     }
 }

@@ -8,7 +8,16 @@ export enum TokenType {
     RESET = 'reset',
 }
 
-@Schema({})
+@Schema({
+    toObject: {
+        transform(doc, ret: any, options) {
+            ret.id = ret._id;
+            delete ret._id;
+            delete ret.__v;
+            return ret;
+        },
+    },
+})
 export class Token {
     @Prop({
         unique: true,

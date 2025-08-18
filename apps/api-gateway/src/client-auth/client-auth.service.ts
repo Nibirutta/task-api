@@ -10,9 +10,15 @@ import {
     CreatePersonalDataDto,
     USER_PATTERNS,
     USERS_CLIENT,
+    AccessTokenPayloadDto,
+    SessionTokenPayloadDto,
 } from '@app/common';
 import { pick } from 'lodash';
 import { lastValueFrom } from 'rxjs';
+import {
+    ICredentialData,
+    IUserData,
+} from '@app/common/interfaces/user-data.interface';
 
 @Injectable()
 export class ClientAuthService implements OnApplicationBootstrap {
@@ -33,11 +39,11 @@ export class ClientAuthService implements OnApplicationBootstrap {
             'email',
             'password',
         ]);
-        let id: string;
-        let userData;
+        let credentialData: ICredentialData;
+        let userData: IUserData;
 
         try {
-            id = await lastValueFrom(
+            credentialData = await lastValueFrom<ICredentialData>(
                 this.authClient.send(AUTH_PATTERNS.CREATE, createCredentialDto),
             );
         } catch (error) {
@@ -45,12 +51,12 @@ export class ClientAuthService implements OnApplicationBootstrap {
         }
 
         const createPersonalDataDto: CreatePersonalDataDto = {
-            owner: id,
+            owner: credentialData.id,
             ...pick(createUserDto, ['firstName', 'lastName']),
         };
 
         try {
-            userData = await lastValueFrom(
+            userData = await lastValueFrom<IUserData>(
                 this.usersClient.send(
                     USER_PATTERNS.CREATE,
                     createPersonalDataDto,
@@ -60,8 +66,38 @@ export class ClientAuthService implements OnApplicationBootstrap {
             throw new RpcException(error);
         }
 
+        const accessTokenPayload: AccessTokenPayloadDto = {
+            sub: userData.owner,
+            username: credentialData.username,
+        };
+
+        const sessionTokenPayloadDto: SessionTokenPayloadDto = {
+            sub: userData.owner,
+            username: credentialData.username,
+            email: credentialData.email,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            preferences: userData.preferences,
+        };
+
         try {
-            return this.authClient.send(AUTH_PATTERNS.SIGN_IN, userData);
+            const accessToken = await lastValueFrom(
+                this.authClient.send(
+                    AUTH_PATTERNS.GENERATE_ACCESS_TOKEN,
+                    accessTokenPayload,
+                ),
+            );
+            const sessionToken = await lastValueFrom(
+                this.authClient.send(
+                    AUTH_PATTERNS.GENERATE_SESSION_TOKEN,
+                    sessionTokenPayloadDto,
+                ),
+            );
+
+            return {
+                accessToken,
+                sessionToken,
+            };
         } catch (error) {
             throw new RpcException(error);
         }

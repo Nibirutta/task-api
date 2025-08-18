@@ -42,6 +42,14 @@ export class Preferences implements IUserPreferences {
 }
 
 @Schema({
+    toObject: {
+        transform(doc, ret: any, options) {
+            ret.id = ret._id;
+            delete ret._id;
+            delete ret.__v;
+            return ret;
+        },
+    },
     timestamps: true,
 })
 export class User {

@@ -49,7 +49,7 @@ export class CredentialsService {
         const newCredential =
             await this.credentialModel.create(newCredentialData);
 
-        return newCredential._id;
+        return newCredential.toObject();
     }
 
     async updateCredential(
@@ -109,7 +109,7 @@ export class CredentialsService {
 
         if (!foundUser) throw new NotFoundException('User not found');
 
-        return foundUser;
+        return foundUser.toObject();
     }
 
     async validateUser(id: string) {
