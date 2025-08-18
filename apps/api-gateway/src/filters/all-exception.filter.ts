@@ -18,7 +18,6 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
     catch(exception: any, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
-        const request = ctx.getRequest<Request>();
 
         const responseObject: ResponseObject = {
             statusCode: 500,

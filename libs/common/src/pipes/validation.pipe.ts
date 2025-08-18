@@ -4,7 +4,6 @@ import {
     ArgumentMetadata,
     BadRequestException,
 } from '@nestjs/common';
-import { RpcException } from '@nestjs/microservices';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 
@@ -26,7 +25,7 @@ export class ValidationPipe implements PipeTransform {
         });
 
         if (errors.length > 0) {
-            throw new RpcException(new BadRequestException(constraints));
+            throw new BadRequestException(constraints);
         }
 
         return value;

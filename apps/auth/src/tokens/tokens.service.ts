@@ -11,7 +11,7 @@ export class TokensService {
         @InjectModel(Token.name) private readonly tokenModel: Model<Token>,
         private readonly jwtService: JwtService,
         private readonly configService: AppConfigService,
-    ) { }
+    ) {}
 
     async generateJWT(payload: any, tokenType: TokenType): Promise<string> {
         switch (tokenType) {

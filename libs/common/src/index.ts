@@ -14,6 +14,7 @@ export * from './contracts/login-request.dto';
 export * from './contracts/update-credential.dto';
 export * from './contracts/create-personal-data.dto';
 export * from './contracts/create-user.dto';
+export * from './contracts/token-payload.dto';
 
 // Pipes
 export * from './pipes/validation.pipe';
@@ -24,3 +25,6 @@ export * from './filters/rpc-exception.filter';
 // Config
 export * from './config/config.module';
 export * from './config/config.service';
+
+// Interfaces
+export * from './interfaces/user-preferences.interface';

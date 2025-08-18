@@ -37,21 +37,6 @@ export class RcpExceptionFilter extends BaseRpcExceptionFilter {
             );
         }
 
-        // Validation Errors
-        if (exception.error instanceof HttpException) {
-            const validationError = exception.error;
-
-            return throwError(
-                () =>
-                    new RpcException({
-                        status: validationError.status,
-                        message: validationError.response.message,
-                        error: validationError.name,
-                        response: validationError.response,
-                    }),
-            );
-        }
-
         return throwError(
             () =>
                 new RpcException({

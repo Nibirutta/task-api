@@ -1,3 +1,4 @@
+import { IUserPreferences } from '@app/common';
 import { SchemaFactory, Prop, Schema } from '@nestjs/mongoose';
 import { Credential } from 'apps/auth/src/schemas/Credential.schema';
 import mongoose from 'mongoose';
@@ -21,7 +22,7 @@ export class NotificationPreferences {
 @Schema({
     _id: false,
 })
-export class Preferences {
+export class Preferences implements IUserPreferences {
     @Prop({
         default: Themes.LIGHT,
         enum: Object.values(Themes),

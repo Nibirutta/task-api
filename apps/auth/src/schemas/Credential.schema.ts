@@ -9,6 +9,7 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
             return ret;
         },
     },
+    timestamps: true,
 })
 export class Credential {
     @Prop({
