@@ -1,12 +1,7 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Credential } from './Credential.schema';
+import { TokenType } from '@app/common';
 import mongoose from 'mongoose';
-
-export enum TokenType {
-    ACCESS = 'access',
-    SESSION = 'session',
-    RESET = 'reset',
-}
 
 @Schema({
     toObject: {
@@ -27,6 +22,7 @@ export class Token {
 
     @Prop({
         required: true,
+        type: String,
         enum: Object.values(TokenType),
     })
     type: TokenType;

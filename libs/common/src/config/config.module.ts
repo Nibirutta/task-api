@@ -2,6 +2,7 @@ import { Module, Global } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as joi from 'joi';
 import { AppConfigService } from './config.service';
+import { TokenConfigService } from './token-config.service';
 
 @Global()
 @Module({
@@ -15,7 +16,7 @@ import { AppConfigService } from './config.service';
             }),
         }),
     ],
-    providers: [AppConfigService],
-    exports: [AppConfigService],
+    providers: [AppConfigService, TokenConfigService],
+    exports: [AppConfigService, TokenConfigService],
 })
 export class AppConfigModule {}

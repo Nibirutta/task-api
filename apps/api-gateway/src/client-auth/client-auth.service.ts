@@ -12,6 +12,7 @@ import {
     USERS_CLIENT,
     AccessTokenPayloadDto,
     SessionTokenPayloadDto,
+    TokenType,
 } from '@app/common';
 import { pick } from 'lodash';
 import { lastValueFrom } from 'rxjs';
@@ -39,6 +40,7 @@ export class ClientAuthService implements OnApplicationBootstrap {
             'email',
             'password',
         ]);
+        
         let credentialData: ICredentialData;
         let userData: IUserData;
 
@@ -66,7 +68,7 @@ export class ClientAuthService implements OnApplicationBootstrap {
             throw new RpcException(error);
         }
 
-        const accessTokenPayload: AccessTokenPayloadDto = {
+        const accessTokenPayloadDto: AccessTokenPayloadDto = {
             sub: userData.owner,
             username: credentialData.username,
         };
@@ -82,16 +84,16 @@ export class ClientAuthService implements OnApplicationBootstrap {
 
         try {
             const accessToken = await lastValueFrom(
-                this.authClient.send(
-                    AUTH_PATTERNS.GENERATE_ACCESS_TOKEN,
-                    accessTokenPayload,
-                ),
+                this.authClient.send(AUTH_PATTERNS.GENERATE_TOKEN, {
+                    payload: accessTokenPayloadDto,
+                    tokenType: TokenType.ACCESS,
+                }),
             );
             const sessionToken = await lastValueFrom(
-                this.authClient.send(
-                    AUTH_PATTERNS.GENERATE_SESSION_TOKEN,
-                    sessionTokenPayloadDto,
-                ),
+                this.authClient.send(AUTH_PATTERNS.GENERATE_TOKEN, {
+                    payload: sessionTokenPayloadDto,
+                    tokenType: TokenType.SESSION,
+                }),
             );
 
             return {
@@ -108,7 +110,7 @@ export class ClientAuthService implements OnApplicationBootstrap {
             return await lastValueFrom(
                 this.authClient.send(AUTH_PATTERNS.UPDATE, {
                     id,
-                    updateCredentialDto: updateCredentialDto,
+                    updateCredentialDto,
                 }),
             );
         } catch (error) {

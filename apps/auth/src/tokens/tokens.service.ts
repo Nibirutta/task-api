@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Token, TokenType } from '../schemas/Token.schema';
+import { Token } from '../schemas/Token.schema';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import {
@@ -9,6 +9,8 @@ import {
     ENV_KEYS,
     ResetTokenPayloadDto,
     SessionTokenPayloadDto,
+    TokenConfigService,
+    TokenType,
 } from '@app/common';
 
 @Injectable()
@@ -17,6 +19,7 @@ export class TokensService {
         @InjectModel(Token.name) private readonly tokenModel: Model<Token>,
         private readonly jwtService: JwtService,
         private readonly configService: AppConfigService,
+        private readonly tokenConfigService: TokenConfigService,
     ) {}
 
     async generateToken(
@@ -26,12 +29,11 @@ export class TokensService {
             | ResetTokenPayloadDto,
         tokenType: TokenType,
     ): Promise<string> {
-        const expirationDate = new Date();
-
         switch (tokenType) {
             case TokenType.ACCESS:
                 const accessToken = await this.jwtService.signAsync(payload, {
-                    expiresIn: '1m',
+                    expiresIn:
+                        this.tokenConfigService.getTokenDuration(tokenType),
                     secret: this.configService.getData(
                         ENV_KEYS.ACCESS_TOKEN_SECRET,
                     ),
@@ -40,19 +42,21 @@ export class TokensService {
                 return accessToken;
             case TokenType.SESSION:
                 const sessionToken = await this.jwtService.signAsync(payload, {
-                    expiresIn: '3d',
+                    expiresIn:
+                        this.tokenConfigService.getTokenDuration(tokenType),
                     secret: this.configService.getData(
                         ENV_KEYS.SESSION_TOKEN_SECRET,
                     ),
                 });
 
-                expirationDate.setDate(expirationDate.getDate() + 3);
-
                 const sessionTokenData = {
                     token: sessionToken,
                     type: TokenType.SESSION,
                     owner: payload.sub,
-                    expiresAt: expirationDate,
+                    expiresAt:
+                        this.tokenConfigService.getTokenExpirationDate(
+                            tokenType,
+                        ),
                 };
 
                 await this.tokenModel.create(sessionTokenData);
@@ -60,19 +64,21 @@ export class TokensService {
                 return sessionToken;
             case TokenType.RESET:
                 const resetToken = await this.jwtService.signAsync(payload, {
-                    expiresIn: '30m',
+                    expiresIn:
+                        this.tokenConfigService.getTokenDuration(tokenType),
                     secret: this.configService.getData(
                         ENV_KEYS.RESET_TOKEN_SECRET,
                     ),
                 });
 
-                expirationDate.setMinutes(expirationDate.getMinutes() + 30);
-
                 const resetTokenData = {
                     token: resetToken,
                     type: TokenType.RESET,
                     owner: payload.sub,
-                    expiresAt: expirationDate,
+                    expiresAt:
+                        this.tokenConfigService.getTokenExpirationDate(
+                            tokenType,
+                        ),
                 };
 
                 await this.tokenModel.create(resetTokenData);

@@ -4,21 +4,24 @@ import { TokensService } from './tokens.service';
 import {
     AccessTokenPayloadDto,
     AUTH_PATTERNS,
+    ResetTokenPayloadDto,
     SessionTokenPayloadDto,
+    TokenType,
 } from '@app/common';
-import { TokenType } from '../schemas/Token.schema';
 
 @Controller()
 export class TokensController {
     constructor(private readonly tokensService: TokensService) {}
 
-    @MessagePattern(AUTH_PATTERNS.GENERATE_ACCESS_TOKEN)
-    generateAccessToken(@Payload() payload: AccessTokenPayloadDto) {
-        return this.tokensService.generateToken(payload, TokenType.ACCESS);
-    }
-
-    @MessagePattern(AUTH_PATTERNS.GENERATE_SESSION_TOKEN)
-    generateSessionToken(@Payload() payload: SessionTokenPayloadDto) {
-        return this.tokensService.generateToken(payload, TokenType.SESSION);
+    @MessagePattern(AUTH_PATTERNS.GENERATE_TOKEN)
+    generateToken(
+        @Payload('payload')
+        payload:
+            | AccessTokenPayloadDto
+            | SessionTokenPayloadDto
+            | ResetTokenPayloadDto,
+        @Payload('tokenType') tokenType: TokenType,
+    ) {
+        return this.tokensService.generateToken(payload, tokenType);
     }
 }

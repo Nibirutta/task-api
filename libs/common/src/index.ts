@@ -4,6 +4,9 @@ export * from './constants/MS_PROVIDES.constants';
 
 // Decorators
 
+// Enums
+export * from './enums/token-type.enum';
+
 // Patterns
 export * from './patterns/auth.patterns';
 export * from './patterns/user.patterns';
@@ -25,6 +28,7 @@ export * from './filters/rpc-exception.filter';
 // Config
 export * from './config/config.module';
 export * from './config/config.service';
+export * from './config/token-config.service';
 
 // Interfaces
 export * from './interfaces/user-preferences.interface';

@@ -11,6 +11,8 @@ import {
     LoginRequestDto,
     UpdateCredentialDto,
     CreateUserDto,
+    TokenConfigService,
+    TokenType,
 } from '@app/common';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { ClientAuthService } from './client-auth.service';
@@ -18,7 +20,10 @@ import { Response } from 'express';
 
 @Controller('auth')
 export class ClientAuthController {
-    constructor(private readonly authClient: ClientAuthService) {}
+    constructor(
+        private readonly authClient: ClientAuthService,
+        private readonly tokenConfigService: TokenConfigService,
+    ) {}
 
     @Post('register')
     async create(
@@ -31,7 +36,7 @@ export class ClientAuthController {
         response.cookie('sessionToken', sessionToken, {
             secure: true,
             httpOnly: true,
-            maxAge: 3 * 24 * 60 * 60 * 1000,
+            maxAge: this.tokenConfigService.getTokenMaxAge(TokenType.SESSION),
             sameSite: 'none',
         });
 
