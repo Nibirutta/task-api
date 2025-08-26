@@ -40,7 +40,7 @@ export class ClientAuthService implements OnApplicationBootstrap {
             'email',
             'password',
         ]);
-        
+
         let credentialData: ICredentialData;
         let userData: IUserData;
 

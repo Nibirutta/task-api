@@ -28,7 +28,7 @@ export class CredentialsController {
     }
 
     @MessagePattern(AUTH_PATTERNS.DELETE)
-    delete(@Payload('id', ParseObjectIdPipe) id: string) {
+    delete(@Payload(ParseObjectIdPipe) id: string) {
         return this.authService.delete(id);
     }
 
@@ -38,7 +38,7 @@ export class CredentialsController {
     }
 
     @MessagePattern(AUTH_PATTERNS.VALIDATE_USER)
-    validateUser(@Payload('id', ParseObjectIdPipe) id: string) {
+    validateUser(@Payload(ParseObjectIdPipe) id: string) {
         return this.authService.validateUser(id);
     }
 }

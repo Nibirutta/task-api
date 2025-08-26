@@ -23,6 +23,7 @@ export class AppConfigService {
         return {
             transport: Transport.TCP,
             options: {
+                host: 'taskapi-users',
                 port: this.getData(ENV_KEYS.USERS_MICROSERVICE_PORT),
             },
         };
@@ -32,6 +33,7 @@ export class AppConfigService {
         return {
             transport: Transport.TCP,
             options: {
+                host: 'taskapi-auth',
                 port: this.getData(ENV_KEYS.AUTH_MICROSERVICE_PORT),
             },
         };

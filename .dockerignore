@@ -1,0 +1,34 @@
+# Dependencies
+node_modules
+
+# dotenv environment variables file
+.env
+.env.development
+.env.production
+
+# Temporary folders
+tmp/
+temp/
+
+# IDE files
+.vscode
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Old project files
+old/
+
+# Build outputs that should be rebuilt in container
+dist/
+
+# Documentation
+*.md
+DEVLOG.md
+README.md

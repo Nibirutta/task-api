@@ -1,0 +1,78 @@
+services:
+
+  rabbitmq:
+    image: rabbitmq:4.1.3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - taskapi-network
+
+  auth:
+    build:
+      context: .
+      dockerfile: apps/auth/Dockerfile
+    container_name: taskapi-auth
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      AUTH_MICROSERVICE_PORT: ${AUTH_MICROSERVICE_PORT}
+      DATABASE_URL: ${DATABASE_URL}
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      SESSION_TOKEN_SECRET: ${SESSION_TOKEN_SECRET}
+      RESET_TOKEN_SECRET: ${RESET_TOKEN_SECRET}
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+    networks:
+      - taskapi-network
+
+  users:
+    build:
+      context: .
+      dockerfile: apps/users/Dockerfile
+    container_name: taskapi-users
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      USERS_MICROSERVICE_PORT: ${USERS_MICROSERVICE_PORT}
+      AUTH_MICROSERVICE_PORT: ${AUTH_MICROSERVICE_PORT}
+      DATABASE_URL: ${DATABASE_URL}
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+      - auth
+    networks:
+      - taskapi-network
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: apps/api-gateway/Dockerfile
+    container_name: taskapi-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      USERS_MICROSERVICE_PORT: ${USERS_MICROSERVICE_PORT}
+      AUTH_MICROSERVICE_PORT: ${AUTH_MICROSERVICE_PORT}
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+      - auth
+      - users
+    networks:
+      - taskapi-network
+
+networks:
+  taskapi-network:
+    driver: bridge

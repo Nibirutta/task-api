@@ -15,6 +15,7 @@ async function bootstrap() {
             useFactory: (configService: AppConfigService) => ({
                 transport: Transport.TCP,
                 options: {
+                    host: '0.0.0.0',
                     port: configService.getData(
                         ENV_KEYS.AUTH_MICROSERVICE_PORT,
                     ),

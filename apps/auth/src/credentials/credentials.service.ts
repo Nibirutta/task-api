@@ -105,7 +105,7 @@ export class CredentialsService {
     }
 
     async delete(id: string) {
-        const foundUser = await this.credentialModel.findByIdAndDelete({ id });
+        const foundUser = await this.credentialModel.findByIdAndDelete(id);
 
         if (!foundUser) throw new NotFoundException('User not found');
 
@@ -113,7 +113,7 @@ export class CredentialsService {
     }
 
     async validateUser(id: string) {
-        const foundUser = await this.credentialModel.findById({ id });
+        const foundUser = await this.credentialModel.findById(id);
         return !!foundUser;
     }
 }
