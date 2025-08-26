@@ -3,7 +3,7 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../schemas/User.schema';
-import { AppConfigService, AUTH_CLIENT } from '@app/common';
+import { AppConfigService, TRANSPORTER_PROVIDER } from '@app/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 @Module({
@@ -19,9 +19,9 @@ import { ClientProxyFactory } from '@nestjs/microservices';
     providers: [
         UsersService,
         {
-            provide: AUTH_CLIENT,
+            provide: TRANSPORTER_PROVIDER,
             useFactory: (configService: AppConfigService) => {
-                const clientOptions = configService.authClientOptions;
+                const clientOptions = configService.clientOptions;
                 return ClientProxyFactory.create(clientOptions);
             },
             inject: [AppConfigService],

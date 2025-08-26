@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ClientOptions, Transport } from '@nestjs/microservices';
-import { ENV_KEYS } from '@app/common';
+import {
+    ClientOptions,
+    MicroserviceOptions,
+    Transport,
+} from '@nestjs/microservices';
 
 @Injectable()
 export class AppConfigService {
@@ -19,22 +22,26 @@ export class AppConfigService {
         return port;
     }
 
-    get usersClientOptions(): ClientOptions {
+    get clientOptions(): ClientOptions {
         return {
-            transport: Transport.TCP,
+            transport: Transport.RMQ,
             options: {
-                host: 'taskapi-users',
-                port: this.getData(ENV_KEYS.USERS_MICROSERVICE_PORT),
+                urls: ['amqp://rabbitmq:5672'],
+                exchange: 'global_exchange',
+                exchangeType: 'topic',
+                wildcards: true,
             },
         };
     }
 
-    get authClientOptions(): ClientOptions {
+    get microserviceOptions(): MicroserviceOptions {
         return {
-            transport: Transport.TCP,
+            transport: Transport.RMQ,
             options: {
-                host: 'taskapi-auth',
-                port: this.getData(ENV_KEYS.AUTH_MICROSERVICE_PORT),
+                urls: ['amqp://rabbitmq:5672'],
+                exchange: 'global_exchange',
+                exchangeType: 'topic',
+                wildcards: true,
             },
         };
     }

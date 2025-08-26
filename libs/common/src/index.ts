@@ -31,4 +31,5 @@ export * from './config/config.service';
 export * from './config/token-config.service';
 
 // Interfaces
+export * from './interfaces/user-data.interface';
 export * from './interfaces/user-preferences.interface';

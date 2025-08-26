@@ -3,12 +3,10 @@ services:
   rabbitmq:
     image: rabbitmq:4.1.3-management
     container_name: rabbitmq
+    restart: unless-stopped
     ports:
       - "5672:5672"
       - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
     networks:
       - taskapi-network
 
@@ -49,7 +47,6 @@ services:
       - .env
     depends_on:
       - rabbitmq
-      - auth
     networks:
       - taskapi-network
 
@@ -64,12 +61,11 @@ services:
     environment:
       USERS_MICROSERVICE_PORT: ${USERS_MICROSERVICE_PORT}
       AUTH_MICROSERVICE_PORT: ${AUTH_MICROSERVICE_PORT}
+      GATEWAY_PORT: ${GATEWAY_PORT}
     env_file:
       - .env
     depends_on:
       - rabbitmq
-      - auth
-      - users
     networks:
       - taskapi-network
 

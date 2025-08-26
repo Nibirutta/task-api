@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import { Transport, AsyncMicroserviceOptions } from '@nestjs/microservices';
+import { AsyncMicroserviceOptions } from '@nestjs/microservices';
 import {
-    ENV_KEYS,
     ValidationPipe,
     RcpExceptionFilter,
     AppConfigService,
@@ -12,15 +11,9 @@ async function bootstrap() {
     const app = await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
         AuthAppModule,
         {
-            useFactory: (configService: AppConfigService) => ({
-                transport: Transport.TCP,
-                options: {
-                    host: '0.0.0.0',
-                    port: configService.getData(
-                        ENV_KEYS.AUTH_MICROSERVICE_PORT,
-                    ),
-                },
-            }),
+            useFactory: (configService: AppConfigService) => {
+                return configService.microserviceOptions;
+            },
             inject: [AppConfigService],
         },
     );
