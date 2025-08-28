@@ -27,7 +27,7 @@ export class CredentialsService {
     }
 
     async createCredential(createCredentialDto: CreateCredentialDto) {
-        const foundUser = await this.credentialModel.findOne({
+        const foundCredential = await this.credentialModel.findOne({
             $or: [
                 {
                     username: createCredentialDto.username,
@@ -36,7 +36,7 @@ export class CredentialsService {
             ],
         });
 
-        if (foundUser)
+        if (foundCredential)
             throw new ConflictException('Username or email is already used');
 
         const newCredentialData = {
@@ -65,7 +65,7 @@ export class CredentialsService {
             }),
         };
 
-        const updatedUser = await this.credentialModel.findByIdAndUpdate(
+        const updatedCredential = await this.credentialModel.findByIdAndUpdate(
             id,
             updateData,
             {
@@ -74,13 +74,13 @@ export class CredentialsService {
             },
         );
 
-        if (!updatedUser) throw new NotFoundException('User not found');
+        if (!updatedCredential) throw new NotFoundException('User not found');
 
-        return updatedUser.toObject();
+        return updatedCredential.toObject();
     }
 
     async login(loginRequestDto: LoginRequestDto) {
-        const foundUser = await this.credentialModel.findOne({
+        const foundCredential = await this.credentialModel.findOne({
             $or: [
                 {
                     email: loginRequestDto.email,
@@ -91,11 +91,11 @@ export class CredentialsService {
             ],
         });
 
-        if (!foundUser) throw new NotFoundException('User not found');
+        if (!foundCredential) throw new NotFoundException('User not found');
 
         const isValidPassword = await bcrypt.compare(
             loginRequestDto.password,
-            foundUser.hashedPassword,
+            foundCredential.hashedPassword,
         );
 
         if (!isValidPassword)
@@ -104,16 +104,17 @@ export class CredentialsService {
         return { login: 'successful' };
     }
 
-    async delete(id: string) {
-        const foundUser = await this.credentialModel.findByIdAndDelete(id);
+    async deleteCredential(id: string) {
+        const deletedCredential =
+            await this.credentialModel.findByIdAndDelete(id);
 
-        if (!foundUser) throw new NotFoundException('User not found');
+        if (!deletedCredential) throw new NotFoundException('User not found');
 
-        return foundUser.toObject();
+        return deletedCredential.toObject();
     }
 
-    async validateUser(id: string) {
-        const foundUser = await this.credentialModel.findById(id);
-        return !!foundUser;
+    async validateCredential(id: string) {
+        const foundCredential = await this.credentialModel.findById(id);
+        return !!foundCredential;
     }
 }

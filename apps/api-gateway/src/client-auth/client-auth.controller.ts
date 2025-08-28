@@ -17,11 +17,12 @@ import {
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { ClientAuthService } from './client-auth.service';
 import { Response } from 'express';
+import { lastValueFrom } from 'rxjs';
 
 @Controller('auth')
 export class ClientAuthController {
     constructor(
-        private readonly authClient: ClientAuthService,
+        private readonly clientAuthService: ClientAuthService,
         private readonly tokenConfigService: TokenConfigService,
     ) {}
 
@@ -31,7 +32,7 @@ export class ClientAuthController {
         @Res({ passthrough: true }) response: Response,
     ) {
         const { accessToken, sessionToken } =
-            await this.authClient.create(createUserDto);
+            await this.clientAuthService.create(createUserDto);
 
         response.cookie('sessionToken', sessionToken, {
             secure: true,
@@ -45,7 +46,7 @@ export class ClientAuthController {
 
     @Post('login')
     login(@Body() loginRequestDto: LoginRequestDto) {
-        return this.authClient.login(loginRequestDto);
+        return this.clientAuthService.login(loginRequestDto);
     }
 
     @Patch(':id')
@@ -53,11 +54,11 @@ export class ClientAuthController {
         @Param('id', ParseObjectIdPipe) id: string,
         @Body() updateCredentialDto: UpdateCredentialDto,
     ) {
-        return this.authClient.update(id, updateCredentialDto);
+        return this.clientAuthService.update(id, updateCredentialDto);
     }
 
     @Delete(':id')
     delete(@Param('id', ParseObjectIdPipe) id: string) {
-        return this.authClient.delete(id);
+        return this.clientAuthService.delete(id);
     }
 }

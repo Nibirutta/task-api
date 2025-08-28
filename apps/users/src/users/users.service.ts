@@ -13,6 +13,7 @@ import {
     TRANSPORTER_PROVIDER,
 } from '@app/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { lastValueFrom, timeout, retry } from 'rxjs';
 
 @Injectable()
 export class UsersService implements OnApplicationBootstrap {
@@ -27,17 +28,27 @@ export class UsersService implements OnApplicationBootstrap {
     }
 
     async createUser(createPersonalDataDto: CreatePersonalDataDto) {
-        const isValid = await this.transporter.send(
-            AUTH_PATTERNS.VALIDATE_USER,
-            createPersonalDataDto.owner,
-        );
+        const isValid = await lastValueFrom(
+            this.transporter.send(
+                AUTH_PATTERNS.VALIDATE_CREDENTIAL,
+                createPersonalDataDto.owner,
+                ).pipe(retry(3), timeout(1000))
+            );
 
         if (!isValid) {
-            throw new NotFoundException('User ID invalid');
+            throw new NotFoundException('Credential ID invalid');
         }
 
         const newUser = await this.userModel.create(createPersonalDataDto);
 
         return newUser.toObject();
+    }
+
+    async deleteUser(id: string) {
+        const foundUser = await this.userModel.findByIdAndDelete(id);
+
+        if (!foundUser) throw new NotFoundException('User not found');
+
+        return foundUser.toObject();
     }
 }

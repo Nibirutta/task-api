@@ -16,7 +16,7 @@ import {
     TRANSPORTER_PROVIDER,
 } from '@app/common';
 import { pick } from 'lodash';
-import { lastValueFrom } from 'rxjs';
+import { forkJoin, lastValueFrom, retry, timeout } from 'rxjs';
 
 @Injectable()
 export class ClientAuthService implements OnApplicationBootstrap {
@@ -41,10 +41,9 @@ export class ClientAuthService implements OnApplicationBootstrap {
 
         try {
             credentialData = await lastValueFrom<ICredentialData>(
-                this.transporter.send(
-                    AUTH_PATTERNS.CREATE,
-                    createCredentialDto,
-                ),
+                this.transporter
+                    .send(AUTH_PATTERNS.CREATE, createCredentialDto)
+                    .pipe(retry(3), timeout(1000)),
             );
         } catch (error) {
             throw new RpcException(error);
@@ -57,12 +56,22 @@ export class ClientAuthService implements OnApplicationBootstrap {
 
         try {
             userData = await lastValueFrom<IUserData>(
-                this.transporter.send(
-                    USER_PATTERNS.CREATE,
-                    createPersonalDataDto,
-                ),
+                this.transporter
+                    .send(USER_PATTERNS.CREATE, createPersonalDataDto)
+                    .pipe(retry(3), timeout(1000)),
             );
         } catch (error) {
+            try {
+                await lastValueFrom(
+                    this.transporter
+                        .send(AUTH_PATTERNS.DELETE, credentialData.id)
+                        .pipe(retry(3), timeout(1000)),
+                );
+            } catch (rollbackError) {
+                // Elaborate a more suitable log system later on
+                console.log(rollbackError);
+            }
+
             throw new RpcException(error);
         }
 
@@ -81,24 +90,43 @@ export class ClientAuthService implements OnApplicationBootstrap {
         };
 
         try {
-            const accessToken = await lastValueFrom(
-                this.transporter.send(AUTH_PATTERNS.GENERATE_TOKEN, {
-                    payload: accessTokenPayloadDto,
-                    tokenType: TokenType.ACCESS,
-                }),
+            return await lastValueFrom(
+                forkJoin({
+                    accessToken: this.transporter.send(
+                        AUTH_PATTERNS.GENERATE_TOKEN,
+                        {
+                            payload: accessTokenPayloadDto,
+                            tokenType: TokenType.ACCESS,
+                        },
+                    ),
+                    sessionToken: this.transporter.send(
+                        AUTH_PATTERNS.GENERATE_TOKEN,
+                        {
+                            payload: sessionTokenPayloadDto,
+                            tokenType: TokenType.SESSION,
+                        },
+                    ),
+                }).pipe(retry(3), timeout(1000)),
             );
-            const sessionToken = await lastValueFrom(
-                this.transporter.send(AUTH_PATTERNS.GENERATE_TOKEN, {
-                    payload: sessionTokenPayloadDto,
-                    tokenType: TokenType.SESSION,
-                }),
-            );
-
-            return {
-                accessToken,
-                sessionToken,
-            };
         } catch (error) {
+            try {
+                await lastValueFrom(
+                    forkJoin([
+                        this.transporter.send(
+                            AUTH_PATTERNS.DELETE,
+                            credentialData.id,
+                        ),
+                        this.transporter.send(
+                            USER_PATTERNS.DELETE,
+                            userData.id,
+                        ),
+                    ]).pipe(retry(3), timeout(1000)),
+                );
+            } catch (rollbackError) {
+                // Elaborate a more suitable log system later on
+                console.log(rollbackError);
+            }
+
             throw new RpcException(error);
         }
     }
@@ -106,10 +134,12 @@ export class ClientAuthService implements OnApplicationBootstrap {
     async update(id: string, updateCredentialDto: UpdateCredentialDto) {
         try {
             return await lastValueFrom(
-                this.transporter.send(AUTH_PATTERNS.UPDATE, {
-                    id,
-                    updateCredentialDto,
-                }),
+                this.transporter
+                    .send(AUTH_PATTERNS.UPDATE, {
+                        id,
+                        updateCredentialDto,
+                    })
+                    .pipe(retry(3), timeout(1000)),
             );
         } catch (error) {
             throw new RpcException(error);
@@ -119,7 +149,9 @@ export class ClientAuthService implements OnApplicationBootstrap {
     async delete(id: string) {
         try {
             return await lastValueFrom(
-                this.transporter.send(AUTH_PATTERNS.DELETE, id),
+                this.transporter
+                    .send(AUTH_PATTERNS.DELETE, id)
+                    .pipe(retry(3), timeout(1000)),
             );
         } catch (error) {
             throw new RpcException(error);
@@ -129,7 +161,9 @@ export class ClientAuthService implements OnApplicationBootstrap {
     async login(loginRequestDto: LoginRequestDto) {
         try {
             return await lastValueFrom(
-                this.transporter.send(AUTH_PATTERNS.LOGIN, loginRequestDto),
+                this.transporter
+                    .send(AUTH_PATTERNS.LOGIN, loginRequestDto)
+                    .pipe(retry(3), timeout(1000)),
             );
         } catch (error) {
             throw new RpcException(error);

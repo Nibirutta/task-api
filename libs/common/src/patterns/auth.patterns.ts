@@ -7,5 +7,5 @@ export const AUTH_PATTERNS = {
     CREATE: 'auth.create',
     UPDATE: 'auth.update',
     DELETE: 'auth.delete',
-    VALIDATE_USER: 'auth.validate-user',
+    VALIDATE_CREDENTIAL: 'auth.validate-credential',
 };

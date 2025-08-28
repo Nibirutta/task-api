@@ -14,12 +14,12 @@ export class CredentialsController {
     constructor(private readonly authService: CredentialsService) {}
 
     @MessagePattern(AUTH_PATTERNS.CREATE)
-    create(@Payload() createCredentialDto: CreateCredentialDto) {
+    createCredential(@Payload() createCredentialDto: CreateCredentialDto) {
         return this.authService.createCredential(createCredentialDto);
     }
 
     @MessagePattern(AUTH_PATTERNS.UPDATE)
-    update(
+    updateCredential(
         @Payload('id', ParseObjectIdPipe) id: string,
         @Payload('updateCredentialDto')
         updateCredentialDto: UpdateCredentialDto,
@@ -28,8 +28,8 @@ export class CredentialsController {
     }
 
     @MessagePattern(AUTH_PATTERNS.DELETE)
-    delete(@Payload(ParseObjectIdPipe) id: string) {
-        return this.authService.delete(id);
+    deleteCredential(@Payload(ParseObjectIdPipe) id: string) {
+        return this.authService.deleteCredential(id);
     }
 
     @MessagePattern(AUTH_PATTERNS.LOGIN)
@@ -37,8 +37,8 @@ export class CredentialsController {
         return this.authService.login(loginRequestDto);
     }
 
-    @MessagePattern(AUTH_PATTERNS.VALIDATE_USER)
-    validateUser(@Payload(ParseObjectIdPipe) id: string) {
-        return this.authService.validateUser(id);
+    @MessagePattern(AUTH_PATTERNS.VALIDATE_CREDENTIAL)
+    validateCredential(@Payload(ParseObjectIdPipe) id: string) {
+        return this.authService.validateCredential(id);
     }
 }
