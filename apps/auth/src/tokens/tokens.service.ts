@@ -93,16 +93,6 @@ export class TokensService {
     }
 
     async deleteAllTokensFromUser(ownerId: string) {
-        const isValid = await lastValueFrom(
-            this.transporter
-                .send(AUTH_PATTERNS.VALIDATE_CREDENTIAL, ownerId)
-                .pipe(retry(3), timeout(1000)),
-        );
-
-        if (!isValid) {
-            throw new NotFoundException('Credential ID invalid');
-        }
-
         const deletedToken = await this.tokenModel.deleteMany({
             owner: ownerId,
         });

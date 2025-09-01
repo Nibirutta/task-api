@@ -1,4 +1,5 @@
 import {
+    IsDate,
     IsEmail,
     IsMongoId,
     IsNotEmpty,
@@ -40,6 +41,14 @@ export class SessionTokenPayloadDto extends BaseTokenPayloadDto {
     @IsNotEmpty()
     @IsObject()
     preferences: IUserPreferences;
+
+    @IsNotEmpty()
+    @IsDate()
+    userCreatedAt: Date;
+
+    @IsNotEmpty()
+    @IsDate()
+    userUpdatedAt: Date;
 }
 
 export class ResetTokenPayloadDto extends BaseTokenPayloadDto {}

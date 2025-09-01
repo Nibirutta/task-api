@@ -101,14 +101,15 @@ export class CredentialsService {
         if (!isValidPassword)
             throw new UnauthorizedException('Invalid credentials');
 
-        return { login: 'successful' };
+        return foundCredential.toObject();
     }
 
     async deleteCredential(id: string) {
         const deletedCredential =
             await this.credentialModel.findByIdAndDelete(id);
 
-        if (!deletedCredential) throw new NotFoundException('User not found');
+        if (!deletedCredential)
+            throw new NotFoundException('Credential not found');
 
         return deletedCredential.toObject();
     }
@@ -116,5 +117,14 @@ export class CredentialsService {
     async validateCredential(id: string) {
         const foundCredential = await this.credentialModel.findById(id);
         return !!foundCredential;
+    }
+
+    async findCredential(id: string) {
+        const foundCredential = await this.credentialModel.findById(id);
+
+        if (!foundCredential)
+            throw new NotFoundException('Credential not found');
+
+        return foundCredential.toObject();
     }
 }

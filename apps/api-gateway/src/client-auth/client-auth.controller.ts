@@ -31,7 +31,7 @@ export class ClientAuthController {
         @Body() createUserDto: CreateUserDto,
         @Res({ passthrough: true }) response: Response,
     ) {
-        const { accessToken, sessionToken } =
+        const { userInfo, accessToken, sessionToken } =
             await this.clientAuthService.create(createUserDto);
 
         response.cookie('sessionToken', sessionToken, {
@@ -41,12 +41,31 @@ export class ClientAuthController {
             sameSite: 'none',
         });
 
-        return accessToken;
+        return {
+            userInfo,
+            accessToken,
+        };
     }
 
     @Post('login')
-    login(@Body() loginRequestDto: LoginRequestDto) {
-        return this.clientAuthService.login(loginRequestDto);
+    async login(
+        @Body() loginRequestDto: LoginRequestDto,
+        @Res({ passthrough: true }) response: Response,
+    ) {
+        const { userInfo, accessToken, sessionToken } =
+            await this.clientAuthService.login(loginRequestDto);
+
+        response.cookie('sessionToken', sessionToken, {
+            secure: true,
+            httpOnly: true,
+            maxAge: this.tokenConfigService.getTokenMaxAge(TokenType.SESSION),
+            sameSite: 'none',
+        });
+
+        return {
+            userInfo,
+            accessToken,
+        };
     }
 
     @Patch(':id')

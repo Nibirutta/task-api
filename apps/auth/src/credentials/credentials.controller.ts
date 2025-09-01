@@ -41,4 +41,9 @@ export class CredentialsController {
     validateCredential(@Payload(ParseObjectIdPipe) id: string) {
         return this.authService.validateCredential(id);
     }
+
+    @MessagePattern(AUTH_PATTERNS.FIND)
+    findCredential(@Payload(ParseObjectIdPipe) id: string) {
+        return this.authService.findCredential(id);
+    }
 }

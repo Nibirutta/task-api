@@ -23,4 +23,9 @@ export class UsersController {
     ) {
         return this.usersService.deleteUser(ownerId);
     }
+
+    @MessagePattern(USER_PATTERNS.FIND)
+    findUser(@Payload(ParseObjectIdPipe) ownerId: string) {
+        return this.usersService.findUser(ownerId);
+    }
 }

@@ -1,5 +1,6 @@
 export const AUTH_PATTERNS = {
     LOGIN: 'auth.login',
+    FIND: 'auth.find',
     LOGOUT: 'token.logout',
     REFRESH: 'token.refresh',
     RESET: 'token.reset',

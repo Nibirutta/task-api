@@ -55,4 +55,14 @@ export class UsersService implements OnApplicationBootstrap {
 
         return foundUser.toObject();
     }
+
+    async findUser(ownerId: string) {
+        const foundUser = await this.userModel.findOne({
+            owner: ownerId,
+        });
+
+        if (!foundUser) throw new NotFoundException('User not found');
+
+        return foundUser.toObject();
+    }
 }

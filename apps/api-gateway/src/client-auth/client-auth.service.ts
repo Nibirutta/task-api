@@ -15,7 +15,7 @@ import {
     IUserData,
     TRANSPORTER_PROVIDER,
 } from '@app/common';
-import { pick } from 'lodash';
+import { pick, omit } from 'lodash';
 import { forkJoin, lastValueFrom, retry, timeout } from 'rxjs';
 import { ClientUsersService } from '../client-users/client-users.service';
 
@@ -78,22 +78,13 @@ export class ClientAuthService implements OnApplicationBootstrap {
             throw new RpcException(error);
         }
 
-        const accessTokenPayloadDto: AccessTokenPayloadDto = {
-            sub: userData.owner,
-            username: credentialData.username,
-        };
+        const { accessTokenPayloadDto, sessionTokenPayloadDto } =
+            this.generateDtoForTokens(userData, credentialData);
 
-        const sessionTokenPayloadDto: SessionTokenPayloadDto = {
-            sub: userData.owner,
-            username: credentialData.username,
-            email: credentialData.email,
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            preferences: userData.preferences,
-        };
+        const userInfo = sessionTokenPayloadDto;
 
         try {
-            return await lastValueFrom(
+            const tokens = await lastValueFrom(
                 forkJoin({
                     accessToken: this.transporter.send(
                         AUTH_PATTERNS.GENERATE_TOKEN,
@@ -111,6 +102,11 @@ export class ClientAuthService implements OnApplicationBootstrap {
                     ),
                 }).pipe(retry(3), timeout(1000)),
             );
+
+            return {
+                userInfo,
+                ...tokens,
+            };
         } catch (error) {
             try {
                 await lastValueFrom(
@@ -158,10 +154,7 @@ export class ClientAuthService implements OnApplicationBootstrap {
                 forkJoin([
                     this.transporter.send(AUTH_PATTERNS.DELETE, id),
                     this.transporter.send(AUTH_PATTERNS.DELETE_ALL_TOKENS, id),
-                ]).pipe(
-                    retry(3),
-                    timeout(1000),
-                )
+                ]).pipe(retry(3), timeout(1000)),
             );
         } catch (error) {
             throw new RpcException(error);
@@ -183,8 +176,10 @@ export class ClientAuthService implements OnApplicationBootstrap {
     }
 
     async login(loginRequestDto: LoginRequestDto) {
+        let credentialData: ICredentialData;
+
         try {
-            return await lastValueFrom(
+            credentialData = await lastValueFrom(
                 this.transporter
                     .send(AUTH_PATTERNS.LOGIN, loginRequestDto)
                     .pipe(retry(3), timeout(1000)),
@@ -192,5 +187,73 @@ export class ClientAuthService implements OnApplicationBootstrap {
         } catch (error) {
             throw new RpcException(error);
         }
+
+        try {
+            const userData: IUserData = await lastValueFrom<IUserData>(
+                this.transporter
+                    .send(USER_PATTERNS.FIND, credentialData.id)
+                    .pipe(retry(3), timeout(1000)),
+            );
+
+            const { accessTokenPayloadDto, sessionTokenPayloadDto } =
+                this.generateDtoForTokens(userData, credentialData);
+
+            const userInfo = sessionTokenPayloadDto;
+
+            const tokens = await lastValueFrom(
+                forkJoin({
+                    accessToken: this.transporter.send(
+                        AUTH_PATTERNS.GENERATE_TOKEN,
+                        {
+                            payload: accessTokenPayloadDto,
+                            tokenType: TokenType.ACCESS,
+                        },
+                    ),
+                    sessionToken: this.transporter.send(
+                        AUTH_PATTERNS.GENERATE_TOKEN,
+                        {
+                            payload: sessionTokenPayloadDto,
+                            tokenType: TokenType.SESSION,
+                        },
+                    ),
+                }).pipe(retry(3), timeout(1000)),
+            );
+
+            return {
+                userInfo,
+                ...tokens,
+            };
+        } catch (error) {
+            throw new RpcException(error);
+        }
+    }
+
+    private generateDtoForTokens(
+        userData: IUserData,
+        credentialData: ICredentialData,
+    ) {
+        const accessTokenPayloadDto: AccessTokenPayloadDto = {
+            sub: userData.owner,
+            username: credentialData.username,
+        };
+
+        const sessionTokenPayloadDto: SessionTokenPayloadDto = {
+            sub: credentialData.id,
+            username: credentialData.username,
+            email: credentialData.email,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            preferences: userData.preferences,
+            userCreatedAt: credentialData.createdAt,
+            userUpdatedAt:
+                credentialData.updatedAt >= userData.updatedAt
+                    ? credentialData.updatedAt
+                    : userData.updatedAt,
+        };
+
+        return {
+            accessTokenPayloadDto,
+            sessionTokenPayloadDto,
+        };
     }
 }
