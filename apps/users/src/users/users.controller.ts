@@ -19,8 +19,8 @@ export class UsersController {
     @MessagePattern(USER_PATTERNS.DELETE)
     deleteUser(
         @Payload(ParseObjectIdPipe)
-        id: string,
+        ownerId: string,
     ) {
-        return this.usersService.deleteUser(id);
+        return this.usersService.deleteUser(ownerId);
     }
 }

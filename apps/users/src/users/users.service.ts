@@ -29,11 +29,13 @@ export class UsersService implements OnApplicationBootstrap {
 
     async createUser(createPersonalDataDto: CreatePersonalDataDto) {
         const isValid = await lastValueFrom(
-            this.transporter.send(
-                AUTH_PATTERNS.VALIDATE_CREDENTIAL,
-                createPersonalDataDto.owner,
-                ).pipe(retry(3), timeout(1000))
-            );
+            this.transporter
+                .send(
+                    AUTH_PATTERNS.VALIDATE_CREDENTIAL,
+                    createPersonalDataDto.owner,
+                )
+                .pipe(retry(3), timeout(1000)),
+        );
 
         if (!isValid) {
             throw new NotFoundException('Credential ID invalid');
@@ -44,8 +46,10 @@ export class UsersService implements OnApplicationBootstrap {
         return newUser.toObject();
     }
 
-    async deleteUser(id: string) {
-        const foundUser = await this.userModel.findByIdAndDelete(id);
+    async deleteUser(ownerId: string) {
+        const foundUser = await this.userModel.findOneAndDelete({
+            owner: ownerId,
+        });
 
         if (!foundUser) throw new NotFoundException('User not found');
 

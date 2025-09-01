@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Token } from '../schemas/Token.schema';
 import { Model } from 'mongoose';
@@ -11,7 +11,11 @@ import {
     SessionTokenPayloadDto,
     TokenConfigService,
     TokenType,
+    TRANSPORTER_PROVIDER,
+    AUTH_PATTERNS,
 } from '@app/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { lastValueFrom, retry, timeout } from 'rxjs';
 
 @Injectable()
 export class TokensService {
@@ -20,6 +24,7 @@ export class TokensService {
         private readonly jwtService: JwtService,
         private readonly configService: AppConfigService,
         private readonly tokenConfigService: TokenConfigService,
+        @Inject(TRANSPORTER_PROVIDER) private readonly transporter: ClientProxy,
     ) {}
 
     async generateToken(
@@ -85,5 +90,33 @@ export class TokensService {
 
                 return resetToken;
         }
+    }
+
+    async deleteAllTokensFromUser(ownerId: string) {
+        const isValid = await lastValueFrom(
+            this.transporter
+                .send(AUTH_PATTERNS.VALIDATE_CREDENTIAL, ownerId)
+                .pipe(retry(3), timeout(1000)),
+        );
+
+        if (!isValid) {
+            throw new NotFoundException('Credential ID invalid');
+        }
+
+        const deletedToken = await this.tokenModel.deleteMany({
+            owner: ownerId,
+        });
+
+        if (!deletedToken) {
+            return {
+                tokensExist: false,
+                tokensDeleted: false,
+            };
+        }
+
+        return {
+            tokensExist: true,
+            tokensDeleted: true,
+        };
     }
 }

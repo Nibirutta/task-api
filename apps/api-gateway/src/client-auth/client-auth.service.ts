@@ -17,11 +17,13 @@ import {
 } from '@app/common';
 import { pick } from 'lodash';
 import { forkJoin, lastValueFrom, retry, timeout } from 'rxjs';
+import { ClientUsersService } from '../client-users/client-users.service';
 
 @Injectable()
 export class ClientAuthService implements OnApplicationBootstrap {
     constructor(
         @Inject(TRANSPORTER_PROVIDER) private readonly transporter: ClientProxy,
+        private readonly clientUsersService: ClientUsersService,
     ) {}
 
     async onApplicationBootstrap() {
@@ -55,10 +57,8 @@ export class ClientAuthService implements OnApplicationBootstrap {
         };
 
         try {
-            userData = await lastValueFrom<IUserData>(
-                this.transporter
-                    .send(USER_PATTERNS.CREATE, createPersonalDataDto)
-                    .pipe(retry(3), timeout(1000)),
+            userData = await this.clientUsersService.createUser(
+                createPersonalDataDto,
             );
         } catch (error) {
             try {
@@ -69,7 +69,10 @@ export class ClientAuthService implements OnApplicationBootstrap {
                 );
             } catch (rollbackError) {
                 // Elaborate a more suitable log system later on
-                console.log(rollbackError);
+                console.log(
+                    'Require manual changes in the Database - Error: ' +
+                        rollbackError,
+                );
             }
 
             throw new RpcException(error);
@@ -124,7 +127,10 @@ export class ClientAuthService implements OnApplicationBootstrap {
                 );
             } catch (rollbackError) {
                 // Elaborate a more suitable log system later on
-                console.log(rollbackError);
+                console.log(
+                    'Require manual changes in the Database - Error: ' +
+                        rollbackError,
+                );
             }
 
             throw new RpcException(error);
@@ -148,12 +154,30 @@ export class ClientAuthService implements OnApplicationBootstrap {
 
     async delete(id: string) {
         try {
-            return await lastValueFrom(
-                this.transporter
-                    .send(AUTH_PATTERNS.DELETE, id)
-                    .pipe(retry(3), timeout(1000)),
+            await lastValueFrom(
+                forkJoin([
+                    this.transporter.send(AUTH_PATTERNS.DELETE, id),
+                    this.transporter.send(AUTH_PATTERNS.DELETE_ALL_TOKENS, id),
+                ]).pipe(
+                    retry(3),
+                    timeout(1000),
+                )
             );
         } catch (error) {
+            throw new RpcException(error);
+        }
+
+        try {
+            await this.clientUsersService.deleteUser(id);
+
+            return {
+                userDeleted: true,
+            };
+        } catch (error) {
+            console.log(
+                'Require manual changes in the Database - Error: ' + error,
+            );
+
             throw new RpcException(error);
         }
     }

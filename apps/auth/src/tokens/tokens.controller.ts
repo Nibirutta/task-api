@@ -8,6 +8,7 @@ import {
     SessionTokenPayloadDto,
     TokenType,
 } from '@app/common';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
 
 @Controller()
 export class TokensController {
@@ -23,5 +24,10 @@ export class TokensController {
         @Payload('tokenType') tokenType: TokenType,
     ) {
         return this.tokensService.generateToken(payload, tokenType);
+    }
+
+    @MessagePattern(AUTH_PATTERNS.DELETE_ALL_TOKENS)
+    deleteAll(@Payload(ParseObjectIdPipe) id: string) {
+        return this.tokensService.deleteAllTokensFromUser(id);
     }
 }
