@@ -5,67 +5,35 @@ import {
     Patch,
     Delete,
     Param,
-    Res,
+    UseInterceptors,
 } from '@nestjs/common';
 import {
     LoginRequestDto,
     UpdateCredentialDto,
     CreateUserDto,
-    TokenConfigService,
-    TokenType,
 } from '@app/common';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { ClientAuthService } from './client-auth.service';
-import { Response } from 'express';
-import { lastValueFrom } from 'rxjs';
+import { ChangeTokenInterceptor } from '../interceptors/change-token.interceptor';
 
 @Controller('auth')
 export class ClientAuthController {
     constructor(
-        private readonly clientAuthService: ClientAuthService,
-        private readonly tokenConfigService: TokenConfigService,
+        private readonly clientAuthService: ClientAuthService
     ) {}
 
+    @UseInterceptors(ChangeTokenInterceptor)
     @Post('register')
     async create(
-        @Body() createUserDto: CreateUserDto,
-        @Res({ passthrough: true }) response: Response,
+        @Body() createUserDto: CreateUserDto
     ) {
-        const { userInfo, accessToken, sessionToken } =
-            await this.clientAuthService.create(createUserDto);
-
-        response.cookie('sessionToken', sessionToken, {
-            secure: true,
-            httpOnly: true,
-            maxAge: this.tokenConfigService.getTokenMaxAge(TokenType.SESSION),
-            sameSite: 'none',
-        });
-
-        return {
-            userInfo,
-            accessToken,
-        };
+        return this.clientAuthService.create(createUserDto);
     }
 
+    @UseInterceptors(ChangeTokenInterceptor)
     @Post('login')
-    async login(
-        @Body() loginRequestDto: LoginRequestDto,
-        @Res({ passthrough: true }) response: Response,
-    ) {
-        const { userInfo, accessToken, sessionToken } =
-            await this.clientAuthService.login(loginRequestDto);
-
-        response.cookie('sessionToken', sessionToken, {
-            secure: true,
-            httpOnly: true,
-            maxAge: this.tokenConfigService.getTokenMaxAge(TokenType.SESSION),
-            sameSite: 'none',
-        });
-
-        return {
-            userInfo,
-            accessToken,
-        };
+    async login(@Body() loginRequestDto: LoginRequestDto) {
+        return this.clientAuthService.login(loginRequestDto);
     }
 
     @Patch(':id')

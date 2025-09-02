@@ -81,7 +81,7 @@ export class ClientAuthService implements OnApplicationBootstrap {
         const { accessTokenPayloadDto, sessionTokenPayloadDto } =
             this.generateDtoForTokens(userData, credentialData);
 
-        const userInfo = sessionTokenPayloadDto;
+        const userInfo = omit(sessionTokenPayloadDto, ['email', 'sub']);
 
         try {
             const tokens = await lastValueFrom(
@@ -198,7 +198,7 @@ export class ClientAuthService implements OnApplicationBootstrap {
             const { accessTokenPayloadDto, sessionTokenPayloadDto } =
                 this.generateDtoForTokens(userData, credentialData);
 
-            const userInfo = sessionTokenPayloadDto;
+            const userInfo = omit(sessionTokenPayloadDto, ['email', 'sub']);
 
             const tokens = await lastValueFrom(
                 forkJoin({
