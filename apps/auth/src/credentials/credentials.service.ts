@@ -22,10 +22,6 @@ export class CredentialsService {
         private readonly credentialModel: Model<Credential>,
     ) {}
 
-    private async hashPassword(password: string): Promise<string> {
-        return bcrypt.hash(password, 10);
-    }
-
     async createCredential(createCredentialDto: CreateCredentialDto) {
         const foundCredential = await this.credentialModel.findOne({
             $or: [
@@ -74,7 +70,8 @@ export class CredentialsService {
             },
         );
 
-        if (!updatedCredential) throw new NotFoundException('User not found');
+        if (!updatedCredential)
+            throw new NotFoundException('Credential not found');
 
         return updatedCredential.toObject();
     }
@@ -91,7 +88,8 @@ export class CredentialsService {
             ],
         });
 
-        if (!foundCredential) throw new NotFoundException('User not found');
+        if (!foundCredential)
+            throw new NotFoundException('Credential not found');
 
         const isValidPassword = await bcrypt.compare(
             loginRequestDto.password,
@@ -126,5 +124,9 @@ export class CredentialsService {
             throw new NotFoundException('Credential not found');
 
         return foundCredential.toObject();
+    }
+
+    private async hashPassword(password: string): Promise<string> {
+        return bcrypt.hash(password, 10);
     }
 }

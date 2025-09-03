@@ -6,6 +6,9 @@ import {
     Delete,
     Param,
     UseInterceptors,
+    Request,
+    Get,
+    UseGuards,
 } from '@nestjs/common';
 import {
     LoginRequestDto,
@@ -14,23 +17,27 @@ import {
 } from '@app/common';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { ClientAuthService } from './client-auth.service';
-import { ChangeTokenInterceptor } from '../interceptors/change-token.interceptor';
+import { SendCookieInterceptor } from '../interceptors/send-cookie.interceptor';
+import { AuthGuard } from '../guard/auth.guard';
 
 @Controller('auth')
 export class ClientAuthController {
-    constructor(
-        private readonly clientAuthService: ClientAuthService
-    ) {}
+    constructor(private readonly clientAuthService: ClientAuthService) {}
 
-    @UseInterceptors(ChangeTokenInterceptor)
+    // For testing purposes
+    @UseGuards(AuthGuard)
+    @Get('profile')
+    getProfile(@Request() req) {
+        return req.user;
+    }
+
+    @UseInterceptors(SendCookieInterceptor)
     @Post('register')
-    async create(
-        @Body() createUserDto: CreateUserDto
-    ) {
+    async create(@Body() createUserDto: CreateUserDto) {
         return this.clientAuthService.create(createUserDto);
     }
 
-    @UseInterceptors(ChangeTokenInterceptor)
+    @UseInterceptors(SendCookieInterceptor)
     @Post('login')
     async login(@Body() loginRequestDto: LoginRequestDto) {
         return this.clientAuthService.login(loginRequestDto);

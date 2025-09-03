@@ -9,8 +9,10 @@ import { Observable, map } from 'rxjs';
 import { TokenConfigService, TokenType } from '@app/common';
 
 @Injectable()
-export class ChangeTokenInterceptor implements NestInterceptor {
-    constructor(private readonly tokenConfigService: TokenConfigService) { }
+export class SendCookieInterceptor implements NestInterceptor {
+    constructor(
+        private readonly tokenConfigService: TokenConfigService,
+    ) {}
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         const response: Response = context.switchToHttp().getResponse();
@@ -18,6 +20,15 @@ export class ChangeTokenInterceptor implements NestInterceptor {
         return next.handle().pipe(
             map((data) => {
                 if (data?.sessionToken) {
+                    response.clearCookie('sessionToken', {
+                        secure: true,
+                        httpOnly: true,
+                        maxAge: this.tokenConfigService.getTokenMaxAge(
+                            TokenType.SESSION,
+                        ),
+                        sameSite: 'none',
+                    });
+
                     response.cookie('sessionToken', data.sessionToken, {
                         secure: true,
                         httpOnly: true,

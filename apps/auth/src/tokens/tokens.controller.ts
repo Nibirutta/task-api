@@ -26,6 +26,19 @@ export class TokensController {
         return this.tokensService.generateToken(payload, tokenType);
     }
 
+    @MessagePattern(AUTH_PATTERNS.VALIDATE_TOKEN)
+    validadeToken(
+        @Payload('token') token: string,
+        @Payload('tokenType') tokenType: TokenType,
+    ) {
+        return this.tokensService.validateToken(token, tokenType);
+    }
+
+    @MessagePattern(AUTH_PATTERNS.DELETE)
+    deleteToken(@Payload() token: string) {
+        return this.tokensService.deleteToken(token);
+    }
+
     @MessagePattern(AUTH_PATTERNS.DELETE_ALL_TOKENS)
     deleteAll(@Payload(ParseObjectIdPipe) id: string) {
         return this.tokensService.deleteAllTokensFromUser(id);
