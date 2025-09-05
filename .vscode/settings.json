@@ -4,6 +4,7 @@
     "conventionalCommits.scopes": [
         "Global",
         "Users",
-        "Auth"
+        "Auth",
+        "Gateway"
     ]
 }

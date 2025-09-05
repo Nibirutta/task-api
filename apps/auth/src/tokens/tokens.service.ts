@@ -26,7 +26,7 @@ export class TokensService {
         private readonly configService: AppConfigService,
         private readonly tokenConfigService: TokenConfigService,
         private readonly credentialService: CredentialsService,
-    ) {}
+    ) { }
 
     async generateToken(
         payload:

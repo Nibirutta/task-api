@@ -34,7 +34,7 @@ export class TokensController {
         return this.tokensService.validateToken(token, tokenType);
     }
 
-    @MessagePattern(AUTH_PATTERNS.DELETE)
+    @MessagePattern(AUTH_PATTERNS.DELETE_TOKEN)
     deleteToken(@Payload() token: string) {
         return this.tokensService.deleteToken(token);
     }
