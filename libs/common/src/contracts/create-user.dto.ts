@@ -7,7 +7,7 @@ import {
     Length,
 } from 'class-validator';
 
-export class CreateUserDto {
+export class CreateAccountDto {
     @IsNotEmpty()
     @IsString()
     @Length(3, 20)

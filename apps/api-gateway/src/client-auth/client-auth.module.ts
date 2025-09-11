@@ -7,7 +7,6 @@ import {
     AppConfigService,
     TRANSPORTER_PROVIDER,
 } from '@app/common';
-import { ClientUsersService } from '../client-users/client-users.service';
 
 @Module({
     imports: [AppConfigModule],
@@ -21,8 +20,8 @@ import { ClientUsersService } from '../client-users/client-users.service';
             },
             inject: [AppConfigService],
         },
-        ClientUsersService,
     ],
     controllers: [ClientAuthController],
+    exports: [ClientAuthService],
 })
 export class ClientAuthModule {}

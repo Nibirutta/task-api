@@ -1,8 +1,4 @@
-import {
-    ForbiddenException,
-    Injectable,
-    UnauthorizedException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Token } from '../schemas/Token.schema';
 import { Model } from 'mongoose';
@@ -26,7 +22,7 @@ export class TokensService {
         private readonly configService: AppConfigService,
         private readonly tokenConfigService: TokenConfigService,
         private readonly credentialService: CredentialsService,
-    ) { }
+    ) {}
 
     async generateToken(
         payload:
@@ -42,18 +38,6 @@ export class TokensService {
                         this.tokenConfigService.getTokenDuration(tokenType),
                     secret: this.getSecretByTokenType(tokenType),
                 });
-
-                const accessTokenData = {
-                    token: accessToken,
-                    type: TokenType.ACCESS,
-                    owner: payload.sub,
-                    expiresAt:
-                        this.tokenConfigService.getTokenExpirationDate(
-                            tokenType,
-                        ),
-                };
-
-                await this.tokenModel.create(accessTokenData);
 
                 return accessToken;
             case TokenType.SESSION:
@@ -100,53 +84,56 @@ export class TokensService {
     }
 
     async validateToken(token: string, tokenType: TokenType) {
-        let decodedToken;
-
-        try {
-            decodedToken = await this.jwtService.verifyAsync(token, {
-                secret: this.getSecretByTokenType(tokenType),
-            });
-        } catch (error) {
-            throw new UnauthorizedException('Invalid Token');
-        }
-
-        const foundToken = await this.tokenModel.findOne({
-            token: token,
-        });
-
-        // If no token is found, it might be a sign of a hacked user or an invalid token
-        // We should verify the token to ensure it's valid and then delete all tokens for that user
-        if (!foundToken) {
+        if (tokenType === TokenType.ACCESS) {
             try {
-                await this.credentialService.findCredential(decodedToken.sub);
-
-                await this.tokenModel.deleteMany({ owner: decodedToken.sub });
-
-                // Sends an email to the user telling him about the risks
+                return this.jwtService.verify(token, {
+                    secret: this.getSecretByTokenType(tokenType),
+                });
             } catch (error) {
-                throw new ForbiddenException('Token Rejected');
+                throw new ForbiddenException('Not allowed - invalid token');
+            }
+        } else {
+            const foundToken = await this.tokenModel.findOne({ token: token });
+
+            if (!foundToken) {
+                try {
+                    const decodedToken = this.jwtService.verify(token, {
+                        secret: this.getSecretByTokenType(tokenType),
+                    });
+
+                    const hackedUser = this.credentialService.findCredential(
+                        decodedToken.sub,
+                    );
+
+                    if (!hackedUser) throw new ForbiddenException();
+
+                    await this.tokenModel.deleteMany({
+                        owner: decodedToken.sub,
+                    });
+
+                    // Sends an email to the user requesting a password change
+                } finally {
+                    throw new ForbiddenException('Not allowed - invalid token');
+                }
+            }
+
+            try {
+                const decodedToken = this.jwtService.verify(token, {
+                    secret: this.getSecretByTokenType(tokenType),
+                });
+
+                return decodedToken;
+            } catch (error) {
+                throw new ForbiddenException('Not allowed - invalid token');
             }
         }
-
-        const foundCredential = await this.credentialService.findCredential(
-            decodedToken.sub,
-        );
-
-        // Verifies if the user really exists in the database, if not, delete all tokens that was linked to him
-        if (!foundCredential) {
-            await this.tokenModel.deleteMany({ owner: decodedToken.sub });
-
-            throw new ForbiddenException('Token Rejected');
-        }
-
-        return decodedToken;
     }
 
     async deleteToken(token: string) {
         return await this.tokenModel.deleteOne({ token: token });
     }
 
-    async deleteAllTokensFromUser(ownerId: string) {
+    async deleteUserTokens(ownerId: string) {
         return await this.tokenModel.deleteMany({
             owner: ownerId,
         });

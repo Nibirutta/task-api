@@ -5,8 +5,7 @@ services:
     container_name: rabbitmq
     restart: unless-stopped
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5672"
     networks:
       - taskapi-network
 
@@ -17,7 +16,7 @@ services:
     container_name: taskapi-auth
     restart: unless-stopped
     ports:
-      - "3002:3002"
+      - "3002"
     environment:
       AUTH_MICROSERVICE_PORT: ${AUTH_MICROSERVICE_PORT}
       DATABASE_URL: ${DATABASE_URL}
@@ -38,7 +37,7 @@ services:
     container_name: taskapi-users
     restart: unless-stopped
     ports:
-      - "3001:3001"
+      - "3001"
     environment:
       USERS_MICROSERVICE_PORT: ${USERS_MICROSERVICE_PORT}
       AUTH_MICROSERVICE_PORT: ${AUTH_MICROSERVICE_PORT}

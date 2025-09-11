@@ -20,7 +20,7 @@ export class CredentialsService {
     constructor(
         @InjectModel(Credential.name)
         private readonly credentialModel: Model<Credential>,
-    ) {}
+    ) { }
 
     async createCredential(createCredentialDto: CreateCredentialDto) {
         const foundCredential = await this.credentialModel.findOne({
@@ -76,7 +76,7 @@ export class CredentialsService {
         return updatedCredential.toObject();
     }
 
-    async login(loginRequestDto: LoginRequestDto) {
+    async validateCredential(loginRequestDto: LoginRequestDto) {
         const foundCredential = await this.credentialModel.findOne({
             $or: [
                 {
@@ -110,11 +110,6 @@ export class CredentialsService {
             throw new NotFoundException('Credential not found');
 
         return deletedCredential.toObject();
-    }
-
-    async validateCredential(id: string) {
-        const foundCredential = await this.credentialModel.findById(id);
-        return !!foundCredential;
     }
 
     async findCredential(id: string) {

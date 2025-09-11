@@ -24,21 +24,18 @@ export class UsersService implements OnApplicationBootstrap {
 
     async onApplicationBootstrap() {
         await this.transporter.connect();
-        console.log('Connected to transporter');
+        console.log('Users microservice connected to transporter');
     }
 
     async createUser(createPersonalDataDto: CreatePersonalDataDto) {
-        const isValid = await lastValueFrom(
-            this.transporter
-                .send(
-                    AUTH_PATTERNS.VALIDATE_CREDENTIAL,
-                    createPersonalDataDto.owner,
-                )
-                .pipe(retry(3), timeout(1000)),
-        );
-
-        if (!isValid) {
-            throw new NotFoundException('Credential ID invalid');
+        try {
+            await lastValueFrom(
+                this.transporter
+                    .send(AUTH_PATTERNS.FIND, createPersonalDataDto.owner)
+                    .pipe(retry(3), timeout(1000)),
+            );
+        } catch (error) {
+            throw error;
         }
 
         const newUser = await this.userModel.create(createPersonalDataDto);

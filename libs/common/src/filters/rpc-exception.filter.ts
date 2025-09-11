@@ -9,7 +9,7 @@ import { Observable, throwError } from 'rxjs';
 import { MongoError } from 'mongodb';
 
 @Catch()
-export class RcpExceptionFilter extends BaseRpcExceptionFilter {
+export class RpcExceptionFilter extends BaseRpcExceptionFilter {
     catch(exception: any, host: ArgumentsHost): Observable<any> {
         if (exception instanceof HttpException) {
             return throwError(
@@ -40,11 +40,16 @@ export class RcpExceptionFilter extends BaseRpcExceptionFilter {
         return throwError(
             () =>
                 new RpcException({
-                    status: HttpStatus.INTERNAL_SERVER_ERROR,
+                    status:
+                        exception.error.status ||
+                        HttpStatus.INTERNAL_SERVER_ERROR,
                     response: {
-                        error: exception.name || 'UnknownError',
-                        message: exception.message || 'Internal server error',
-                        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+                        error: exception.error.error || 'UnknownError',
+                        message:
+                            exception.error.message || 'Internal server error',
+                        statusCode:
+                            exception.error.status ||
+                            HttpStatus.INTERNAL_SERVER_ERROR,
                     },
                 }),
         );

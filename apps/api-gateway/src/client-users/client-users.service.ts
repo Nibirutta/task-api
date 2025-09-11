@@ -16,22 +16,48 @@ export class ClientUsersService implements OnApplicationBootstrap {
 
     async onApplicationBootstrap() {
         await this.transporter.connect();
-        console.log('Connected to transporter');
+        console.log('Client users connected to transporter');
     }
 
-    createUser(createPersonalDataDto: CreatePersonalDataDto) {
-        return lastValueFrom<IUserData>(
-            this.transporter
-                .send(USER_PATTERNS.CREATE, createPersonalDataDto)
-                .pipe(retry(3), timeout(1000)),
-        );
+    async createUser(
+        createPersonalDataDto: CreatePersonalDataDto,
+    ): Promise<IUserData> {
+        try {
+            return lastValueFrom<IUserData>(
+                this.transporter
+                    .send(USER_PATTERNS.CREATE, createPersonalDataDto)
+                    .pipe(retry(3), timeout(1000)),
+            );
+        } catch (error) {
+            throw error;
+        }
     }
 
-    deleteUser(ownerId: string) {
-        return lastValueFrom(
-            this.transporter
-                .send(USER_PATTERNS.DELETE, ownerId)
-                .pipe(retry(3), timeout(1000)),
-        );
+    async findUser(ownerId: string) {
+        try {
+            return lastValueFrom(
+                this.transporter
+                    .send(USER_PATTERNS.FIND, ownerId)
+                    .pipe(retry(3), timeout(1000)),
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async deleteUser(ownerId: string) {
+        try {
+            const userDeleted = await lastValueFrom(
+                this.transporter
+                    .send(USER_PATTERNS.DELETE, ownerId)
+                    .pipe(retry(3), timeout(1000)),
+            );
+
+            return {
+                userDeleted: userDeleted,
+            };
+        } catch (error) {
+            throw error;
+        }
     }
 }

@@ -1,17 +1,20 @@
 import { Module } from '@nestjs/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
-import { ClientUsersController } from './client-users.controller';
-import { ClientUsersService } from './client-users.service';
+import { ClientAccountController } from './client-account.controller';
+import { ClientAccountService } from './client-account.service';
+import { ClientAuthModule } from '../client-auth/client-auth.module';
+import { ClientUsersModule } from '../client-users/client-users.module';
 import {
+    TRANSPORTER_PROVIDER,
     AppConfigModule,
     AppConfigService,
-    TRANSPORTER_PROVIDER,
 } from '@app/common';
 
 @Module({
-    imports: [AppConfigModule],
+    imports: [ClientAuthModule, ClientUsersModule, AppConfigModule],
+    controllers: [ClientAccountController],
     providers: [
-        ClientUsersService,
+        ClientAccountService,
         {
             provide: TRANSPORTER_PROVIDER,
             useFactory: (configService: AppConfigService) => {
@@ -21,7 +24,5 @@ import {
             inject: [AppConfigService],
         },
     ],
-    controllers: [ClientUsersController],
-    exports: [ClientUsersService],
 })
-export class ClientUsersModule {}
+export class ClientAccountModule {}

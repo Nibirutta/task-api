@@ -1,13 +1,4 @@
-import {
-    IsDate,
-    IsEmail,
-    IsMongoId,
-    IsNotEmpty,
-    IsObject,
-    IsOptional,
-    IsString,
-} from 'class-validator';
-import { IUserPreferences } from '../interfaces/user-preferences.interface';
+import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
 
 export class BaseTokenPayloadDto {
     @IsNotEmpty()
@@ -21,34 +12,6 @@ export class AccessTokenPayloadDto extends BaseTokenPayloadDto {
     username: string;
 }
 
-export class SessionTokenPayloadDto extends BaseTokenPayloadDto {
-    @IsNotEmpty()
-    @IsString()
-    username: string;
-
-    @IsNotEmpty()
-    @IsEmail()
-    email: string;
-
-    @IsNotEmpty()
-    @IsString()
-    firstName: string;
-
-    @IsOptional()
-    @IsString()
-    lastName?: string;
-
-    @IsNotEmpty()
-    @IsObject()
-    preferences: IUserPreferences;
-
-    @IsNotEmpty()
-    @IsDate()
-    userCreatedAt: Date;
-
-    @IsNotEmpty()
-    @IsDate()
-    userUpdatedAt: Date;
-}
+export class SessionTokenPayloadDto extends BaseTokenPayloadDto {}
 
 export class ResetTokenPayloadDto extends BaseTokenPayloadDto {}

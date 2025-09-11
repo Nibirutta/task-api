@@ -3,6 +3,7 @@ import {
     ExecutionContext,
     Inject,
     Injectable,
+    OnApplicationBootstrap,
     UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
@@ -11,10 +12,15 @@ import { AUTH_PATTERNS, TokenType, TRANSPORTER_PROVIDER } from '@app/common';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class JwtGuard implements CanActivate, OnApplicationBootstrap {
     constructor(
         @Inject(TRANSPORTER_PROVIDER) private readonly transporter: ClientProxy,
     ) {}
+
+    async onApplicationBootstrap() {
+        await this.transporter.connect();
+        console.log('Guard connected to transporter');
+    }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request: Request = context.switchToHttp().getRequest();

@@ -1,8 +1,8 @@
 import { PickType } from '@nestjs/mapped-types';
-import { CreateUserDto } from './create-user.dto';
+import { CreateAccountDto } from './create-user.dto';
 import { IsMongoId, IsNotEmpty } from 'class-validator';
 
-export class CreatePersonalDataDto extends PickType(CreateUserDto, [
+export class CreatePersonalDataDto extends PickType(CreateAccountDto, [
     'firstName',
     'lastName',
 ]) {

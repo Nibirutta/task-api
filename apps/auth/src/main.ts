@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AsyncMicroserviceOptions } from '@nestjs/microservices';
 import {
     ValidationPipe,
-    RcpExceptionFilter,
+    RpcExceptionFilter,
     AppConfigService,
 } from '@app/common';
 import { AuthAppModule } from './auth-app.module';
@@ -19,7 +19,7 @@ async function bootstrap() {
     );
 
     app.useGlobalPipes(new ValidationPipe());
-    app.useGlobalFilters(new RcpExceptionFilter());
+    app.useGlobalFilters(new RpcExceptionFilter());
 
     await app.listen();
 }

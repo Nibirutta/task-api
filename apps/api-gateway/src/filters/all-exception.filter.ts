@@ -24,19 +24,20 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
             response: '',
         };
 
-        if (exception instanceof RpcException) {
-            const rpcException: any = exception.getError();
-            responseObject.statusCode = rpcException.error.status;
-            responseObject.response = rpcException.error.response;
-        } else if (exception instanceof HttpException) {
+        console.log(exception);
+
+        if (exception instanceof HttpException) {
             responseObject.statusCode = exception.getStatus();
             responseObject.response = exception.getResponse();
         } else {
-            responseObject.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+            responseObject.statusCode =
+                exception.error.status || HttpStatus.INTERNAL_SERVER_ERROR;
             responseObject.response = {
-                message: exception.message || 'Internal server error',
-                error: exception.name || 'UnknownError',
-                statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+                message:
+                    exception.error.response.message || 'Internal server error',
+                error: exception.error.response.error || 'UnknownError',
+                statusCode:
+                    exception.error.status || HttpStatus.INTERNAL_SERVER_ERROR,
             };
         }
 

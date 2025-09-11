@@ -27,7 +27,7 @@ export class TokensController {
     }
 
     @MessagePattern(AUTH_PATTERNS.VALIDATE_TOKEN)
-    validadeToken(
+    validateToken(
         @Payload('token') token: string,
         @Payload('tokenType') tokenType: TokenType,
     ) {
@@ -39,8 +39,8 @@ export class TokensController {
         return this.tokensService.deleteToken(token);
     }
 
-    @MessagePattern(AUTH_PATTERNS.DELETE_ALL_TOKENS)
-    deleteAll(@Payload(ParseObjectIdPipe) id: string) {
-        return this.tokensService.deleteAllTokensFromUser(id);
+    @MessagePattern(AUTH_PATTERNS.DELETE_USER_TOKENS)
+    deleteUserTokens(@Payload(ParseObjectIdPipe) id: string) {
+        return this.tokensService.deleteUserTokens(id);
     }
 }

@@ -11,7 +11,7 @@ import { ParseObjectIdPipe } from '@nestjs/mongoose';
 
 @Controller()
 export class CredentialsController {
-    constructor(private readonly authService: CredentialsService) {}
+    constructor(private readonly authService: CredentialsService) { }
 
     @MessagePattern(AUTH_PATTERNS.CREATE)
     createCredential(@Payload() createCredentialDto: CreateCredentialDto) {
@@ -32,14 +32,9 @@ export class CredentialsController {
         return this.authService.deleteCredential(id);
     }
 
-    @MessagePattern(AUTH_PATTERNS.LOGIN)
-    login(@Payload() loginRequestDto: LoginRequestDto) {
-        return this.authService.login(loginRequestDto);
-    }
-
     @MessagePattern(AUTH_PATTERNS.VALIDATE_CREDENTIAL)
-    validateCredential(@Payload(ParseObjectIdPipe) id: string) {
-        return this.authService.validateCredential(id);
+    validateCredential(@Payload() loginRequestDto: LoginRequestDto) {
+        return this.authService.validateCredential(loginRequestDto);
     }
 
     @MessagePattern(AUTH_PATTERNS.FIND)
