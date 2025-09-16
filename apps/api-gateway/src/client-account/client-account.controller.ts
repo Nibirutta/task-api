@@ -1,4 +1,4 @@
-import { CreateAccountDto, LoginRequestDto } from '@app/common';
+import { CreateAccountDto, LoginRequestDto, UpdateCredentialDto } from '@app/common';
 import {
     Body,
     Controller,
@@ -8,20 +8,22 @@ import {
     Delete,
     UseGuards,
     Get,
+    Patch
 } from '@nestjs/common';
 import { ClientAccountService } from './client-account.service';
 import { SendCookieInterceptor } from '../interceptors/send-cookie.interceptor';
 import { JwtGuard } from '../guard/jwt.guard';
+import { SessionGuard } from '../guard/session.guard';
 
 @Controller('account')
 export class ClientAccountController {
-    constructor(private readonly clientAccount: ClientAccountService) {}
+    constructor(private readonly clientAccount: ClientAccountService) { }
 
-    // For testing purposes
-    @UseGuards(JwtGuard)
-    @Get()
+    @UseGuards(SessionGuard)
+    @UseInterceptors(SendCookieInterceptor)
+    @Get('refresh')
     getProfile(@Request() req) {
-        return req.user;
+        return this.clientAccount.refreshSession(req.user.sub);
     }
 
     @UseInterceptors(SendCookieInterceptor)

@@ -118,11 +118,9 @@ export class TokensService {
             }
 
             try {
-                const decodedToken = this.jwtService.verify(token, {
+                return this.jwtService.verify(token, {
                     secret: this.getSecretByTokenType(tokenType),
                 });
-
-                return decodedToken;
             } catch (error) {
                 throw new ForbiddenException('Not allowed - invalid token');
             }

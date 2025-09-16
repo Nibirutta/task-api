@@ -24,6 +24,17 @@ export class ClientAuthService implements OnApplicationBootstrap {
         console.log('Client auth connected to transporter');
     }
 
+    async findCredential(id: string) {
+        try {
+            return await lastValueFrom<ICredentialData>(
+                this.transporter.send(AUTH_PATTERNS.FIND, id)
+                    .pipe(retry(3), timeout(1000)),
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async validateCredential(
         loginRequestDto: LoginRequestDto,
     ): Promise<ICredentialData> {

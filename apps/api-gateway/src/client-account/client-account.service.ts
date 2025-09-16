@@ -114,4 +114,30 @@ export class ClientAccountService {
             userDeleted: deletedProfile.firstName,
         };
     }
+
+    async refreshSession(id: string) {
+        const validatedCredential: ICredentialData = await this.clientAuthService.findCredential(id);
+
+        const validatedProfile: IProfileData = await this.clientProfileService.findProfile(id);
+
+        const accessTokenPayloadDto: AccessTokenPayloadDto = {
+            sub: validatedCredential.id,
+            username: validatedCredential.username,
+        };
+
+        const sessionTokenPayloadDto: SessionTokenPayloadDto = {
+            sub: validatedCredential.id,
+        };
+
+        const tokens = await this.clientAuthService.generateUserTokens(
+            accessTokenPayloadDto,
+            sessionTokenPayloadDto,
+        );
+
+        return {
+            credentialData: validatedCredential,
+            userData: validatedProfile,
+            ...tokens,
+        };
+    }
 }
