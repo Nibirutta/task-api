@@ -1,31 +1,31 @@
 import { Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
-    CreatePersonalDataDto,
-    IUserData,
+    CreateProfileDto,
+    IProfileData,
     TRANSPORTER_PROVIDER,
-    USER_PATTERNS,
+    PROFILE_PATTERNS,
 } from '@app/common';
 import { lastValueFrom, retry, timeout } from 'rxjs';
 
 @Injectable()
-export class ClientUsersService implements OnApplicationBootstrap {
+export class ClientProfileService implements OnApplicationBootstrap {
     constructor(
         @Inject(TRANSPORTER_PROVIDER) private readonly transporter: ClientProxy,
     ) {}
 
     async onApplicationBootstrap() {
         await this.transporter.connect();
-        console.log('Client users connected to transporter');
+        console.log('Client profile connected to transporter');
     }
 
-    async createUser(
-        createPersonalDataDto: CreatePersonalDataDto,
-    ): Promise<IUserData> {
+    async createProfile(
+        createProfileDto: CreateProfileDto,
+    ): Promise<IProfileData> {
         try {
-            return lastValueFrom<IUserData>(
+            return lastValueFrom<IProfileData>(
                 this.transporter
-                    .send(USER_PATTERNS.CREATE, createPersonalDataDto)
+                    .send(PROFILE_PATTERNS.CREATE, createProfileDto)
                     .pipe(retry(3), timeout(1000)),
             );
         } catch (error) {
@@ -33,11 +33,11 @@ export class ClientUsersService implements OnApplicationBootstrap {
         }
     }
 
-    async findUser(ownerId: string) {
+    async findProfile(ownerId: string) {
         try {
-            return lastValueFrom(
+            return lastValueFrom<IProfileData>(
                 this.transporter
-                    .send(USER_PATTERNS.FIND, ownerId)
+                    .send(PROFILE_PATTERNS.FIND, ownerId)
                     .pipe(retry(3), timeout(1000)),
             );
         } catch (error) {
@@ -45,17 +45,13 @@ export class ClientUsersService implements OnApplicationBootstrap {
         }
     }
 
-    async deleteUser(ownerId: string) {
+    async deleteProfile(ownerId: string) {
         try {
-            const userDeleted = await lastValueFrom(
+            return lastValueFrom<IProfileData>(
                 this.transporter
-                    .send(USER_PATTERNS.DELETE, ownerId)
+                    .send(PROFILE_PATTERNS.DELETE, ownerId)
                     .pipe(retry(3), timeout(1000)),
             );
-
-            return {
-                userDeleted: userDeleted,
-            };
         } catch (error) {
             throw error;
         }

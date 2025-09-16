@@ -10,7 +10,7 @@ import { TokenConfigService } from './token-config.service';
         ConfigModule.forRoot({
             isGlobal: false,
             validationSchema: joi.object({
-                USERS_MICROSERVICE_PORT: joi.number().default(3001),
+                PROFILE_MICROSERVICE_PORT: joi.number().default(3001),
                 AUTH_MICROSERVICE_PORT: joi.number().default(3002),
                 DATABASE_URL: joi.string(),
             }),

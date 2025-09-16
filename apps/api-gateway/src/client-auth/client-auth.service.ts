@@ -17,7 +17,7 @@ import { forkJoin, lastValueFrom, retry, timeout } from 'rxjs';
 export class ClientAuthService implements OnApplicationBootstrap {
     constructor(
         @Inject(TRANSPORTER_PROVIDER) private readonly transporter: ClientProxy,
-    ) { }
+    ) {}
 
     async onApplicationBootstrap() {
         await this.transporter.connect();

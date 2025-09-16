@@ -6,7 +6,9 @@ export const corsOptions = {
         if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
             callback(null, true);
         } else {
-            callback(new ForbiddenException('Origin not allowed by CORS policy'));
+            callback(
+                new ForbiddenException('Origin not allowed by CORS policy'),
+            );
         }
     },
     credentials: true,

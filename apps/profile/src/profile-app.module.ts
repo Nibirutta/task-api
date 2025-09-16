@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { ENV_KEYS, AppConfigModule, AppConfigService } from '@app/common';
-import { UsersModule } from './users/users.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
     imports: [
@@ -18,9 +18,9 @@ import { UsersModule } from './users/users.module';
             }),
             inject: [AppConfigService],
         }),
-        UsersModule,
+        ProfileModule,
     ],
     controllers: [],
     providers: [],
 })
-export class UsersAppModule {}
+export class ProfileAppModule {}

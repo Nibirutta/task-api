@@ -3,15 +3,15 @@ import { ClientProxyFactory } from '@nestjs/microservices';
 import { ClientAccountController } from './client-account.controller';
 import { ClientAccountService } from './client-account.service';
 import { ClientAuthModule } from '../client-auth/client-auth.module';
-import { ClientUsersModule } from '../client-users/client-users.module';
 import {
     TRANSPORTER_PROVIDER,
     AppConfigModule,
     AppConfigService,
 } from '@app/common';
+import { ClientProfileModule } from '../client-profile/client-profile.module';
 
 @Module({
-    imports: [ClientAuthModule, ClientUsersModule, AppConfigModule],
+    imports: [ClientAuthModule, ClientProfileModule, AppConfigModule],
     controllers: [ClientAccountController],
     providers: [
         ClientAccountService,

@@ -20,7 +20,7 @@ export class CredentialsService {
     constructor(
         @InjectModel(Credential.name)
         private readonly credentialModel: Model<Credential>,
-    ) { }
+    ) {}
 
     async createCredential(createCredentialDto: CreateCredentialDto) {
         const foundCredential = await this.credentialModel.findOne({

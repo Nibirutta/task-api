@@ -1,4 +1,4 @@
-export interface IUserPreferences {
+export interface IProfilePreferences {
     theme: string;
     language: string;
     notification: {

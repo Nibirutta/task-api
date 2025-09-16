@@ -11,7 +11,7 @@ import { ParseObjectIdPipe } from '@nestjs/mongoose';
 
 @Controller()
 export class CredentialsController {
-    constructor(private readonly authService: CredentialsService) { }
+    constructor(private readonly authService: CredentialsService) {}
 
     @MessagePattern(AUTH_PATTERNS.CREATE)
     createCredential(@Payload() createCredentialDto: CreateCredentialDto) {

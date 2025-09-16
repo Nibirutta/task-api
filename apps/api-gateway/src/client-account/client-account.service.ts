@@ -1,23 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { ClientAuthService } from '../client-auth/client-auth.service';
-import { ClientUsersService } from '../client-users/client-users.service';
 import {
     CreateAccountDto,
     CreateCredentialDto,
     ICredentialData,
-    CreatePersonalDataDto,
-    IUserData,
+    CreateProfileDto,
+    IProfileData,
     AccessTokenPayloadDto,
     SessionTokenPayloadDto,
     LoginRequestDto,
 } from '@app/common';
 import { pick } from 'lodash';
+import { ClientProfileService } from '../client-profile/client-profile.service';
 
 @Injectable()
 export class ClientAccountService {
     constructor(
         private readonly clientAuthService: ClientAuthService,
-        private readonly clientUsersService: ClientUsersService,
+        private readonly clientProfileService: ClientProfileService,
     ) {}
 
     async createAccount(createUserDto: CreateAccountDto) {
@@ -27,20 +27,20 @@ export class ClientAccountService {
             'password',
         ]);
 
-        let userData: IUserData;
+        let profileData: IProfileData;
         let tokens;
 
         const credentialData: ICredentialData =
             await this.clientAuthService.createCredential(createCredentialDto);
 
-        const createPersonalDataDto: CreatePersonalDataDto = {
+        const createProfileDto: CreateProfileDto = {
             owner: credentialData.id,
             ...pick(createUserDto, ['firstName', 'lastName']),
         };
 
         try {
-            userData = await this.clientUsersService.createUser(
-                createPersonalDataDto,
+            profileData = await this.clientProfileService.createProfile(
+                createProfileDto,
             );
         } catch (error) {
             await this.clientAuthService.deleteCredential(credentialData.id);
@@ -64,14 +64,14 @@ export class ClientAccountService {
             );
         } catch (error) {
             await this.clientAuthService.deleteCredential(credentialData.id);
-            await this.clientUsersService.deleteUser(credentialData.id);
+            await this.clientProfileService.deleteProfile(credentialData.id);
 
             throw error;
         }
 
         return {
             credentialData,
-            userData,
+            userData: profileData,
             ...tokens,
         };
     }
@@ -80,7 +80,7 @@ export class ClientAccountService {
         const validatedCredential =
             await this.clientAuthService.validateCredential(loginRequestDto);
 
-        const validatedUser = await this.clientUsersService.findUser(
+        const validatedProfile = await this.clientProfileService.findProfile(
             validatedCredential.id,
         );
 
@@ -100,16 +100,18 @@ export class ClientAccountService {
 
         return {
             credentialData: validatedCredential,
-            userData: validatedUser,
+            userData: validatedProfile,
             ...tokens,
         };
     }
 
     async deleteAccount(id: string) {
         await this.clientAuthService.deleteCredential(id);
-        const deletedUser = await this.clientUsersService.deleteUser(id);
+        const deletedProfile = await this.clientProfileService.deleteProfile(id);
         await this.clientAuthService.deleteUserTokens(id);
 
-        return deletedUser;
+        return {
+            userDeleted: deletedProfile.firstName,
+        };
     }
 }

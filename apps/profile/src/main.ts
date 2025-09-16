@@ -5,11 +5,11 @@ import {
     RpcExceptionFilter,
     AppConfigService,
 } from '@app/common';
-import { UsersAppModule } from './users-app.module';
+import { ProfileAppModule } from './profile-app.module';
 
 async function bootstrap() {
     const app = await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
-        UsersAppModule,
+        ProfileAppModule,
         {
             useFactory: (configService: AppConfigService) => {
                 return configService.microserviceOptions;

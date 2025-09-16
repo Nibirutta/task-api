@@ -30,17 +30,16 @@ services:
     networks:
       - taskapi-network
 
-  users:
+  profile:
     build:
       context: .
-      dockerfile: apps/users/Dockerfile
-    container_name: taskapi-users
+      dockerfile: apps/profile/Dockerfile
+    container_name: taskapi-profile
     restart: unless-stopped
     ports:
       - "3001"
     environment:
-      USERS_MICROSERVICE_PORT: ${USERS_MICROSERVICE_PORT}
-      AUTH_MICROSERVICE_PORT: ${AUTH_MICROSERVICE_PORT}
+      PROFILE_MICROSERVICE_PORT: ${PROFILE_MICROSERVICE_PORT}
       DATABASE_URL: ${DATABASE_URL}
     env_file:
       - .env
@@ -58,7 +57,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      USERS_MICROSERVICE_PORT: ${USERS_MICROSERVICE_PORT}
+      PROFILE_MICROSERVICE_PORT: ${PROFILE_MICROSERVICE_PORT}
       AUTH_MICROSERVICE_PORT: ${AUTH_MICROSERVICE_PORT}
       GATEWAY_PORT: ${GATEWAY_PORT}
     env_file:

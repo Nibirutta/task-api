@@ -10,7 +10,7 @@ import { Observable, map } from 'rxjs';
 import {
     AUTH_PATTERNS,
     ICredentialData,
-    IUserData,
+    IProfileData,
     TokenConfigService,
     TokenType,
     TRANSPORTER_PROVIDER,
@@ -58,7 +58,7 @@ export class SendCookieInterceptor implements NestInterceptor {
                     });
 
                     const credentialData: ICredentialData = data.credentialData;
-                    const userData: IUserData = data.userData;
+                    const userData: IProfileData = data.userData;
                     const accessToken = data.accessToken;
 
                     const userInfo = {

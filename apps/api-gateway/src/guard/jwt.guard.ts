@@ -42,7 +42,7 @@ export class JwtGuard implements CanActivate, OnApplicationBootstrap {
 
             request['user'] = payload;
         } catch (error) {
-            throw new RpcException(error);
+            throw error;
         }
 
         return true;

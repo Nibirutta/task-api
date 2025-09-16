@@ -1,4 +1,4 @@
-import { IUserPreferences } from '@app/common';
+import { IProfilePreferences } from '@app/common';
 import { SchemaFactory, Prop, Schema } from '@nestjs/mongoose';
 import { Credential } from 'apps/auth/src/schemas/Credential.schema';
 import mongoose from 'mongoose';
@@ -22,7 +22,7 @@ export class NotificationPreferences {
 @Schema({
     _id: false,
 })
-export class Preferences implements IUserPreferences {
+export class Preferences implements IProfilePreferences {
     @Prop({
         default: Themes.LIGHT,
         enum: Object.values(Themes),
@@ -52,7 +52,7 @@ export class Preferences implements IUserPreferences {
     },
     timestamps: true,
 })
-export class User {
+export class Profile {
     @Prop({
         required: true,
     })
@@ -75,4 +75,4 @@ export class User {
     preferences: Preferences;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const ProfileSchema = SchemaFactory.createForClass(Profile);

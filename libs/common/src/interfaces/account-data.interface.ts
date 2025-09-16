@@ -1,4 +1,4 @@
-import { IUserPreferences } from './user-preferences.interface';
+import { IProfilePreferences } from './profile-preferences.interface';
 
 export interface ICredentialData {
     id: string;
@@ -9,12 +9,12 @@ export interface ICredentialData {
     updatedAt: Date;
 }
 
-export interface IUserData {
+export interface IProfileData {
     id: string;
     owner: string;
     firstName: string;
     lastName?: string;
-    preferences: IUserPreferences;
+    preferences: IProfilePreferences;
     createdAt: Date;
     updatedAt: Date;
 }

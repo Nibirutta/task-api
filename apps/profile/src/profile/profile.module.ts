@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
+import { ProfileController } from './profile.controller';
+import { ProfileService } from './profile.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from '../schemas/User.schema';
+import { Profile, ProfileSchema } from '../schemas/Profile.schema';
 import { AppConfigService, TRANSPORTER_PROVIDER } from '@app/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
@@ -10,14 +10,14 @@ import { ClientProxyFactory } from '@nestjs/microservices';
     imports: [
         MongooseModule.forFeature([
             {
-                name: User.name,
-                schema: UserSchema,
+                name: Profile.name,
+                schema: ProfileSchema,
             },
         ]),
     ],
-    controllers: [UsersController],
+    controllers: [ProfileController],
     providers: [
-        UsersService,
+        ProfileService,
         {
             provide: TRANSPORTER_PROVIDER,
             useFactory: (configService: AppConfigService) => {
@@ -28,4 +28,4 @@ import { ClientProxyFactory } from '@nestjs/microservices';
         },
     ],
 })
-export class UsersModule {}
+export class ProfileModule {}
