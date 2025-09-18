@@ -28,4 +28,9 @@ export class ProfileController {
     findUser(@Payload(ParseObjectIdPipe) ownerId: string) {
         return this.profileService.findProfile(ownerId);
     }
+
+    @MessagePattern(PROFILE_PATTERNS.OWNER_UPDATED)
+    ownerUpdated(@Payload(ParseObjectIdPipe) ownerId: string) {
+        return this.profileService.ownerUpdated(ownerId);
+    }
 }

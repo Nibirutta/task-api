@@ -63,4 +63,13 @@ export class ProfileService implements OnApplicationBootstrap {
 
         return foundProfile.toObject();
     }
+
+    async ownerUpdated(ownerId: string) {
+        const updatedProfile =
+            await this.profileModel.findByIdAndUpdate(ownerId);
+
+        if (!updatedProfile) throw new NotFoundException('Profile not found');
+
+        return updatedProfile.toObject();
+    }
 }

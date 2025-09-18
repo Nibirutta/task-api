@@ -13,11 +13,13 @@ import { lastValueFrom, Observable } from 'rxjs';
 
 @Injectable()
 export class SessionGuard implements CanActivate, OnApplicationBootstrap {
-    constructor(@Inject(TRANSPORTER_PROVIDER) private readonly transporter: ClientProxy) {}
-    
+    constructor(
+        @Inject(TRANSPORTER_PROVIDER) private readonly transporter: ClientProxy,
+    ) {}
+
     async onApplicationBootstrap() {
         await this.transporter.connect();
-        console.log('Session Guard connected to transporter');        
+        console.log('Session Guard connected to transporter');
     }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -26,7 +28,9 @@ export class SessionGuard implements CanActivate, OnApplicationBootstrap {
         const sessionToken = request.cookies?.sessionToken;
 
         if (!sessionToken) {
-            throw new UnauthorizedException('Unauthorized Access - Session Token Missing');
+            throw new UnauthorizedException(
+                'Unauthorized Access - Session Token Missing',
+            );
         }
 
         try {

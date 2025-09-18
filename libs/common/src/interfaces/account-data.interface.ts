@@ -18,7 +18,3 @@ export interface IProfileData {
     createdAt: Date;
     updatedAt: Date;
 }
-
-export interface IUserInfo {
-    username: string;
-}

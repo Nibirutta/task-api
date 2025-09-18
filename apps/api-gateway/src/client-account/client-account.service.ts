@@ -39,9 +39,8 @@ export class ClientAccountService {
         };
 
         try {
-            profileData = await this.clientProfileService.createProfile(
-                createProfileDto,
-            );
+            profileData =
+                await this.clientProfileService.createProfile(createProfileDto);
         } catch (error) {
             await this.clientAuthService.deleteCredential(credentialData.id);
 
@@ -70,8 +69,7 @@ export class ClientAccountService {
         }
 
         return {
-            credentialData,
-            userData: profileData,
+            profileData,
             ...tokens,
         };
     }
@@ -99,15 +97,15 @@ export class ClientAccountService {
         );
 
         return {
-            credentialData: validatedCredential,
-            userData: validatedProfile,
+            profileData: validatedProfile,
             ...tokens,
         };
     }
 
     async deleteAccount(id: string) {
         await this.clientAuthService.deleteCredential(id);
-        const deletedProfile = await this.clientProfileService.deleteProfile(id);
+        const deletedProfile =
+            await this.clientProfileService.deleteProfile(id);
         await this.clientAuthService.deleteUserTokens(id);
 
         return {
@@ -116,9 +114,11 @@ export class ClientAccountService {
     }
 
     async refreshSession(id: string) {
-        const validatedCredential: ICredentialData = await this.clientAuthService.findCredential(id);
+        const validatedCredential: ICredentialData =
+            await this.clientAuthService.findCredential(id);
 
-        const validatedProfile: IProfileData = await this.clientProfileService.findProfile(id);
+        const validatedProfile: IProfileData =
+            await this.clientProfileService.findProfile(id);
 
         const accessTokenPayloadDto: AccessTokenPayloadDto = {
             sub: validatedCredential.id,
@@ -135,8 +135,7 @@ export class ClientAccountService {
         );
 
         return {
-            credentialData: validatedCredential,
-            userData: validatedProfile,
+            profileData: validatedProfile,
             ...tokens,
         };
     }

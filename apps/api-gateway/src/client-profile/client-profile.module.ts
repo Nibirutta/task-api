@@ -22,6 +22,6 @@ import { ClientProxyFactory } from '@nestjs/microservices';
             inject: [AppConfigService],
         },
     ],
-    exports: [ClientProfileService]
+    exports: [ClientProfileService],
 })
 export class ClientProfileModule {}

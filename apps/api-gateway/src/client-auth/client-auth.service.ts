@@ -27,7 +27,8 @@ export class ClientAuthService implements OnApplicationBootstrap {
     async findCredential(id: string) {
         try {
             return await lastValueFrom<ICredentialData>(
-                this.transporter.send(AUTH_PATTERNS.FIND, id)
+                this.transporter
+                    .send(AUTH_PATTERNS.FIND, id)
                     .pipe(retry(3), timeout(1000)),
             );
         } catch (error) {

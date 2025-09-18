@@ -4,11 +4,7 @@ import { ClientAccountModule } from './client-account/client-account.module';
 import { ClientProfileModule } from './client-profile/client-profile.module';
 
 @Module({
-    imports: [
-        ClientAuthModule,
-        ClientAccountModule,
-        ClientProfileModule,
-    ],
+    imports: [ClientAuthModule, ClientAccountModule, ClientProfileModule],
     controllers: [],
     providers: [],
 })

@@ -9,8 +9,6 @@ import { Response, Request } from 'express';
 import { Observable, map } from 'rxjs';
 import {
     AUTH_PATTERNS,
-    ICredentialData,
-    IProfileData,
     TokenConfigService,
     TokenType,
     TRANSPORTER_PROVIDER,
@@ -57,28 +55,9 @@ export class SendCookieInterceptor implements NestInterceptor {
                         sameSite: 'none',
                     });
 
-                    const credentialData: ICredentialData = data.credentialData;
-                    const userData: IProfileData = data.userData;
-                    const accessToken = data.accessToken;
+                    const { sessionToken, ...rest } = data;
 
-                    const userInfo = {
-                        username: credentialData.username,
-                        firstName: userData.firstName,
-                        preferences: userData.preferences,
-                        userCreatedAt:
-                            credentialData.createdAt < userData.createdAt
-                                ? credentialData.createdAt
-                                : userData.createdAt,
-                        userUpdatedAt:
-                            credentialData.updatedAt > userData.updatedAt
-                                ? credentialData.updatedAt
-                                : userData.updatedAt,
-                    };
-
-                    return {
-                        userInfo,
-                        accessToken,
-                    };
+                    return rest;
                 }
 
                 return data;
