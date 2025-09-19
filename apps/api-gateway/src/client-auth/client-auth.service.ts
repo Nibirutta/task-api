@@ -36,9 +36,7 @@ export class ClientAuthService implements OnApplicationBootstrap {
         }
     }
 
-    async validateCredential(
-        loginRequestDto: LoginRequestDto,
-    ): Promise<ICredentialData> {
+    async validateCredential(loginRequestDto: LoginRequestDto) {
         try {
             return await lastValueFrom<ICredentialData>(
                 this.transporter
@@ -50,9 +48,7 @@ export class ClientAuthService implements OnApplicationBootstrap {
         }
     }
 
-    async createCredential(
-        createCredentialDto: CreateCredentialDto,
-    ): Promise<ICredentialData> {
+    async createCredential(createCredentialDto: CreateCredentialDto) {
         try {
             return lastValueFrom<ICredentialData>(
                 this.transporter
@@ -67,7 +63,7 @@ export class ClientAuthService implements OnApplicationBootstrap {
     async generateUserTokens(
         accessTokenPayloadDto: AccessTokenPayloadDto,
         sessionTokenPayloadDto: SessionTokenPayloadDto,
-    ): Promise<{ accessToken: string; sessionToken: string }> {
+    ) {
         try {
             return lastValueFrom(
                 forkJoin({
@@ -109,7 +105,7 @@ export class ClientAuthService implements OnApplicationBootstrap {
         updateCredentialDto: UpdateCredentialDto,
     ) {
         try {
-            return lastValueFrom(
+            return lastValueFrom<ICredentialData>(
                 this.transporter
                     .send(AUTH_PATTERNS.UPDATE, {
                         id,
@@ -124,7 +120,7 @@ export class ClientAuthService implements OnApplicationBootstrap {
 
     async deleteCredential(id: string) {
         try {
-            return lastValueFrom(
+            return lastValueFrom<ICredentialData>(
                 this.transporter
                     .send(AUTH_PATTERNS.DELETE, id)
                     .pipe(retry(3), timeout(1000)),

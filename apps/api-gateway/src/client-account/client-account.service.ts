@@ -9,6 +9,7 @@ import {
     AccessTokenPayloadDto,
     SessionTokenPayloadDto,
     LoginRequestDto,
+    UpdateCredentialDto,
 } from '@app/common';
 import { pick } from 'lodash';
 import { ClientProfileService } from '../client-profile/client-profile.service';
@@ -35,7 +36,7 @@ export class ClientAccountService {
 
         const createProfileDto: CreateProfileDto = {
             owner: credentialData.id,
-            ...pick(createUserDto, ['firstName', 'lastName']),
+            ...pick(createUserDto, ['name']),
         };
 
         try {
@@ -69,7 +70,7 @@ export class ClientAccountService {
         }
 
         return {
-            profileData,
+            ...profileData,
             ...tokens,
         };
     }
@@ -97,7 +98,7 @@ export class ClientAccountService {
         );
 
         return {
-            profileData: validatedProfile,
+            ...validatedProfile,
             ...tokens,
         };
     }
@@ -109,7 +110,7 @@ export class ClientAccountService {
         await this.clientAuthService.deleteUserTokens(id);
 
         return {
-            userDeleted: deletedProfile.firstName,
+            userDeleted: deletedProfile.name,
         };
     }
 
@@ -135,7 +136,37 @@ export class ClientAccountService {
         );
 
         return {
-            profileData: validatedProfile,
+            ...validatedProfile,
+            ...tokens,
+        };
+    }
+
+    async updateAccount(id: string, updateCredentialDto: UpdateCredentialDto) {
+        const updatedCredential: ICredentialData =
+            await this.clientAuthService.updateCredential(
+                id,
+                updateCredentialDto,
+            );
+
+        const updatedProfile: IProfileData =
+            await this.clientProfileService.findProfile(id);
+
+        const accessTokenPayloadDto: AccessTokenPayloadDto = {
+            sub: updatedCredential.id,
+            username: updatedCredential.username,
+        };
+
+        const sessionTokenPayloadDto: SessionTokenPayloadDto = {
+            sub: updatedCredential.id,
+        };
+
+        const tokens = await this.clientAuthService.generateUserTokens(
+            accessTokenPayloadDto,
+            sessionTokenPayloadDto,
+        );
+
+        return {
+            ...updatedProfile,
             ...tokens,
         };
     }

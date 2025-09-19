@@ -23,6 +23,8 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
             response: '',
         };
 
+        console.log(exception);
+
         if (exception instanceof HttpException) {
             responseObject.statusCode = exception.getStatus();
             responseObject.response = exception.getResponse();
@@ -37,12 +39,6 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
                     exception.error.status || HttpStatus.INTERNAL_SERVER_ERROR,
             };
         }
-
-        console.log('-----------------');
-        console.log(exception);
-        console.log('-----------------');
-        console.log(responseObject);
-        console.log('-----------------');
 
         response
             .status(responseObject.statusCode)

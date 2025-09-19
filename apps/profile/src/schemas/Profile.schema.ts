@@ -1,13 +1,7 @@
-import { IProfilePreferences } from '@app/common';
+import { IProfilePreferences, Themes, Languages } from '@app/common';
 import { SchemaFactory, Prop, Schema } from '@nestjs/mongoose';
 import { Credential } from 'apps/auth/src/schemas/Credential.schema';
 import mongoose from 'mongoose';
-
-export enum Themes {
-    LIGHT = 'light',
-    DARK = 'dark',
-    LOFI = 'lofi',
-}
 
 @Schema({
     _id: false,
@@ -30,7 +24,8 @@ export class Preferences implements IProfilePreferences {
     theme: string;
 
     @Prop({
-        default: 'pt-BR',
+        default: Languages.PT_BR,
+        enum: Object.values(Languages),
     })
     language: string;
 
@@ -55,11 +50,10 @@ export class Preferences implements IProfilePreferences {
 export class Profile {
     @Prop({
         required: true,
+        minlength: 1,
+        maxlength: 20,
     })
-    firstName: string;
-
-    @Prop()
-    lastName: string;
+    name: string;
 
     @Prop({
         required: true,

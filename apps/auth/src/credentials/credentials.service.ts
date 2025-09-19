@@ -4,6 +4,7 @@ import {
     NotFoundException,
     UnauthorizedException,
     Inject,
+    OnApplicationBootstrap,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -18,16 +19,20 @@ import * as bcrypt from 'bcrypt';
 import { omit } from 'lodash';
 import { Credential } from '../schemas/Credential.schema';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom, timeout } from 'rxjs';
 
 @Injectable()
-export class CredentialsService {
+export class CredentialsService implements OnApplicationBootstrap {
     constructor(
         @InjectModel(Credential.name)
         private readonly credentialModel: Model<Credential>,
         @Inject(TRANSPORTER_PROVIDER)
         private readonly transporter: ClientProxy,
     ) {}
+
+    async onApplicationBootstrap() {
+        await this.transporter.connect();
+        console.log('Auth-Credentials microservice connected to transporter');
+    }
 
     async createCredential(createCredentialDto: CreateCredentialDto) {
         const foundCredential = await this.credentialModel.findOne({

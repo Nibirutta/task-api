@@ -2,7 +2,6 @@ import {
     IsString,
     IsNotEmpty,
     IsStrongPassword,
-    IsOptional,
     IsEmail,
     Length,
 } from 'class-validator';
@@ -24,9 +23,6 @@ export class CreateAccountDto {
 
     @IsNotEmpty()
     @IsString()
-    firstName: string;
-
-    @IsOptional()
-    @IsString()
-    lastName: string;
+    @Length(1, 20)
+    name: string;
 }

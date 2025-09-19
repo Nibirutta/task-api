@@ -1,4 +1,8 @@
-import { CreateAccountDto, LoginRequestDto } from '@app/common';
+import {
+    CreateAccountDto,
+    LoginRequestDto,
+    UpdateCredentialDto,
+} from '@app/common';
 import {
     Body,
     Controller,
@@ -8,31 +12,45 @@ import {
     Delete,
     UseGuards,
     Get,
+    Patch,
 } from '@nestjs/common';
 import { ClientAccountService } from './client-account.service';
 import { SendCookieInterceptor } from '../interceptors/send-cookie.interceptor';
 import { JwtGuard } from '../guard/jwt.guard';
 import { SessionGuard } from '../guard/session.guard';
-import { SendUserInfoInterceptor } from '../interceptors/send-user-info.interceptor';
+import { SendProfileInterceptor } from '../interceptors/send-profile.interceptor';
 
 @Controller('account')
 export class ClientAccountController {
     constructor(private readonly clientAccount: ClientAccountService) {}
 
     @UseGuards(SessionGuard)
-    @UseInterceptors(SendCookieInterceptor, SendUserInfoInterceptor)
+    @UseInterceptors(SendCookieInterceptor, SendProfileInterceptor)
     @Get('refresh')
     refreshSession(@Request() req) {
         return this.clientAccount.refreshSession(req.user.sub);
     }
 
-    @UseInterceptors(SendCookieInterceptor, SendUserInfoInterceptor)
+    @UseInterceptors(SendCookieInterceptor, SendProfileInterceptor)
     @Post('register')
     registerAccount(@Body() createUserDto: CreateAccountDto) {
         return this.clientAccount.createAccount(createUserDto);
     }
 
-    @UseInterceptors(SendCookieInterceptor, SendUserInfoInterceptor)
+    @UseGuards(JwtGuard)
+    @UseInterceptors(SendCookieInterceptor, SendProfileInterceptor)
+    @Patch('credential')
+    updateAccount(
+        @Request() req,
+        @Body() updateCredentialDto: UpdateCredentialDto,
+    ) {
+        return this.clientAccount.updateAccount(
+            req.user.sub,
+            updateCredentialDto,
+        );
+    }
+
+    @UseInterceptors(SendCookieInterceptor, SendProfileInterceptor)
     @Post('login')
     login(@Body() loginRequestDto: LoginRequestDto) {
         return this.clientAccount.login(loginRequestDto);

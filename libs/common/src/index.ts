@@ -6,6 +6,7 @@ export * from './constants/MS_PROVIDES.constants';
 
 // Enums
 export * from './enums/token-type.enum';
+export * from './enums/profile.enum';
 
 // Patterns
 export * from './patterns/auth.patterns';
@@ -18,6 +19,10 @@ export * from './contracts/update-credential.dto';
 export * from './contracts/create-profile.dto';
 export * from './contracts/create-account.dto';
 export * from './contracts/token-payload.dto';
+export * from './contracts/change-language.dto';
+export * from './contracts/change-notification.dto';
+export * from './contracts/change-theme.dto';
+export * from './contracts/change-name.dto';
 
 // Pipes
 export * from './pipes/validation.pipe';

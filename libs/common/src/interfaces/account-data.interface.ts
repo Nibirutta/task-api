@@ -12,8 +12,7 @@ export interface ICredentialData {
 export interface IProfileData {
     id: string;
     owner: string;
-    firstName: string;
-    lastName?: string;
+    name: string;
     preferences: IProfilePreferences;
     createdAt: Date;
     updatedAt: Date;
