@@ -110,7 +110,7 @@ export class ClientAccountService {
         await this.clientAuthService.deleteUserTokens(id);
 
         return {
-            userDeleted: deletedProfile.name,
+            message: `User ${deletedProfile.name} was deleted`,
         };
     }
 

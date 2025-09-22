@@ -1,4 +1,3 @@
-import { IProfileData } from '@app/common';
 import {
     NestInterceptor,
     Injectable,

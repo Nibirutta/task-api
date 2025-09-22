@@ -19,6 +19,7 @@ import { SendCookieInterceptor } from '../interceptors/send-cookie.interceptor';
 import { JwtGuard } from '../guard/jwt.guard';
 import { SessionGuard } from '../guard/session.guard';
 import { SendProfileInterceptor } from '../interceptors/send-profile.interceptor';
+import { LogoutInterceptor } from '../interceptors/logout.interceptor';
 
 @Controller('account')
 export class ClientAccountController {
@@ -29,6 +30,12 @@ export class ClientAccountController {
     @Get('refresh')
     refreshSession(@Request() req) {
         return this.clientAccount.refreshSession(req.user.sub);
+    }
+
+    @UseInterceptors(LogoutInterceptor)
+    @Get('logout')
+    logout() {
+        return { message: 'Logout successful' };
     }
 
     @UseInterceptors(SendCookieInterceptor, SendProfileInterceptor)
@@ -57,6 +64,7 @@ export class ClientAccountController {
     }
 
     @UseGuards(JwtGuard)
+    @UseInterceptors(LogoutInterceptor)
     @Delete()
     deleteAccount(@Request() req) {
         return this.clientAccount.deleteAccount(req.user.sub);
