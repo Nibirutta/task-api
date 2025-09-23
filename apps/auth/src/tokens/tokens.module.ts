@@ -6,7 +6,6 @@ import { TokensService } from './tokens.service';
 import { JwtModule } from '@nestjs/jwt';
 import { AppConfigService, TRANSPORTER_PROVIDER } from '@app/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
-import { CredentialsModule } from '../credentials/credentials.module';
 
 @Module({
     imports: [
@@ -17,7 +16,6 @@ import { CredentialsModule } from '../credentials/credentials.module';
             },
         ]),
         JwtModule,
-        CredentialsModule,
     ],
     controllers: [TokensController],
     providers: [

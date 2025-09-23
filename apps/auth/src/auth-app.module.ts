@@ -7,8 +7,8 @@ import { TokensModule } from './tokens/tokens.module';
 
 @Module({
     imports: [
+        AppConfigModule,
         MongooseModule.forRootAsync({
-            imports: [AppConfigModule],
             useFactory: (configService: AppConfigService) => ({
                 uri: configService.getData(ENV_KEYS.DATABASE_URL),
                 onConnectionCreate: (connection: Connection) => {

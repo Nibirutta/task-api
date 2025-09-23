@@ -11,6 +11,7 @@ export * from './enums/profile.enum';
 // Patterns
 export * from './patterns/auth.patterns';
 export * from './patterns/profile.patterns';
+export * from './patterns/email.patterns';
 
 // DTOs
 export * from './contracts/create-credential.dto';
@@ -23,6 +24,7 @@ export * from './contracts/change-language.dto';
 export * from './contracts/change-notification.dto';
 export * from './contracts/change-theme.dto';
 export * from './contracts/change-name.dto';
+export * from './contracts/reset-request.dto';
 
 // Pipes
 export * from './pipes/validation.pipe';

@@ -1,6 +1,7 @@
 import {
     CanActivate,
     ExecutionContext,
+    ForbiddenException,
     Inject,
     Injectable,
     OnApplicationBootstrap,
@@ -34,14 +35,28 @@ export class SessionGuard implements CanActivate, OnApplicationBootstrap {
         }
 
         try {
-            const decodedToken = await lastValueFrom(
+            const tokenData = await lastValueFrom(
                 this.transporter.send(AUTH_PATTERNS.VALIDATE_TOKEN, {
                     token: sessionToken,
                     tokenType: TokenType.SESSION,
                 }),
             );
 
-            request['user'] = decodedToken;
+            if (!tokenData.isSecure) {
+                const hackedUser = await lastValueFrom(
+                    this.transporter.send(AUTH_PATTERNS.FIND, tokenData.decodedToken.sub)
+                );
+
+                if (hackedUser) {
+                    this.transporter.send(AUTH_PATTERNS.DELETE_USER_TOKENS, tokenData.decodedToken.sub).subscribe();
+
+                    // Sends an email to the user requesting a password change
+                }
+
+                throw new ForbiddenException('Not allowed - invalid token');
+            }
+
+            request['user'] = tokenData.decodedToken;
         } catch (error) {
             throw error;
         }

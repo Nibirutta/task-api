@@ -12,7 +12,6 @@ import {
     TokenConfigService,
     TokenType,
 } from '@app/common';
-import { CredentialsService } from '../credentials/credentials.service';
 
 @Injectable()
 export class TokensService {
@@ -21,7 +20,6 @@ export class TokensService {
         private readonly jwtService: JwtService,
         private readonly configService: AppConfigService,
         private readonly tokenConfigService: TokenConfigService,
-        private readonly credentialService: CredentialsService,
     ) {}
 
     async generateToken(
@@ -86,9 +84,14 @@ export class TokensService {
     async validateToken(token: string, tokenType: TokenType) {
         if (tokenType === TokenType.ACCESS) {
             try {
-                return this.jwtService.verify(token, {
+                const decodedToken = this.jwtService.verify(token, {
                     secret: this.getSecretByTokenType(tokenType),
                 });
+
+                return {
+                    isSecure: true,
+                    decodedToken: decodedToken,
+                };
             } catch (error) {
                 throw new ForbiddenException('Not allowed - invalid token');
             }
@@ -101,26 +104,24 @@ export class TokensService {
                         secret: this.getSecretByTokenType(tokenType),
                     });
 
-                    const hackedUser = this.credentialService.findCredential(
-                        decodedToken.sub,
-                    );
-
-                    if (!hackedUser) throw new ForbiddenException();
-
-                    await this.tokenModel.deleteMany({
-                        owner: decodedToken.sub,
-                    });
-
-                    // Sends an email to the user requesting a password change
-                } finally {
+                    return {
+                        isSecure: false,
+                        decodedToken: decodedToken,
+                    }
+                } catch (error) {
                     throw new ForbiddenException('Not allowed - invalid token');
                 }
             }
 
             try {
-                return this.jwtService.verify(token, {
+                const decodedToken = this.jwtService.verify(token, {
                     secret: this.getSecretByTokenType(tokenType),
                 });
+
+                return {
+                    isSecure: true,
+                    decodedToken: decodedToken,
+                };
             } catch (error) {
                 throw new ForbiddenException('Not allowed - invalid token');
             }

@@ -12,6 +12,7 @@ import { TokenConfigService } from './token-config.service';
             validationSchema: joi.object({
                 PROFILE_MICROSERVICE_PORT: joi.number().default(3001),
                 AUTH_MICROSERVICE_PORT: joi.number().default(3002),
+                EMAIL_MICROSERVICE_PORT: joi.number().default(3003),
                 DATABASE_URL: joi.string(),
             }),
         }),
