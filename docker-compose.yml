@@ -58,6 +58,7 @@ services:
       - "3003"
     environment:
       EMAIL_MICROSERVICE_PORT: ${EMAIL_MICROSERVICE_PORT}
+      
     env_file:
       - .env
     depends_on:

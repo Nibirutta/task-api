@@ -25,6 +25,7 @@ export * from './contracts/change-notification.dto';
 export * from './contracts/change-theme.dto';
 export * from './contracts/change-name.dto';
 export * from './contracts/reset-request.dto';
+export * from './contracts/send-email.dto';
 
 // Pipes
 export * from './pipes/validation.pipe';

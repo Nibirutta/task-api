@@ -33,14 +33,14 @@ export class JwtGuard implements CanActivate, OnApplicationBootstrap {
         }
 
         try {
-            const tokenData = await lastValueFrom(
+            const decodedToken = await lastValueFrom(
                 this.transporter.send(AUTH_PATTERNS.VALIDATE_TOKEN, {
                     token: accessToken,
                     tokenType: TokenType.ACCESS,
                 }),
             );
 
-            request['user'] = tokenData.decodedToken;
+            request['user'] = decodedToken;
         } catch (error) {
             throw error;
         }

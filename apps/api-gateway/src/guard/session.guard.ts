@@ -1,7 +1,6 @@
 import {
     CanActivate,
     ExecutionContext,
-    ForbiddenException,
     Inject,
     Injectable,
     OnApplicationBootstrap,
@@ -10,7 +9,7 @@ import {
 import { Request } from 'express';
 import { ClientProxy } from '@nestjs/microservices';
 import { AUTH_PATTERNS, TokenType, TRANSPORTER_PROVIDER } from '@app/common';
-import { lastValueFrom, Observable } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class SessionGuard implements CanActivate, OnApplicationBootstrap {
@@ -35,28 +34,14 @@ export class SessionGuard implements CanActivate, OnApplicationBootstrap {
         }
 
         try {
-            const tokenData = await lastValueFrom(
+            const decodedToken = await lastValueFrom(
                 this.transporter.send(AUTH_PATTERNS.VALIDATE_TOKEN, {
                     token: sessionToken,
                     tokenType: TokenType.SESSION,
                 }),
             );
 
-            if (!tokenData.isSecure) {
-                const hackedUser = await lastValueFrom(
-                    this.transporter.send(AUTH_PATTERNS.FIND, tokenData.decodedToken.sub)
-                );
-
-                if (hackedUser) {
-                    this.transporter.send(AUTH_PATTERNS.DELETE_USER_TOKENS, tokenData.decodedToken.sub).subscribe();
-
-                    // Sends an email to the user requesting a password change
-                }
-
-                throw new ForbiddenException('Not allowed - invalid token');
-            }
-
-            request['user'] = tokenData.decodedToken;
+            request['user'] = decodedToken;
         } catch (error) {
             throw error;
         }

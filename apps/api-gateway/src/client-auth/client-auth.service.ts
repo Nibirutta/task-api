@@ -10,6 +10,7 @@ import {
     TokenType,
     ICredentialData,
     TRANSPORTER_PROVIDER,
+    ResetRequestDto,
 } from '@app/common';
 import { forkJoin, lastValueFrom, retry, timeout } from 'rxjs';
 
@@ -124,6 +125,18 @@ export class ClientAuthService implements OnApplicationBootstrap {
                 this.transporter
                     .send(AUTH_PATTERNS.DELETE, id)
                     .pipe(retry(3), timeout(1000)),
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async requestPasswordReset(resetRequestDto: ResetRequestDto) {
+        try {
+            return lastValueFrom(
+                this.transporter
+                    .send(AUTH_PATTERNS.RESET, resetRequestDto)
+                    .pipe(retry(3), timeout(5000)),
             );
         } catch (error) {
             throw error;

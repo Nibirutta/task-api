@@ -1,8 +1,16 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
-import { ENV_KEYS, AppConfigModule, AppConfigService } from '@app/common';
+import {
+    ENV_KEYS,
+    AppConfigModule,
+    AppConfigService,
+    TRANSPORTER_PROVIDER,
+} from '@app/common';
 import { ProfileModule } from './profile/profile.module';
+import { ProfileAppController } from './profile-app.controller';
+import { ProfileAppService } from './profile-app.service';
+import { ClientProxyFactory } from '@nestjs/microservices';
 
 @Module({
     imports: [
@@ -20,7 +28,17 @@ import { ProfileModule } from './profile/profile.module';
         }),
         ProfileModule,
     ],
-    controllers: [],
-    providers: [],
+    controllers: [ProfileAppController],
+    providers: [
+        ProfileAppService,
+        {
+            provide: TRANSPORTER_PROVIDER,
+            useFactory: (configService: AppConfigService) => {
+                const clientOptions = configService.clientOptions;
+                return ClientProxyFactory.create(clientOptions);
+            },
+            inject: [AppConfigService],
+        },
+    ],
 })
 export class ProfileAppModule {}

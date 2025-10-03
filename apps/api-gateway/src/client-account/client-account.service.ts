@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { ClientAuthService } from '../client-auth/client-auth.service';
 import {
     CreateAccountDto,
@@ -10,15 +10,19 @@ import {
     SessionTokenPayloadDto,
     LoginRequestDto,
     UpdateCredentialDto,
+    ResetRequestDto,
+    TRANSPORTER_PROVIDER,
 } from '@app/common';
 import { pick } from 'lodash';
 import { ClientProfileService } from '../client-profile/client-profile.service';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class ClientAccountService {
     constructor(
         private readonly clientAuthService: ClientAuthService,
         private readonly clientProfileService: ClientProfileService,
+        @Inject(TRANSPORTER_PROVIDER) private readonly transporter: ClientProxy,
     ) {}
 
     async createAccount(createUserDto: CreateAccountDto) {
@@ -169,5 +173,9 @@ export class ClientAccountService {
             ...updatedProfile,
             ...tokens,
         };
+    }
+
+    async requestPasswordReset(resetRequestDto: ResetRequestDto) {
+        return this.clientAuthService.requestPasswordReset(resetRequestDto);
     }
 }

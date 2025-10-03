@@ -1,6 +1,7 @@
 export const AUTH_PATTERNS = {
     VALIDATE_CREDENTIAL: 'auth.validate',
     FIND: 'auth.find',
+    FIND_BY_EMAIL: 'auth.find-email',
     CREATE: 'auth.create',
     UPDATE: 'auth.update',
     DELETE: 'auth.delete',

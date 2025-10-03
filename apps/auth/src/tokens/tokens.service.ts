@@ -107,7 +107,7 @@ export class TokensService {
                     return {
                         isSecure: false,
                         decodedToken: decodedToken,
-                    }
+                    };
                 } catch (error) {
                     throw new ForbiddenException('Not allowed - invalid token');
                 }

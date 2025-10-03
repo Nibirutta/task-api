@@ -1,6 +1,5 @@
 import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-
 import { ApiGatewayModule } from './api-gateway.module';
 import { corsOptions } from './configCors';
 import { AllExceptionsFilter } from './filters/all-exception.filter';

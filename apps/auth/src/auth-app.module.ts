@@ -1,9 +1,17 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
-import { ENV_KEYS, AppConfigModule, AppConfigService } from '@app/common';
+import {
+    ENV_KEYS,
+    AppConfigModule,
+    AppConfigService,
+    TRANSPORTER_PROVIDER,
+} from '@app/common';
 import { CredentialsModule } from './credentials/credentials.module';
 import { TokensModule } from './tokens/tokens.module';
+import { AuthAppController } from './auth-app.controller';
+import { AuthAppService } from './auth-app.service';
+import { ClientProxyFactory } from '@nestjs/microservices';
 
 @Module({
     imports: [
@@ -22,7 +30,17 @@ import { TokensModule } from './tokens/tokens.module';
         CredentialsModule,
         TokensModule,
     ],
-    controllers: [],
-    providers: [],
+    controllers: [AuthAppController],
+    providers: [
+        AuthAppService,
+        {
+            provide: TRANSPORTER_PROVIDER,
+            useFactory: (configService: AppConfigService) => {
+                const clientOptions = configService.clientOptions;
+                return ClientProxyFactory.create(clientOptions);
+            },
+            inject: [AppConfigService],
+        },
+    ],
 })
 export class AuthAppModule {}

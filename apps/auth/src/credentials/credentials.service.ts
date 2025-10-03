@@ -3,8 +3,6 @@ import {
     ConflictException,
     NotFoundException,
     UnauthorizedException,
-    Inject,
-    OnApplicationBootstrap,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,27 +10,17 @@ import {
     UpdateCredentialDto,
     CreateCredentialDto,
     LoginRequestDto,
-    TRANSPORTER_PROVIDER,
-    PROFILE_PATTERNS,
 } from '@app/common';
 import * as bcrypt from 'bcrypt';
 import { omit } from 'lodash';
 import { Credential } from '../schemas/Credential.schema';
-import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
-export class CredentialsService implements OnApplicationBootstrap {
+export class CredentialsService {
     constructor(
         @InjectModel(Credential.name)
         private readonly credentialModel: Model<Credential>,
-        @Inject(TRANSPORTER_PROVIDER)
-        private readonly transporter: ClientProxy,
     ) {}
-
-    async onApplicationBootstrap() {
-        await this.transporter.connect();
-        console.log('Auth-Credentials microservice connected to transporter');
-    }
 
     async createCredential(createCredentialDto: CreateCredentialDto) {
         const foundCredential = await this.credentialModel.findOne({
@@ -57,7 +45,7 @@ export class CredentialsService implements OnApplicationBootstrap {
         const newCredential =
             await this.credentialModel.create(newCredentialData);
 
-        return newCredential.toObject();
+        return newCredential;
     }
 
     async updateCredential(
@@ -85,9 +73,7 @@ export class CredentialsService implements OnApplicationBootstrap {
         if (!updatedCredential)
             throw new NotFoundException('Credential not found');
 
-        this.transporter.send(PROFILE_PATTERNS.OWNER_UPDATED, id).subscribe();
-
-        return updatedCredential.toObject();
+        return updatedCredential;
     }
 
     async validateCredential(loginRequestDto: LoginRequestDto) {
@@ -113,7 +99,7 @@ export class CredentialsService implements OnApplicationBootstrap {
         if (!isValidPassword)
             throw new UnauthorizedException('Invalid credentials');
 
-        return foundCredential.toObject();
+        return foundCredential;
     }
 
     async deleteCredential(id: string) {
@@ -123,7 +109,7 @@ export class CredentialsService implements OnApplicationBootstrap {
         if (!deletedCredential)
             throw new NotFoundException('Credential not found');
 
-        return deletedCredential.toObject();
+        return deletedCredential;
     }
 
     async findCredential(id: string) {
@@ -132,7 +118,18 @@ export class CredentialsService implements OnApplicationBootstrap {
         if (!foundCredential)
             throw new NotFoundException('Credential not found');
 
-        return foundCredential.toObject();
+        return foundCredential;
+    }
+
+    async findCredentialByEmail(email: string) {
+        const foundCredential = await this.credentialModel.findOne({
+            email: email,
+        });
+
+        if (!foundCredential)
+            throw new NotFoundException('Credential not found');
+
+        return foundCredential;
     }
 
     private async hashPassword(password: string): Promise<string> {

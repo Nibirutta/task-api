@@ -37,6 +37,8 @@ export class RpcExceptionFilter extends BaseRpcExceptionFilter {
             );
         }
 
+        console.log(exception);
+
         return throwError(
             () =>
                 new RpcException({

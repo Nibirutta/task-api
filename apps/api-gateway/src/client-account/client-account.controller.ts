@@ -1,6 +1,7 @@
 import {
     CreateAccountDto,
     LoginRequestDto,
+    ResetRequestDto,
     UpdateCredentialDto,
 } from '@app/common';
 import {
@@ -61,6 +62,11 @@ export class ClientAccountController {
     @Post('login')
     login(@Body() loginRequestDto: LoginRequestDto) {
         return this.clientAccount.login(loginRequestDto);
+    }
+
+    @Post('request-reset')
+    requestPasswordReset(@Body() resetRequestDto: ResetRequestDto) {
+        return this.clientAccount.requestPasswordReset(resetRequestDto);
     }
 
     @UseGuards(JwtGuard)
