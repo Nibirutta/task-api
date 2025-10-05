@@ -5,6 +5,7 @@ import {
     MicroserviceOptions,
     Transport,
 } from '@nestjs/microservices';
+import { ENV_KEYS } from '../constants/ENV_KEYS.constants';
 
 @Injectable()
 export class AppConfigService {
@@ -26,7 +27,7 @@ export class AppConfigService {
         return {
             transport: Transport.RMQ,
             options: {
-                urls: ['amqp://rabbitmq:5672'],
+                urls: [this.getData(ENV_KEYS.RABBITMQ_URL)],
                 exchange: 'global_exchange',
                 exchangeType: 'topic',
                 wildcards: true,
@@ -38,7 +39,7 @@ export class AppConfigService {
         return {
             transport: Transport.RMQ,
             options: {
-                urls: ['amqp://rabbitmq:5672'],
+                urls: [this.getData(ENV_KEYS.RABBITMQ_URL)],
                 exchange: 'global_exchange',
                 exchangeType: 'topic',
                 wildcards: true,

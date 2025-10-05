@@ -17,6 +17,7 @@ import { TokenConfigService } from './token-config.service';
                 DEV_EMAIL_PASSWORD: joi.string(),
                 RESET_URL: joi.string(),
                 DATABASE_URL: joi.string(),
+                RABBITMQ_URL: joi.string(),
             }),
         }),
     ],
