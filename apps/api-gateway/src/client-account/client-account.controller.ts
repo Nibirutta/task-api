@@ -1,6 +1,7 @@
 import {
     CreateAccountDto,
     LoginRequestDto,
+    ResetPasswordDto,
     ResetRequestDto,
     UpdateCredentialDto,
 } from '@app/common';
@@ -14,6 +15,7 @@ import {
     UseGuards,
     Get,
     Patch,
+    Query,
 } from '@nestjs/common';
 import { ClientAccountService } from './client-account.service';
 import { SendCookieInterceptor } from '../interceptors/send-cookie.interceptor';
@@ -67,6 +69,14 @@ export class ClientAccountController {
     @Post('request-reset')
     requestPasswordReset(@Body() resetRequestDto: ResetRequestDto) {
         return this.clientAccount.requestPasswordReset(resetRequestDto);
+    }
+
+    @Post('reset-password')
+    resetPassword(
+        @Query('token') token: string,
+        @Body() resetPasswordDto: ResetPasswordDto,
+    ) {
+        return this.clientAccount.resetPassword(token, resetPasswordDto);
     }
 
     @UseGuards(JwtGuard)

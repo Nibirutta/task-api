@@ -32,7 +32,7 @@ export class EmailService {
             });
 
             return {
-                wasEmailSent: true,
+                message: 'Email was sent',
             };
         } catch (error) {
             throw new BadGatewayException('Failed to send email');

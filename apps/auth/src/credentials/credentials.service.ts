@@ -10,6 +10,7 @@ import {
     UpdateCredentialDto,
     CreateCredentialDto,
     LoginRequestDto,
+    ResetPasswordDto,
 } from '@app/common';
 import * as bcrypt from 'bcrypt';
 import { omit } from 'lodash';
@@ -130,6 +131,23 @@ export class CredentialsService {
             throw new NotFoundException('Credential not found');
 
         return foundCredential;
+    }
+
+    async resetPassword(id: string, resetPasswordDto: ResetPasswordDto) {
+        const hashedPassword = await this.hashPassword(
+            resetPasswordDto.password,
+        );
+
+        const updatedCredential = await this.credentialModel.findByIdAndUpdate(
+            id,
+            { hashedPassword: hashedPassword },
+            { runValidators: true, new: true },
+        );
+
+        if (!updatedCredential)
+            throw new NotFoundException('Credential not found');
+
+        return updatedCredential;
     }
 
     private async hashPassword(password: string): Promise<string> {

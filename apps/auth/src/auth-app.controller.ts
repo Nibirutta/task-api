@@ -10,6 +10,7 @@ import {
     ResetTokenPayloadDto,
     TokenType,
     ResetRequestDto,
+    ResetPasswordDto,
 } from '@app/common';
 import { AuthAppService } from './auth-app.service';
 
@@ -46,9 +47,17 @@ export class AuthAppController {
         return this.authAppService.validateCredential(loginRequestDto);
     }
 
-    @MessagePattern(AUTH_PATTERNS.RESET)
+    @MessagePattern(AUTH_PATTERNS.REQUEST_RESET)
     requestPasswordReset(@Payload() resetRequestDto: ResetRequestDto) {
         return this.authAppService.requestPasswordReset(resetRequestDto);
+    }
+
+    @MessagePattern(AUTH_PATTERNS.RESET_PASSWORD)
+    resetPassword(
+        @Payload('token') token: string,
+        @Payload('resetPasswordDto') resetPasswordDto: ResetPasswordDto,
+    ) {
+        return this.authAppService.resetPassword(token, resetPasswordDto);
     }
 
     @MessagePattern(AUTH_PATTERNS.GENERATE_TOKEN)

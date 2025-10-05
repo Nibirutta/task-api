@@ -16,6 +16,7 @@ import {
     UpdateCredentialDto,
     PROFILE_PATTERNS,
     EMAIL_PATTERNS,
+    ResetPasswordDto,
 } from '@app/common';
 import { ClientProxy } from '@nestjs/microservices';
 
@@ -104,6 +105,17 @@ export class AuthAppService {
         return {
             successful: true,
         };
+    }
+
+    async resetPassword(token: string, resetPassword: ResetPasswordDto) {
+        const validatedToken = await this.validateToken(token, TokenType.RESET);
+
+        const updatedCredential = await this.credentialsService.resetPassword(
+            validatedToken.sub,
+            resetPassword,
+        );
+
+        return updatedCredential.toObject();
     }
 
     async generateToken(

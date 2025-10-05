@@ -3,36 +3,22 @@ import {
     NestInterceptor,
     ExecutionContext,
     CallHandler,
-    Inject,
 } from '@nestjs/common';
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { Observable, map } from 'rxjs';
 import {
-    AUTH_PATTERNS,
     TokenConfigService,
     TokenType,
-    TRANSPORTER_PROVIDER,
 } from '@app/common';
-import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class SendCookieInterceptor implements NestInterceptor {
     constructor(
-        private readonly tokenConfigService: TokenConfigService,
-        @Inject(TRANSPORTER_PROVIDER) private readonly transporter: ClientProxy,
+        private readonly tokenConfigService: TokenConfigService
     ) {}
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         const response: Response = context.switchToHttp().getResponse();
-        const request: Request = context.switchToHttp().getRequest();
-
-        const sessionToken = request.cookies?.sessionToken;
-
-        if (sessionToken) {
-            this.transporter
-                .send(AUTH_PATTERNS.DELETE_TOKEN, sessionToken)
-                .subscribe();
-        }
 
         return next.handle().pipe(
             map((data) => {

@@ -96,7 +96,7 @@ export class TokensService {
                 throw new ForbiddenException('Not allowed - invalid token');
             }
         } else {
-            const foundToken = await this.tokenModel.findOne({ token: token });
+            const foundToken = await this.tokenModel.findOneAndDelete({ token: token });
 
             if (!foundToken) {
                 try {
