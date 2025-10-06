@@ -2,7 +2,8 @@ FROM node:24-alpine AS builder
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY package.json ./
+COPY package-lock.json ./
 
 RUN npm ci
 
@@ -18,7 +19,8 @@ RUN apk add --no-cache dumb-init
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY package.json ./
+COPY package-lock.json ./
 
 RUN npm ci --only-production
 
