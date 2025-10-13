@@ -21,8 +21,8 @@ API Gateway (Port 3000)
 ## 🔐 Autenticação
 
 A API usa **JWT Tokens** com **cookies HttpOnly**:
-- **Access Token**: Autenticação de curta duração (15 min)
-- **Session Token**: Refresh token de longa duração (7 dias)
+- **Access Token**: Autenticação de curta duração (1 min)
+- **Session Token**: Refresh token de longa duração (3 dias)
 - **Reset Token**: Token único para reset de senha
 
 ## 📚 Rotas Disponíveis
