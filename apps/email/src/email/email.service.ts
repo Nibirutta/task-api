@@ -9,8 +9,8 @@ export class EmailService {
     private mailTransport() {
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
-            port: 587,
-            secure: false, // true for 465, false for other ports
+            port: 465,
+            secure: true, // true for 465, false for other ports
             auth: {
                 user: this.configService.getData(ENV_KEYS.DEV_EMAIL),
                 pass: this.configService.getData(ENV_KEYS.DEV_EMAIL_PASSWORD),
@@ -35,6 +35,8 @@ export class EmailService {
                 message: 'Email was sent',
             };
         } catch (error) {
+            console.log(error);
+
             throw new BadGatewayException('Failed to send email');
         }
     }
