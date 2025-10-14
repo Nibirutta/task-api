@@ -8,6 +8,7 @@
         "Gateway",
         "Profile",
         "Account",
-        "Docs"
+        "Docs",
+        "Email"
     ]
 }

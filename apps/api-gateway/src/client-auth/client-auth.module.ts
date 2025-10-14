@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
 import { ClientAuthService } from './client-auth.service';
-import { ClientAuthController } from './client-auth.controller';
 import {
     AppConfigModule,
     AppConfigService,
@@ -21,7 +20,7 @@ import {
             inject: [AppConfigService],
         },
     ],
-    controllers: [ClientAuthController],
+    controllers: [],
     exports: [ClientAuthService],
 })
 export class ClientAuthModule {}
