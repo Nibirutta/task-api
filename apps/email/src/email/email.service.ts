@@ -1,31 +1,19 @@
 import { BadGatewayException, Injectable } from '@nestjs/common';
 import { AppConfigService, ENV_KEYS, SendEmailDto } from '@app/common';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 @Injectable()
 export class EmailService {
-    constructor(private readonly configService: AppConfigService) {}
+    private readonly emailSender;
 
-    private mailTransport() {
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // true for 465, false for other ports
-            auth: {
-                user: this.configService.getData(ENV_KEYS.DEV_EMAIL),
-                pass: this.configService.getData(ENV_KEYS.DEV_EMAIL_PASSWORD),
-            },
-        });
-
-        return transporter;
+    constructor(private readonly configService: AppConfigService) {
+        this.emailSender = new Resend(this.configService.getData(ENV_KEYS.EMAIL_SENDER_KEY));
     }
 
     async sendMail(sendEmailDto: SendEmailDto) {
-        const transport = this.mailTransport();
-
         try {
-            await transport.sendMail({
-                from: `"Task Manager" <${this.configService.getData(ENV_KEYS.DEV_EMAIL)}>`,
+            await this.emailSender.emails.send({
+                from: `"Task Manager" <${this.configService.getData(ENV_KEYS.EMAIL_DOMAIN_ADDRESS)}>`,
                 to: sendEmailDto.receiver,
                 subject: sendEmailDto.subject,
                 text: sendEmailDto.message,
