@@ -6,16 +6,11 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { Observable, map } from 'rxjs';
-import {
-    TokenConfigService,
-    TokenType,
-} from '@app/common';
+import { TokenConfigService, TokenType } from '@app/common';
 
 @Injectable()
 export class SendCookieInterceptor implements NestInterceptor {
-    constructor(
-        private readonly tokenConfigService: TokenConfigService
-    ) {}
+    constructor(private readonly tokenConfigService: TokenConfigService) {}
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         const response: Response = context.switchToHttp().getResponse();

@@ -7,7 +7,9 @@ export class EmailService {
     private readonly emailSender;
 
     constructor(private readonly configService: AppConfigService) {
-        this.emailSender = new Resend(this.configService.getData(ENV_KEYS.EMAIL_SENDER_KEY));
+        this.emailSender = new Resend(
+            this.configService.getData(ENV_KEYS.EMAIL_SENDER_KEY),
+        );
     }
 
     async sendMail(sendEmailDto: SendEmailDto) {

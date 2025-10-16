@@ -9,6 +9,7 @@
         "Profile",
         "Account",
         "Docs",
-        "Email"
+        "Email",
+        "Task"
     ]
 }
