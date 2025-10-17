@@ -1,6 +1,5 @@
 import { IProfilePreferences, Themes, Languages } from '@app/common';
 import { SchemaFactory, Prop, Schema } from '@nestjs/mongoose';
-import { Credential } from 'apps/auth/src/schemas/Credential.schema';
 import mongoose from 'mongoose';
 
 @Schema({
@@ -58,9 +57,8 @@ export class Profile {
     @Prop({
         required: true,
         type: mongoose.Schema.Types.ObjectId,
-        ref: Credential.name,
     })
-    owner: Credential;
+    owner: mongoose.Schema.Types.ObjectId;
 
     @Prop({
         default: () => ({}),

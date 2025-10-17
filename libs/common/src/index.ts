@@ -7,6 +7,8 @@ export * from './constants/MS_PROVIDES.constants';
 // Enums
 export * from './enums/token-type.enum';
 export * from './enums/profile.enum';
+export * from './enums/task-priority.enum';
+export * from './enums/task-status.enum';
 
 // Patterns
 export * from './patterns/auth.patterns';
