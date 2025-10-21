@@ -1,6 +1,6 @@
-import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
-import { TaskPriority, TaskStatus } from "@app/common";
-import mongoose from "mongoose";
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { TaskPriority, TaskStatus } from '@app/common';
+import mongoose from 'mongoose';
 
 @Schema({
     toObject: {
@@ -18,7 +18,7 @@ export class Task {
         required: true,
         minLength: 1,
         maxLength: 50,
-        trim: true
+        trim: true,
     })
     title: string;
 
@@ -30,13 +30,13 @@ export class Task {
 
     @Prop({
         default: TaskStatus.TO_DO,
-        enum: Object.values(TaskStatus)
+        enum: Object.values(TaskStatus),
     })
     status: string;
 
     @Prop({
         default: TaskPriority.MEDIUM,
-        enum: Object.values(TaskPriority)
+        enum: Object.values(TaskPriority),
     })
     priority: string;
 
@@ -47,7 +47,7 @@ export class Task {
 
     @Prop({
         required: true,
-        type: mongoose.Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId,
     })
     owner: mongoose.Schema.Types.ObjectId;
 }

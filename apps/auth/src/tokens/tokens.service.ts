@@ -131,11 +131,11 @@ export class TokensService {
     }
 
     async deleteToken(token: string) {
-        return await this.tokenModel.deleteOne({ token: token });
+        return this.tokenModel.deleteOne({ token: token });
     }
 
     async deleteUserTokens(ownerId: string) {
-        return await this.tokenModel.deleteMany({
+        return this.tokenModel.deleteMany({
             owner: ownerId,
         });
     }

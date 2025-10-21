@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Themes } from '../enums/profile.enum';
+import { Themes } from '@app/common/enums/profile.enum';
 
 export class ChangeThemeDto {
     @IsNotEmpty()

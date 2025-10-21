@@ -1,7 +1,7 @@
 import {
     Body,
     Controller,
-    Post,
+    Patch,
     Get,
     UseGuards,
     UseInterceptors,
@@ -28,12 +28,12 @@ export class ClientProfileController {
         return this.profileService.findProfile(req.user.sub);
     }
 
-    @Post('name')
+    @Patch('name')
     changeName(@Request() req, @Body() changeNameDto: ChangeNameDto) {
         return this.profileService.changeName(req.user.sub, changeNameDto);
     }
 
-    @Post('language')
+    @Patch('language')
     changeLanguage(
         @Request() req,
         @Body() changeLanguageDto: ChangeLanguageDto,
@@ -44,7 +44,7 @@ export class ClientProfileController {
         );
     }
 
-    @Post('notification')
+    @Patch('notification')
     changeNotification(
         @Request() req,
         @Body() changeNotificationDto: ChangeNotificationDto,
@@ -55,7 +55,7 @@ export class ClientProfileController {
         );
     }
 
-    @Post('theme')
+    @Patch('theme')
     changeThemes(@Request() req, @Body() changeThemeDto: ChangeThemeDto) {
         return this.profileService.changeTheme(req.user.sub, changeThemeDto);
     }

@@ -14,21 +14,25 @@ export * from './enums/task-status.enum';
 export * from './patterns/auth.patterns';
 export * from './patterns/profile.patterns';
 export * from './patterns/email.patterns';
+export * from './patterns/task.patterns';
 
 // DTOs
-export * from './contracts/create-credential.dto';
-export * from './contracts/login-request.dto';
-export * from './contracts/update-credential.dto';
-export * from './contracts/create-profile.dto';
-export * from './contracts/create-account.dto';
-export * from './contracts/token-payload.dto';
-export * from './contracts/change-language.dto';
-export * from './contracts/change-notification.dto';
-export * from './contracts/change-theme.dto';
-export * from './contracts/change-name.dto';
-export * from './contracts/reset-request.dto';
-export * from './contracts/send-email.dto';
-export * from './contracts/reset-password.dto';
+export * from './contracts/account/credential/create-credential.dto';
+export * from './contracts/account/login-request.dto';
+export * from './contracts/account/credential/update-credential.dto';
+export * from './contracts/account/profile/create-profile.dto';
+export * from './contracts/account/create-account.dto';
+export * from './contracts/account/token/token-payload.dto';
+export * from './contracts/account/profile/change-language.dto';
+export * from './contracts/account/profile/change-notification.dto';
+export * from './contracts/account/profile/change-theme.dto';
+export * from './contracts/account/profile/change-name.dto';
+export * from './contracts/account/credential/reset-request.dto';
+export * from './contracts/email/send-email.dto';
+export * from './contracts/account/credential/reset-password.dto';
+export * from './contracts/task/tasks-filter.dto';
+export * from './contracts/task/create-task.dto';
+export * from './contracts/task/update-task.dto';
 
 // Pipes
 export * from './pipes/validation.pipe';

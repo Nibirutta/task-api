@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Languages } from '../enums/profile.enum';
+import { Languages } from '@app/common/enums/profile.enum';
 
 export class ChangeLanguageDto {
     @IsNotEmpty()

@@ -58,7 +58,25 @@ services:
       - "3003"
     environment:
       EMAIL_MICROSERVICE_PORT: ${EMAIL_MICROSERVICE_PORT}
-      
+      EMAIL_SENDER_KEY: ${EMAIL_SENDER_KEY}
+      EMAIL_DOMAIN_ADDRESS: ${EMAIL_DOMAIN_ADDRESS}
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+    networks:
+      - taskapi-network
+
+  task:
+    build:
+      context: .
+      dockerfile: apps/task/Dockerfile
+    container_name: taskapi-task
+    restart: unless-stopped
+    ports:
+      - "3004"
+    environment:
+      TASK_MICROSERVICE_PORT: ${TASK_MICROSERVICE_PORT}
     env_file:
       - .env
     depends_on:

@@ -103,7 +103,7 @@ export class AuthAppService {
             .subscribe();
 
         return {
-            successful: true,
+            message: "Email was sent",
         };
     }
 

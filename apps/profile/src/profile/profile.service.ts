@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Profile } from '../schemas/Profile.schema';
 import { Model } from 'mongoose';
@@ -19,6 +23,11 @@ export class ProfileService {
 
     async createProfile(createProfileDto: CreateProfileDto) {
         const newProfile = await this.profileModel.create(createProfileDto);
+
+        if (!newProfile)
+            throw new InternalServerErrorException(
+                'Impossible to create profile',
+            );
 
         return newProfile;
     }

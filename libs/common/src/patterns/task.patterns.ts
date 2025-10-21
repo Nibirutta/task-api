@@ -1,0 +1,6 @@
+export const TASK_PATTERNS = {
+    FIND: 'TASK_FIND',
+    CREATE: 'TASK_CREATE',
+    UPDATE: 'TASK_UPDATE',
+    DELETE: 'TASK_DELETE',
+};

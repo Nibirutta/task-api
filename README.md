@@ -20,6 +20,8 @@ API Gateway (Port 3000)
 
 ## 🔐 Autenticação
 
+> Nota: Todas as rotas que fazem uso do JWTGuard necessitam da presença do token de acesso no header da requisição.
+
 A API usa **JWT Tokens** com **cookies HttpOnly**:
 - **Access Token**: Autenticação de curta duração (1 min)
 - **Session Token**: Refresh token de longa duração (3 dias)
@@ -238,7 +240,7 @@ Obtém dados completos do perfil do usuário.
 
 ---
 
-#### **POST** `/profile/name`
+#### **PATCH** `/profile/name`
 Altera o nome de exibição do usuário.
 
 **Autenticação:** 🔒 **JwtGuard**
@@ -256,7 +258,7 @@ Altera o nome de exibição do usuário.
 
 ---
 
-#### **POST** `/profile/language`
+#### **PATCH** `/profile/language`
 Altera o idioma preferido do usuário.
 
 **Autenticação:** 🔒 **JwtGuard**
@@ -274,7 +276,7 @@ Altera o idioma preferido do usuário.
 
 ---
 
-#### **POST** `/profile/theme`
+#### **PATCH** `/profile/theme`
 Altera o tema visual preferido.
 
 **Autenticação:** 🔒 **JwtGuard**
@@ -292,7 +294,7 @@ Altera o tema visual preferido.
 
 ---
 
-#### **POST** `/profile/notification`
+#### **PATCH** `/profile/notification`
 Altera configurações de notificação.
 
 **Autenticação:** 🔒 **JwtGuard**
@@ -312,6 +314,154 @@ Altera configurações de notificação.
 **Peculiaridades:**
 - Atualmente apenas suporte para notificações por email
 - Permite ativar/desativar tipos específicos
+
+---
+
+### ✅ Task Routes (`/task`)
+
+> **Nota:** Todas as rotas de tarefas requerem autenticação (`JwtGuard`) e são automaticamente associadas ao usuário logado.
+
+#### **GET** `/task`
+Obtém lista de tarefas do usuário com filtros opcionais.
+
+**Autenticação:** 🔒 **JwtGuard**
+
+**Dados Necessários:** Nenhum (filtros via query parameters)
+
+**Query Parameters (opcionais):**
+```
+?title=string                    // Filtrar por título
+&status=to-do|in-progress|in-review|done
+&priority=low|medium|high|urgent|optional
+&from=2024-01-01T00:00:00.000Z   // Data inicial
+&to=2024-12-31T23:59:59.000Z     // Data final
+```
+
+**Resposta:**
+```json
+[
+  {
+    "id": "string",
+    "title": "string",
+    "description": "string",
+    "status": "to-do|in-progress|in-review|done",
+    "priority": "low|medium|high|urgent|optional",
+    "dueDate": "2024-10-25T10:30:00.000Z",
+    "owner": "string",
+    "createdAt": "2024-10-21T15:00:00.000Z",
+    "updatedAt": "2024-10-21T15:00:00.000Z"
+  }
+]
+```
+
+**Peculiaridades:**
+- Retorna apenas tarefas do usuário autenticado
+- Filtros podem ser combinados
+- Lista vazia se nenhuma tarefa encontrada
+
+---
+
+#### **POST** `/task`
+Cria uma nova tarefa para o usuário.
+
+**Autenticação:** 🔒 **JwtGuard**
+
+**Dados Necessários:**
+```json
+{
+  "title": "string (obrigatório)",
+  "description": "string (opcional)",
+  "status": "to-do" | "in-progress" | "in-review" | "done",
+  "priority": "low" | "medium" | "high" | "urgent" | "optional",
+  "dueDate": "2024-10-25T10:30:00.000Z (obrigatório)"
+}
+```
+
+**Resposta:**
+- ✅ Tarefa criada com dados completos + ID gerado
+- ❌ `400` - Dados inválidos
+- ❌ `401` - Não autorizado
+
+**Peculiaridades:**
+- `status` padrão: `"to-do"` se não especificado
+- `priority` padrão: `"medium"` se não especificado
+- `owner` automaticamente definido pelo usuário logado
+- `dueDate` deve ser uma data válida no futuro
+
+---
+
+#### **PATCH** `/task/:id`
+Atualiza uma tarefa existente do usuário.
+
+**Autenticação:** 🔒 **JwtGuard**
+
+**Parâmetros de URL:**
+- `id`: ID da tarefa a ser atualizada
+
+**Dados Necessários:**
+```json
+{
+  "title": "string (opcional)",
+  "description": "string (opcional)",
+  "status": "to-do" | "in-progress" | "in-review" | "done",
+  "priority": "low" | "medium" | "high" | "urgent" | "optional",
+  "dueDate": "2024-10-25T10:30:00.000Z (opcional)"
+}
+```
+
+**Resposta:**
+- ✅ Tarefa atualizada com dados completos
+- ❌ `400` - Dados inválidos
+- ❌ `401` - Não autorizado
+- ❌ `404` - Tarefa não encontrada
+
+**Peculiaridades:**
+- Apenas campos fornecidos são atualizados
+- Usuário só pode atualizar suas próprias tarefas
+- `updatedAt` automaticamente atualizado
+
+---
+
+#### **DELETE** `/task/:id`
+Remove uma tarefa do usuário permanentemente.
+
+**Autenticação:** 🔒 **JwtGuard**
+
+**Parâmetros de URL:**
+- `id`: ID da tarefa a ser removida
+
+**Dados Necessários:** Nenhum
+
+**Resposta:**
+- ✅ `{ "message": "Task deleted successfully" }`
+- ❌ `401` - Não autorizado
+- ❌ `404` - Tarefa não encontrada
+
+**Peculiaridades:**
+- Usuário só pode deletar suas próprias tarefas
+- Ação irreversível
+- Remove completamente do banco de dados
+
+---
+
+## 📋 Estados e Prioridades das Tarefas
+
+### **Status Disponíveis:**
+| Status | Descrição |
+|--------|-----------|
+| `to-do` | Tarefa pendente para iniciar |
+| `in-progress` | Tarefa em andamento |
+| `in-review` | Tarefa em revisão/validação |
+| `done` | Tarefa concluída |
+
+### **Prioridades Disponíveis:**
+| Prioridade | Descrição |
+|------------|-----------|
+| `optional` | Tarefa opcional/baixa urgência |
+| `low` | Prioridade baixa |
+| `medium` | Prioridade média (padrão) |
+| `high` | Prioridade alta |
+| `urgent` | Tarefa urgente |
 
 ---
 
