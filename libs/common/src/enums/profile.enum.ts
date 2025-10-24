@@ -1,7 +1,10 @@
 export enum Themes {
-    LIGHT = 'light',
-    DARK = 'dark',
-    LOFI = 'lofi',
+    DEFAULT = 'default',
+    NEON_FLOW = 'neon-flow',
+    CLOUDY_FOCUS = 'cloudy-focus',
+    AFTER_HOURS = 'after-hours',
+    FOREST_CALM = 'forest-calm',
+    SOLAR_BLOOM = 'solar-bloom',
 }
 
 export enum NotificationsTypes {

@@ -17,7 +17,7 @@ export class NotificationPreferences {
 })
 export class Preferences implements IProfilePreferences {
     @Prop({
-        default: Themes.LIGHT,
+        default: Themes.DEFAULT,
         enum: Object.values(Themes),
     })
     theme: string;
