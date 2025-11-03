@@ -10,6 +10,15 @@
   "monorepo": true,
   "root": "apps/api-gateway",
   "projects": {
+    "account": {
+      "type": "application",
+      "root": "apps/account",
+      "entryFile": "main",
+      "sourceRoot": "apps/account/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/account/tsconfig.app.json"
+      }
+    },
     "api-gateway": {
       "type": "application",
       "root": "apps/api-gateway",
@@ -17,15 +26,6 @@
       "sourceRoot": "apps/api-gateway/src",
       "compilerOptions": {
         "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
-      }
-    },
-    "auth": {
-      "type": "application",
-      "root": "apps/auth",
-      "entryFile": "main",
-      "sourceRoot": "apps/auth/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/auth/tsconfig.app.json"
       }
     },
     "commons": {
@@ -37,22 +37,13 @@
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
     },
-    "email": {
+    "notification": {
       "type": "application",
-      "root": "apps/email",
+      "root": "apps/notification",
       "entryFile": "main",
-      "sourceRoot": "apps/email/src",
+      "sourceRoot": "apps/notification/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/email/tsconfig.app.json"
-      }
-    },
-    "profile": {
-      "type": "application",
-      "root": "apps/profile",
-      "entryFile": "main",
-      "sourceRoot": "apps/profile/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/profile/tsconfig.app.json"
+        "tsConfigPath": "apps/notification/tsconfig.app.json"
       }
     },
     "task": {

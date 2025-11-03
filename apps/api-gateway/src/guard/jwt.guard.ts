@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { ClientProxy } from '@nestjs/microservices';
-import { AUTH_PATTERNS, TokenType, TRANSPORTER_PROVIDER } from '@app/common';
+import { ACCOUNT_PATTERNS, TokenType, TRANSPORTER_PROVIDER } from '@app/common';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class JwtGuard implements CanActivate, OnApplicationBootstrap {
     }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        const request: Request = context.switchToHttp().getRequest();
+        const request: Request = context.switchToHttp().getRequest<Request>();
         const accessToken = this.extractTokenFromHeader(request);
 
         if (!accessToken) {
@@ -34,7 +34,7 @@ export class JwtGuard implements CanActivate, OnApplicationBootstrap {
 
         try {
             const decodedToken = await lastValueFrom(
-                this.transporter.send(AUTH_PATTERNS.VALIDATE_TOKEN, {
+                this.transporter.send(ACCOUNT_PATTERNS.VALIDATE_TOKEN, {
                     token: accessToken,
                     tokenType: TokenType.ACCESS,
                 }),

@@ -82,4 +82,14 @@ export class TaskService {
 
         return deletedTask;
     }
+
+    async deleteAllTasksFromUser(owner: string) {
+        await this.taskModel.deleteMany({
+            owner: owner,
+        });
+
+        return {
+            success: true,
+        };
+    }
 }

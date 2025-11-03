@@ -1,5 +1,5 @@
 import {
-    AUTH_PATTERNS,
+    ACCOUNT_PATTERNS,
     TokenConfigService,
     TRANSPORTER_PROVIDER,
     TokenType,
@@ -30,7 +30,7 @@ export class LogoutInterceptor implements NestInterceptor {
 
         if (sessionToken) {
             this.transporter
-                .send(AUTH_PATTERNS.DELETE_TOKEN, sessionToken)
+                .send(ACCOUNT_PATTERNS.LOGOUT, sessionToken)
                 .subscribe();
         }
 

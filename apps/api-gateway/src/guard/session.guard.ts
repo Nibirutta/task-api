@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { ClientProxy } from '@nestjs/microservices';
-import { AUTH_PATTERNS, TokenType, TRANSPORTER_PROVIDER } from '@app/common';
+import { ACCOUNT_PATTERNS, TokenType, TRANSPORTER_PROVIDER } from '@app/common';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class SessionGuard implements CanActivate, OnApplicationBootstrap {
     }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        const request: Request = context.switchToHttp().getRequest();
+        const request = context.switchToHttp().getRequest<Request>();
 
         const sessionToken = request.cookies?.sessionToken;
 
@@ -35,7 +35,7 @@ export class SessionGuard implements CanActivate, OnApplicationBootstrap {
 
         try {
             const decodedToken = await lastValueFrom(
-                this.transporter.send(AUTH_PATTERNS.VALIDATE_TOKEN, {
+                this.transporter.send(ACCOUNT_PATTERNS.VALIDATE_TOKEN, {
                     token: sessionToken,
                     tokenType: TokenType.SESSION,
                 }),

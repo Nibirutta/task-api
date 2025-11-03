@@ -1,6 +1,7 @@
 export const TASK_PATTERNS = {
-    FIND: 'TASK_FIND',
-    CREATE: 'TASK_CREATE',
-    UPDATE: 'TASK_UPDATE',
-    DELETE: 'TASK_DELETE',
+    FIND: 'task.find',
+    CREATE: 'task.create',
+    UPDATE: 'task.update',
+    DELETE: 'task.delete',
+    DELETE_ALL: 'task.delete-all',
 };

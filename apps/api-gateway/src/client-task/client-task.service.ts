@@ -6,6 +6,7 @@ import {
     TasksFilterDto,
     TRANSPORTER_PROVIDER,
     UpdateTaskDto,
+    TaskResponseDto,
 } from '@app/common';
 import { lastValueFrom, retry, timeout } from 'rxjs';
 
@@ -22,7 +23,7 @@ export class ClientTaskService implements OnApplicationBootstrap {
 
     async getTasks(owner: string, tasksFilterDto: TasksFilterDto) {
         try {
-            return lastValueFrom(
+            return lastValueFrom<TaskResponseDto[]>(
                 this.transporter
                     .send(TASK_PATTERNS.FIND, {
                         owner,
@@ -37,7 +38,7 @@ export class ClientTaskService implements OnApplicationBootstrap {
 
     async createTask(owner: string, createTaskDto: CreateTaskDto) {
         try {
-            return lastValueFrom(
+            return lastValueFrom<TaskResponseDto>(
                 this.transporter
                     .send(TASK_PATTERNS.CREATE, {
                         owner,
@@ -52,7 +53,7 @@ export class ClientTaskService implements OnApplicationBootstrap {
 
     async updateTask(owner: string, id: string, updateTaskDto: UpdateTaskDto) {
         try {
-            return lastValueFrom(
+            return lastValueFrom<TaskResponseDto>(
                 this.transporter
                     .send(TASK_PATTERNS.UPDATE, {
                         owner,
@@ -68,7 +69,7 @@ export class ClientTaskService implements OnApplicationBootstrap {
 
     async deleteTask(owner: string, id: string) {
         try {
-            return lastValueFrom(
+            return lastValueFrom<TaskResponseDto>(
                 this.transporter
                     .send(TASK_PATTERNS.DELETE, {
                         owner,

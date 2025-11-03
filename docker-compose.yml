@@ -9,16 +9,15 @@ services:
     networks:
       - taskapi-network
 
-  auth:
+  account:
     build:
       context: .
-      dockerfile: apps/auth/Dockerfile
-    container_name: taskapi-auth
+      dockerfile: apps/account/Dockerfile
+    container_name: taskapi-account
     restart: unless-stopped
     ports:
-      - "3002"
+      - "3001"
     environment:
-      AUTH_MICROSERVICE_PORT: ${AUTH_MICROSERVICE_PORT}
       DATABASE_URL: ${DATABASE_URL}
       ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
       SESSION_TOKEN_SECRET: ${SESSION_TOKEN_SECRET}
@@ -30,34 +29,15 @@ services:
     networks:
       - taskapi-network
 
-  profile:
+  notification:
     build:
       context: .
-      dockerfile: apps/profile/Dockerfile
-    container_name: taskapi-profile
-    restart: unless-stopped
-    ports:
-      - "3001"
-    environment:
-      PROFILE_MICROSERVICE_PORT: ${PROFILE_MICROSERVICE_PORT}
-      DATABASE_URL: ${DATABASE_URL}
-    env_file:
-      - .env
-    depends_on:
-      - rabbitmq
-    networks:
-      - taskapi-network
-
-  email:
-    build:
-      context: .
-      dockerfile: apps/email/Dockerfile
-    container_name: taskapi-email
+      dockerfile: apps/notification/Dockerfile
+    container_name: taskapi-notification
     restart: unless-stopped
     ports:
       - "3003"
     environment:
-      EMAIL_MICROSERVICE_PORT: ${EMAIL_MICROSERVICE_PORT}
       EMAIL_SENDER_KEY: ${EMAIL_SENDER_KEY}
       EMAIL_DOMAIN_ADDRESS: ${EMAIL_DOMAIN_ADDRESS}
     env_file:
@@ -74,9 +54,7 @@ services:
     container_name: taskapi-task
     restart: unless-stopped
     ports:
-      - "3004"
-    environment:
-      TASK_MICROSERVICE_PORT: ${TASK_MICROSERVICE_PORT}
+      - "3002"
     env_file:
       - .env
     depends_on:
@@ -92,10 +70,6 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
-    environment:
-      PROFILE_MICROSERVICE_PORT: ${PROFILE_MICROSERVICE_PORT}
-      AUTH_MICROSERVICE_PORT: ${AUTH_MICROSERVICE_PORT}
-      GATEWAY_PORT: ${GATEWAY_PORT}
     env_file:
       - .env
     depends_on:

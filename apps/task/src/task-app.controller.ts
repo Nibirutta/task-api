@@ -1,23 +1,34 @@
 import { Controller } from '@nestjs/common';
 import { Payload, MessagePattern } from '@nestjs/microservices';
-import { TaskAppService } from './task-app.service';
 import {
     CreateTaskDto,
     TASK_PATTERNS,
     TasksFilterDto,
     UpdateTaskDto,
+    TaskResponseDto,
 } from '@app/common';
+import { TaskService } from './task/task.service';
+import { plainToInstance } from 'class-transformer';
 
 @Controller()
 export class TaskAppController {
-    constructor(private readonly taskAppService: TaskAppService) {}
+    constructor(private readonly taskService: TaskService) {}
 
     @MessagePattern(TASK_PATTERNS.FIND)
     async getTasks(
         @Payload('owner') owner: string,
         @Payload('tasksFilterDto') tasksFilterDto: TasksFilterDto,
     ) {
-        return this.taskAppService.getTasks(owner, tasksFilterDto);
+        const foundTasks = await this.taskService.getTasks(
+            owner,
+            tasksFilterDto,
+        );
+
+        return foundTasks.map((task) =>
+            plainToInstance(TaskResponseDto, task, {
+                excludeExtraneousValues: true,
+            }),
+        );
     }
 
     @MessagePattern(TASK_PATTERNS.CREATE)
@@ -25,7 +36,14 @@ export class TaskAppController {
         @Payload('owner') owner: string,
         @Payload('createTaskDto') createTaskDto: CreateTaskDto,
     ) {
-        return this.taskAppService.createTask(owner, createTaskDto);
+        const createdTask = await this.taskService.createTask(
+            owner,
+            createTaskDto,
+        );
+
+        return plainToInstance(TaskResponseDto, createdTask, {
+            excludeExtraneousValues: true,
+        });
     }
 
     @MessagePattern(TASK_PATTERNS.UPDATE)
@@ -34,7 +52,15 @@ export class TaskAppController {
         @Payload('id') id: string,
         @Payload('updateTaskDto') updateTaskDto: UpdateTaskDto,
     ) {
-        return this.taskAppService.updateTask(owner, id, updateTaskDto);
+        const updatedTask = await this.taskService.updateTask(
+            owner,
+            id,
+            updateTaskDto,
+        );
+
+        return plainToInstance(TaskResponseDto, updatedTask, {
+            excludeExtraneousValues: true,
+        });
     }
 
     @MessagePattern(TASK_PATTERNS.DELETE)
@@ -42,6 +68,15 @@ export class TaskAppController {
         @Payload('owner') owner: string,
         @Payload('id') id: string,
     ) {
-        return this.taskAppService.deleteTask(owner, id);
+        const deletedTask = await this.taskService.deleteTask(owner, id);
+
+        return plainToInstance(TaskResponseDto, deletedTask, {
+            excludeExtraneousValues: true,
+        });
+    }
+
+    @MessagePattern(TASK_PATTERNS.DELETE_ALL)
+    async deleteAllTasksFromUser(@Payload() owner: string) {
+        return await this.taskService.deleteAllTasksFromUser(owner);
     }
 }

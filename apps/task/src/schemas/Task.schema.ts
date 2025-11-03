@@ -2,17 +2,7 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { TaskPriority, TaskStatus } from '@app/common';
 import mongoose from 'mongoose';
 
-@Schema({
-    toObject: {
-        transform(doc, ret: any, options) {
-            ret.id = ret._id;
-            delete ret._id;
-            delete ret.__v;
-            return ret;
-        },
-    },
-    timestamps: true,
-})
+@Schema({ timestamps: true })
 export class Task {
     @Prop({
         required: true,

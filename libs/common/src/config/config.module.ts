@@ -10,9 +10,6 @@ import { TokenConfigService } from './token-config.service';
         ConfigModule.forRoot({
             isGlobal: false,
             validationSchema: joi.object({
-                PROFILE_MICROSERVICE_PORT: joi.number().default(3001),
-                AUTH_MICROSERVICE_PORT: joi.number().default(3002),
-                EMAIL_MICROSERVICE_PORT: joi.number().default(3003),
                 EMAIL_SENDER_KEY: joi.string(),
                 EMAIL_DOMAIN_ADDRESS: joi.string(),
                 RESET_URL: joi.string(),

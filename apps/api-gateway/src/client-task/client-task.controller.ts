@@ -41,7 +41,7 @@ export class ClientTaskController {
             updateTaskDto,
         );
     }
-    
+
     @Delete(':id')
     deleteTask(@Request() req, @Param('id') id: string) {
         return this.clientTaskService.deleteTask(req.user.sub, id);

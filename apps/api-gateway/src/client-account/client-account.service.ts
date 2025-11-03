@@ -1,185 +1,118 @@
-import { Injectable } from '@nestjs/common';
-import { ClientAuthService } from '../client-auth/client-auth.service';
+import { Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import {
     CreateAccountDto,
-    CreateCredentialDto,
-    ICredentialData,
-    CreateProfileDto,
-    IProfileData,
-    AccessTokenPayloadDto,
-    SessionTokenPayloadDto,
     LoginRequestDto,
-    UpdateCredentialDto,
     ResetRequestDto,
     ResetPasswordDto,
+    TRANSPORTER_PROVIDER,
+    SessionResponseDto,
+    ACCOUNT_PATTERNS,
+    UpdateAccountDto,
 } from '@app/common';
-import { pick } from 'lodash';
-import { ClientProfileService } from '../client-profile/client-profile.service';
+import { ClientProxy } from '@nestjs/microservices';
+import { lastValueFrom, retry, timeout } from 'rxjs';
 
 @Injectable()
-export class ClientAccountService {
+export class ClientAccountService implements OnApplicationBootstrap {
     constructor(
-        private readonly clientAuthService: ClientAuthService,
-        private readonly clientProfileService: ClientProfileService,
+        @Inject(TRANSPORTER_PROVIDER) private readonly transporter: ClientProxy,
     ) {}
 
-    async createAccount(createUserDto: CreateAccountDto) {
-        const createCredentialDto: CreateCredentialDto = pick(createUserDto, [
-            'username',
-            'email',
-            'password',
-        ]);
-
-        let profileData: IProfileData;
-        let tokens;
-
-        const credentialData: ICredentialData =
-            await this.clientAuthService.createCredential(createCredentialDto);
-
-        const createProfileDto: CreateProfileDto = {
-            owner: credentialData.id,
-            ...pick(createUserDto, ['name']),
-        };
-
-        try {
-            profileData =
-                await this.clientProfileService.createProfile(createProfileDto);
-        } catch (error) {
-            await this.clientAuthService.deleteCredential(credentialData.id);
-
-            throw error;
-        }
-
-        const accessTokenPayloadDto: AccessTokenPayloadDto = {
-            sub: credentialData.id,
-            username: credentialData.username,
-        };
-
-        const sessionTokenPayloadDto: SessionTokenPayloadDto = {
-            sub: credentialData.id,
-        };
-
-        try {
-            tokens = await this.clientAuthService.generateUserTokens(
-                accessTokenPayloadDto,
-                sessionTokenPayloadDto,
-            );
-        } catch (error) {
-            await this.clientAuthService.deleteCredential(credentialData.id);
-            await this.clientProfileService.deleteProfile(credentialData.id);
-
-            throw error;
-        }
-
-        return {
-            ...profileData,
-            ...tokens,
-        };
+    async onApplicationBootstrap() {
+        await this.transporter.connect();
+        console.log('Client account connected to the transporter');
     }
 
-    async login(loginRequestDto: LoginRequestDto) {
-        const validatedCredential =
-            await this.clientAuthService.validateCredential(loginRequestDto);
+    async register(createAccountDto: CreateAccountDto) {
+        try {
+            return await lastValueFrom<SessionResponseDto>(
+                this.transporter
+                    .send(ACCOUNT_PATTERNS.REGISTER, createAccountDto)
+                    .pipe(retry(3), timeout(1000)),
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
 
-        const validatedProfile = await this.clientProfileService.findProfile(
-            validatedCredential.id,
-        );
-
-        const accessTokenPayloadDto: AccessTokenPayloadDto = {
-            sub: validatedCredential.id,
-            username: validatedCredential.username,
-        };
-
-        const sessionTokenPayloadDto: SessionTokenPayloadDto = {
-            sub: validatedCredential.id,
-        };
-
-        const tokens = await this.clientAuthService.generateUserTokens(
-            accessTokenPayloadDto,
-            sessionTokenPayloadDto,
-        );
-
-        return {
-            ...validatedProfile,
-            ...tokens,
-        };
+    async updateAccount(id: string, updateAccountDto: UpdateAccountDto) {
+        try {
+            return await lastValueFrom<SessionResponseDto>(
+                this.transporter
+                    .send(ACCOUNT_PATTERNS.UPDATE, {
+                        id,
+                        updateAccountDto,
+                    })
+                    .pipe(retry(3), timeout(1000)),
+            );
+        } catch (error) {
+            throw error;
+        }
     }
 
     async deleteAccount(id: string) {
-        await this.clientAuthService.deleteCredential(id);
-        const deletedProfile =
-            await this.clientProfileService.deleteProfile(id);
-        await this.clientAuthService.deleteUserTokens(id);
+        try {
+            return await lastValueFrom(
+                this.transporter
+                    .send(ACCOUNT_PATTERNS.DELETE, id)
+                    .pipe(retry(3), timeout(1000)),
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
 
-        return {
-            message: `User ${deletedProfile.name} was deleted`,
-        };
+    async login(loginRequestDto: LoginRequestDto) {
+        try {
+            return await lastValueFrom<SessionResponseDto>(
+                this.transporter
+                    .send(ACCOUNT_PATTERNS.LOGIN, loginRequestDto)
+                    .pipe(retry(3), timeout(1000)),
+            );
+        } catch (error) {
+            throw error;
+        }
     }
 
     async refreshSession(id: string) {
-        const validatedCredential: ICredentialData =
-            await this.clientAuthService.findCredential(id);
-
-        const validatedProfile: IProfileData =
-            await this.clientProfileService.findProfile(id);
-
-        const accessTokenPayloadDto: AccessTokenPayloadDto = {
-            sub: validatedCredential.id,
-            username: validatedCredential.username,
-        };
-
-        const sessionTokenPayloadDto: SessionTokenPayloadDto = {
-            sub: validatedCredential.id,
-        };
-
-        const tokens = await this.clientAuthService.generateUserTokens(
-            accessTokenPayloadDto,
-            sessionTokenPayloadDto,
-        );
-
-        return {
-            ...validatedProfile,
-            ...tokens,
-        };
-    }
-
-    async updateAccount(id: string, updateCredentialDto: UpdateCredentialDto) {
-        const updatedCredential: ICredentialData =
-            await this.clientAuthService.updateCredential(
-                id,
-                updateCredentialDto,
+        try {
+            return await lastValueFrom<SessionResponseDto>(
+                this.transporter
+                    .send(ACCOUNT_PATTERNS.REFRESH_SESSION, id)
+                    .pipe(retry(3), timeout(1000)),
             );
-
-        const updatedProfile: IProfileData =
-            await this.clientProfileService.findProfile(id);
-
-        const accessTokenPayloadDto: AccessTokenPayloadDto = {
-            sub: updatedCredential.id,
-            username: updatedCredential.username,
-        };
-
-        const sessionTokenPayloadDto: SessionTokenPayloadDto = {
-            sub: updatedCredential.id,
-        };
-
-        const tokens = await this.clientAuthService.generateUserTokens(
-            accessTokenPayloadDto,
-            sessionTokenPayloadDto,
-        );
-
-        return {
-            ...updatedProfile,
-            ...tokens,
-        };
+        } catch (error) {
+            throw error;
+        }
     }
 
     async requestPasswordReset(resetRequestDto: ResetRequestDto) {
-        return this.clientAuthService.requestPasswordReset(resetRequestDto);
+        try {
+            return await lastValueFrom(
+                this.transporter
+                    .send(
+                        ACCOUNT_PATTERNS.REQUEST_PASSWORD_RESET,
+                        resetRequestDto,
+                    )
+                    .pipe(retry(3), timeout(1000)),
+            );
+        } catch (error) {
+            throw error;
+        }
     }
 
     async resetPassword(token: string, resetPasswordDto: ResetPasswordDto) {
-        await this.clientAuthService.resetPassword(token, resetPasswordDto);
-
-        return { message: 'Password is now reseted' };
+        try {
+            return await lastValueFrom(
+                this.transporter
+                    .send(ACCOUNT_PATTERNS.RESET_PASSWORD, {
+                        token,
+                        resetPasswordDto,
+                    })
+                    .pipe(retry(3), timeout(1000)),
+            );
+        } catch (error) {
+            throw error;
+        }
     }
 }

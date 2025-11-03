@@ -12,20 +12,22 @@ TaskAPI é uma aplicação baseada em arquitetura de microserviços usando NestJ
 
 ```
 API Gateway (Port 3000)
-├── Auth Service (Microserviço de autenticação)
-├── Profile Service (Microserviço de perfil)  
-├── Users Service (Microserviço de usuários)
-└── Email Service (Microserviço de emails)
+├── Account Service (Microserviço de contas)
+├── Task Service (Microserviço de tarefas)
+└── Notification Service (Microserviço de notificações)
 ```
 
 ## 🔐 Autenticação
 
-> Nota: Todas as rotas que fazem uso do JWTGuard necessitam da presença do token de acesso no header da requisição.
+– Rotas com proteção usam dois tipos de token:
 
-A API usa **JWT Tokens** com **cookies HttpOnly**:
-- **Access Token**: Autenticação de curta duração (1 min)
-- **Session Token**: Refresh token de longa duração (3 dias)
-- **Reset Token**: Token único para reset de senha
+- Access Token: curta duração (1 min) — deve ser enviado no header Authorization: Bearer <token>
+- Session Token: longa duração (3 dias) — enviado e renovado como Cookie HttpOnly chamado sessionToken
+- Reset Token: token único (30 min) para reset de senha, enviado por e-mail
+
+Observações:
+- JwtGuard lê o Access Token do header Authorization
+- SessionGuard lê o Session Token do cookie sessionToken
 
 ## 📚 Rotas Disponíveis
 
@@ -33,6 +35,8 @@ A API usa **JWT Tokens** com **cookies HttpOnly**:
 
 #### **POST** `/account/register`
 Registra uma nova conta de usuário.
+
+Autenticação: GuestGuard (bloqueia usuários já autenticados)
 
 **Dados Necessários:**
 ```json
@@ -45,19 +49,22 @@ Registra uma nova conta de usuário.
 ```
 
 **Resposta:**
-- ✅ Conta criada + cookies de autenticação + dados do perfil
+- ✅ Corpo: { profile, accessToken } e cookie sessionToken definido
 - ❌ `400` - Dados inválidos
+- ❌ `403` - Usuário já logado
 - ❌ `409` - Username/email já existe
 
 **Peculiaridades:**
-- Cria automaticamente credencial e perfil
-- Define cookies de autenticação
+- Cria automaticamente uma conta de usuário
+- Define e retorna cookies de autenticação
 - Retorna dados completos do perfil
 
 ---
 
 #### **POST** `/account/login`
 Autentica um usuário existente.
+
+Autenticação: GuestGuard (bloqueia usuários já autenticados)
 
 **Dados Necessários:**
 ```json
@@ -69,13 +76,14 @@ Autentica um usuário existente.
 ```
 
 **Resposta:**
-- ✅ Login realizado + cookies de autenticação + dados do perfil
+- ✅ Corpo: { profile, accessToken } e cookie sessionToken definido
 - ❌ `401` - Credenciais inválidas
+- ❌ `403` - Usuário já logado
 - ❌ `400` - Dados mal formatados
 
 **Peculiaridades:**
 - Aceita username OU email
-- Define cookies HttpOnly automaticamente
+- Retorna os tokens de sessão (**Access Token** & **Session Token**)
 - Retorna perfil completo do usuário
 
 ---
@@ -83,12 +91,12 @@ Autentica um usuário existente.
 #### **GET** `/account/refresh`
 Renova a sessão usando o session token.
 
-**Autenticação:** 🔒 **SessionGuard** (cookie de sessão)
+Autenticação: 🔒 SessionGuard (usa cookie de sessão)
 
 **Dados Necessários:** Nenhum (usa cookie)
 
 **Resposta:**
-- ✅ Novo access token + dados atualizados do perfil
+- ✅ Corpo: { profile, accessToken } e novo cookie sessionToken definido
 - ❌ `401` - Session token inválido/expirado
 
 **Peculiaridades:**
@@ -101,40 +109,43 @@ Renova a sessão usando o session token.
 #### **GET** `/account/logout`
 Realiza logout do usuário.
 
-**Autenticação:** Nenhuma (público)
-
 **Dados Necessários:** Nenhum
 
-**Resposta:**
-- ✅ `{ "message": "Logout successful" }`
-
 **Peculiaridades:**
-- Remove cookies automaticamente
-- Invalida tokens no servidor
+- Responde 204 No Content
+- Limpa o cookie sessionToken
+- Invalida o session token no servidor
 
 ---
 
-#### **PATCH** `/account/credential`
-Atualiza credenciais da conta (email/senha).
+#### **PATCH** `/account`
+Pode atualizar qualquer informação da conta do usuário (email, senha, nome...).
 
-**Autenticação:** 🔒 **JwtGuard** (usuário logado)
+Autenticação: 🔒 JwtGuard (usuário logado)
 
 **Dados Necessários:**
 ```json
 {
   "email": "string (opcional)",
-  "password": "string (opcional)"
+  "password": "string (opcional)",
+  "name": "string (1-20, opcional)",
+  "language": "pt-br|en-us|... (opcional)",
+  "theme": "default|dark|... (opcional)",
+  "notification": {
+    "notificationType": "email" ,
+    "isActivated": true
+  }
 }
 ```
 
 **Resposta:**
-- ✅ Credenciais atualizadas + novos cookies + dados do perfil
+- ✅ Corpo: { profile, accessToken } e cookie sessionToken redefinido
 - ❌ `401` - Não autorizado
 - ❌ `400` - Dados inválidos
 - ❌ `409` - Email já em uso
 
 **Peculiaridades:**
-- Campos opcionais (atualize apenas o que desejar)
+- Todos os campos são opcionais (atualize apenas o que desejar)
 - Gera novos tokens após alteração
 - Username não pode ser alterado
 
@@ -143,7 +154,7 @@ Atualiza credenciais da conta (email/senha).
 #### **POST** `/account/request-reset`
 Solicita reset de senha via email.
 
-**Autenticação:** Nenhuma (público)
+Autenticação: pública (bloqueada para autenticados via GuestGuard)
 
 **Dados Necessários:**
 ```json
@@ -152,9 +163,9 @@ Solicita reset de senha via email.
 }
 ```
 
-**Resposta:**
-- ✅ `{ "message": "Reset email sent" }`
+- ✅ `{ "success": true }`
 - ❌ `400` - Email inválido
+- ❌ `403` - Usuário já logado
 - ❌ `404` - Email não encontrado
 
 **Peculiaridades:**
@@ -178,9 +189,9 @@ Redefine a senha usando token de reset.
 }
 ```
 
-**Resposta:**
-- ✅ `{ "message": "Password updated successfully" }`
+- ✅ `{ "success": true }`
 - ❌ `400` - Token inválido/expirado
+- ❌ `403` - Usuário já logado
 - ❌ `400` - Senha não atende critérios
 
 **Peculiaridades:**
@@ -197,123 +208,13 @@ Remove a conta do usuário permanentemente.
 
 **Dados Necessários:** Nenhum
 
-**Resposta:**
-- ✅ Conta removida + logout automático
+- ✅ 204 No Content (logout automático e sessão invalidada)
 - ❌ `401` - Não autorizado
 
 **Peculiaridades:**
 - Remove todos os dados relacionados
 - Faz logout automático via `LogoutInterceptor`
 - Ação irreversível
-
----
-
-### 👤 Profile Routes (`/profile`)
-
-> **Nota:** Todas as rotas de perfil requerem autenticação (`JwtGuard`) e retornam dados do perfil atualizados (`SendProfileInterceptor`).
-
-#### **GET** `/profile`
-Obtém dados completos do perfil do usuário.
-
-**Autenticação:** 🔒 **JwtGuard**
-
-**Dados Necessários:** Nenhum
-
-**Resposta:**
-```json
-{
-  "name": "string",
-  "ownerId": "string",
-  "preferences": {
-    "theme": "light|dark|lofi",
-    "language": "pt-BR|en-US", 
-    "notification": {
-      "email": true | false
-    }
-  }
-}
-```
-
-**Peculiaridades:**
-- Dados são obtidos automaticamente via token JWT
-- Retorna preferências completas do usuário
-
----
-
-#### **PATCH** `/profile/name`
-Altera o nome de exibição do usuário.
-
-**Autenticação:** 🔒 **JwtGuard**
-
-**Dados Necessários:**
-```json
-{
-  "name": "string (1-20 caracteres)"
-}
-```
-
-**Resposta:**
-- ✅ Perfil atualizado com novo nome
-- ❌ `400` - Nome inválido
-
----
-
-#### **PATCH** `/profile/language`
-Altera o idioma preferido do usuário.
-
-**Autenticação:** 🔒 **JwtGuard**
-
-**Dados Necessários:**
-```json
-{
-  "language": "pt-BR" | "en-US"
-}
-```
-
-**Resposta:**
-- ✅ Perfil atualizado com novo idioma
-- ❌ `400` - Idioma não suportado
-
----
-
-#### **PATCH** `/profile/theme`
-Altera o tema visual preferido.
-
-**Autenticação:** 🔒 **JwtGuard**
-
-**Dados Necessários:**
-```json
-{
-  "theme": "light" | "dark" | "lofi"
-}
-```
-
-**Resposta:**
-- ✅ Perfil atualizado com novo tema
-- ❌ `400` - Tema não suportado
-
----
-
-#### **PATCH** `/profile/notification`
-Altera configurações de notificação.
-
-**Autenticação:** 🔒 **JwtGuard**
-
-**Dados Necessários:**
-```json
-{
-  "notificationType": "email",
-  "activate": boolean
-}
-```
-
-**Resposta:**
-- ✅ Preferências de notificação atualizadas
-- ❌ `400` - Tipo de notificação inválido
-
-**Peculiaridades:**
-- Atualmente apenas suporte para notificações por email
-- Permite ativar/desativar tipos específicos
 
 ---
 
@@ -347,7 +248,6 @@ Obtém lista de tarefas do usuário com filtros opcionais.
     "status": "to-do|in-progress|in-review|done",
     "priority": "low|medium|high|urgent|optional",
     "dueDate": "2024-10-25T10:30:00.000Z",
-    "owner": "string",
     "createdAt": "2024-10-21T15:00:00.000Z",
     "updatedAt": "2024-10-21T15:00:00.000Z"
   }
@@ -471,14 +371,16 @@ Remove uma tarefa do usuário permanentemente.
 
 | Cookie | Tipo | Duração | Uso |
 |--------|------|---------|-----|
-| `access_token` | JWT | 1 min | Autenticação de requisições |
-| `session_token` | JWT | 3 dias | Renovação de sessão |
+| `sessionToken` | JWT | 3 dias | Renovação de sessão (SessionGuard) |
+
+Observações:
+- Access Token NÃO é cookie; ele vem no corpo da resposta e deve ser enviado no header Authorization em chamadas protegidas
 
 ### Características:
-- **HttpOnly**: Não acessível via JavaScript
-- **Secure**: Apenas HTTPS (produção)
-- **SameSite**: Proteção CSRF
-- **Path**: `/` (toda a aplicação)
+- HttpOnly: Não acessível via JavaScript
+- Secure: Apenas HTTPS (produção)
+- SameSite: `none` (para funcionar com front-ends em domínios diferentes)
+- Path: `/` (toda a aplicação)
 
 ---
 
@@ -486,29 +388,26 @@ Remove uma tarefa do usuário permanentemente.
 
 ### Guards Disponíveis:
 
-#### `JwtGuard`
-- Valida access token do cookie
-- Extrai dados do usuário para `req.user`
-- Usado em rotas protegidas
+#### JwtGuard
+- Lê e valida o Access Token do header Authorization: Bearer <token>
+- Popula `req.user` com o payload do token
+- Usado nas rotas protegidas (task, update/delete account, logout)
 
-#### `SessionGuard` 
-- Valida session token do cookie
-- Usado apenas no endpoint de refresh
-- Permite renovação de sessão
+#### SessionGuard 
+- Lê e valida o Session Token do cookie `sessionToken`
+- Usado no endpoint `/account/refresh`
+
+#### GuestGuard
+- Bloqueia acesso de usuários já autenticados a rotas públicas (register, login, reset)
 
 ### Interceptors Automáticos:
 
-#### `SendCookieInterceptor`
-- Define cookies de autenticação automaticamente
-- Usado em login, register, refresh
+#### SendCookieInterceptor
+- Define/renova o cookie `sessionToken` e remove `sessionToken` do corpo da resposta
+- Usado em register, login e refresh
 
-#### `SendProfileInterceptor`
-- Busca e adiciona dados do perfil à resposta
-- Usado em rotas que retornam perfil
-
-#### `LogoutInterceptor`
-- Remove cookies de autenticação
-- Invalida tokens no servidor
+#### LogoutInterceptor
+- Limpa o cookie `sessionToken` e invalida o token de sessão no servidor
 - Usado em logout e delete account
 
 ---
@@ -557,7 +456,6 @@ Remove uma tarefa do usuário permanentemente.
 - Logger customizado
 - Rate limiting (limitação de acesso)
 - Health checks (verificação de status do servidor)
-- Tasks routes (rotas de gerenciamento de tarefas)
 - AI assistant (auxilio da IA para que o usuário possa se organizar melhor)
 - Outros meios de notificação
 - Pequenas otimizações e manutenção do código
@@ -568,7 +466,7 @@ Remove uma tarefa do usuário permanentemente.
 
 **Versão Atual**: `0.1.0` (Early Access)  
 **Branch**: `main`  
-**Última Atualização**: Outubro 2025
+**Última Atualização**: Novembro 2025
 
 ---
 
@@ -581,4 +479,4 @@ Remove uma tarefa do usuário permanentemente.
 
 ---
 
-*Última atualização: 13/10/2025*
+*Última atualização: 02/11/2025*

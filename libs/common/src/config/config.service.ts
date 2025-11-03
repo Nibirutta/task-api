@@ -12,15 +12,15 @@ export class AppConfigService {
     constructor(private readonly configService: ConfigService) {}
 
     getData(key: string) {
-        const port = this.configService.get(key);
+        const data = this.configService.get(key);
 
-        if (!port) {
+        if (!data) {
             throw new Error(
                 `${key} is missing or invalid, please check the config module, .env file or the env_keys.`,
             );
         }
 
-        return port;
+        return data;
     }
 
     get clientOptions(): ClientOptions {

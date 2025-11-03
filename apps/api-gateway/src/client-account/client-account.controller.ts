@@ -3,7 +3,7 @@ import {
     LoginRequestDto,
     ResetPasswordDto,
     ResetRequestDto,
-    UpdateCredentialDto,
+    UpdateAccountDto,
 } from '@app/common';
 import {
     Body,
@@ -16,73 +16,73 @@ import {
     Get,
     Patch,
     Query,
+    HttpStatus,
+    HttpCode,
 } from '@nestjs/common';
 import { ClientAccountService } from './client-account.service';
 import { SendCookieInterceptor } from '../interceptors/send-cookie.interceptor';
 import { JwtGuard } from '../guard/jwt.guard';
 import { SessionGuard } from '../guard/session.guard';
-import { SendProfileInterceptor } from '../interceptors/send-profile.interceptor';
 import { LogoutInterceptor } from '../interceptors/logout.interceptor';
+import { GuestGuard } from '../guard/guest.guard';
 
 @Controller('account')
 export class ClientAccountController {
     constructor(private readonly clientAccount: ClientAccountService) {}
 
-    @UseGuards(SessionGuard)
-    @UseInterceptors(SendCookieInterceptor, SendProfileInterceptor)
-    @Get('refresh')
-    refreshSession(@Request() req) {
-        return this.clientAccount.refreshSession(req.user.sub);
-    }
-
-    @UseInterceptors(LogoutInterceptor)
-    @Get('logout')
-    logout() {
-        return { message: 'Logout successful' };
-    }
-
-    @UseInterceptors(SendCookieInterceptor, SendProfileInterceptor)
+    @UseGuards(GuestGuard)
+    @UseInterceptors(SendCookieInterceptor)
     @Post('register')
-    registerAccount(@Body() createUserDto: CreateAccountDto) {
-        return this.clientAccount.createAccount(createUserDto);
+    register(@Body() createAccountDto: CreateAccountDto) {
+        return this.clientAccount.register(createAccountDto);
     }
 
     @UseGuards(JwtGuard)
-    @UseInterceptors(SendCookieInterceptor, SendProfileInterceptor)
-    @Patch('credential')
-    updateAccount(
-        @Request() req,
-        @Body() updateCredentialDto: UpdateCredentialDto,
-    ) {
-        return this.clientAccount.updateAccount(
-            req.user.sub,
-            updateCredentialDto,
-        );
+    @UseInterceptors(SendCookieInterceptor)
+    @Patch()
+    update(@Request() req, @Body() updateAccountDto: UpdateAccountDto) {
+        return this.clientAccount.updateAccount(req.user.sub, updateAccountDto);
     }
 
-    @UseInterceptors(SendCookieInterceptor, SendProfileInterceptor)
+    @UseGuards(JwtGuard)
+    @UseInterceptors(LogoutInterceptor)
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Delete()
+    delete(@Request() req) {
+        return this.clientAccount.deleteAccount(req.user.sub);
+    }
+
+    @UseGuards(GuestGuard)
+    @UseInterceptors(SendCookieInterceptor)
     @Post('login')
     login(@Body() loginRequestDto: LoginRequestDto) {
         return this.clientAccount.login(loginRequestDto);
     }
 
+    @UseInterceptors(LogoutInterceptor)
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Get('logout')
+    logout() {}
+
+    @UseGuards(SessionGuard)
+    @UseInterceptors(SendCookieInterceptor)
+    @Get('refresh')
+    refreshSession(@Request() req) {
+        return this.clientAccount.refreshSession(req.user.sub);
+    }
+
+    @UseGuards(GuestGuard)
     @Post('request-reset')
-    requestPasswordReset(@Body() resetRequestDto: ResetRequestDto) {
+    requestResetPassword(@Body() resetRequestDto: ResetRequestDto) {
         return this.clientAccount.requestPasswordReset(resetRequestDto);
     }
 
+    @UseGuards(GuestGuard)
     @Post('reset-password')
     resetPassword(
         @Query('token') token: string,
         @Body() resetPasswordDto: ResetPasswordDto,
     ) {
         return this.clientAccount.resetPassword(token, resetPasswordDto);
-    }
-
-    @UseGuards(JwtGuard)
-    @UseInterceptors(LogoutInterceptor)
-    @Delete()
-    deleteAccount(@Request() req) {
-        return this.clientAccount.deleteAccount(req.user.sub);
     }
 }
