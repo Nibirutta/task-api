@@ -4,7 +4,7 @@ export enum Themes {
     CLOUDY_FOCUS = 'cloudy-focus',
     AFTER_HOURS = 'after-hours',
     FOREST_CALM = 'forest-calm',
-    SOLAR_BLOOM = 'solar-bloom',
+    MARS_COLONY = 'mars-colony',
 }
 
 export enum NotificationsTypes {
