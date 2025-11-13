@@ -1,3 +1,3 @@
 export const allowedOrigins = [
-    'https://your-taskmanager.vercel.app/',
+    'https://your-taskmanager.vercel.app',
 ];
