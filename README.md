@@ -414,11 +414,6 @@ Observações:
 
 ## 🌐 CORS Configuration
 
-### Origins Permitidas:
-- `http://localhost:3000` (React dev)
-- `http://localhost:5173` (Vite dev)  
-- `http://127.0.0.1:5500` (Live Server)
-
 ### Configurações:
 - `credentials: true` (cookies permitidos)
 - `optionsSuccessStatus: 200`
@@ -464,7 +459,7 @@ Observações:
 
 ## 🔄 Versionamento
 
-**Versão Atual**: `0.1.0` (Early Access)  
+**Versão Atual**: `1.0.0` (Early Access)  
 **Branch**: `main`  
 **Última Atualização**: Novembro 2025
 
@@ -479,4 +474,4 @@ Observações:
 
 ---
 
-*Última atualização: 02/11/2025*
+*Última atualização: 13/11/2025*
