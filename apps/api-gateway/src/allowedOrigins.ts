@@ -1,3 +1,3 @@
-export const allowedOrigins = [
-    'https://your-taskmanager.vercel.app',
-];
+const origins: string = process.env.ORIGINS ?? "";
+
+export const allowedOrigins = origins.split(',');
