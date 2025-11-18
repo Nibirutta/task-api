@@ -9,7 +9,7 @@ import {
 } from '@app/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
-import { DebuggingThrottlerGuard } from '../guard/smartThrottlerGuard.guard';
+import { CustomThrottlerGuard } from '../guard/customThrottlerGuard.guard';
 
 @Module({
     imports: [
@@ -36,7 +36,7 @@ import { DebuggingThrottlerGuard } from '../guard/smartThrottlerGuard.guard';
         },
         {
             provide: APP_GUARD,
-            useClass: DebuggingThrottlerGuard
+            useClass: CustomThrottlerGuard
         }
     ],
 })

@@ -25,11 +25,17 @@ import { JwtGuard } from '../guard/jwt.guard';
 import { SessionGuard } from '../guard/session.guard';
 import { LogoutInterceptor } from '../interceptors/logout.interceptor';
 import { GuestGuard } from '../guard/guest.guard';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 
 @Controller('account')
 export class ClientAccountController {
     constructor(private readonly clientAccount: ClientAccountService) {}
 
+    @Throttle({
+        default: {
+            limit: 20,
+        }
+    })
     @UseGuards(GuestGuard)
     @UseInterceptors(SendCookieInterceptor)
     @Post('register')
@@ -37,6 +43,7 @@ export class ClientAccountController {
         return this.clientAccount.register(createAccountDto);
     }
 
+    @SkipThrottle()
     @UseGuards(JwtGuard)
     @UseInterceptors(SendCookieInterceptor)
     @Patch()
@@ -44,6 +51,7 @@ export class ClientAccountController {
         return this.clientAccount.updateAccount(req.user.sub, updateAccountDto);
     }
 
+    @SkipThrottle()
     @UseGuards(JwtGuard)
     @UseInterceptors(LogoutInterceptor)
     @HttpCode(HttpStatus.NO_CONTENT)
@@ -52,6 +60,11 @@ export class ClientAccountController {
         return this.clientAccount.deleteAccount(req.user.sub);
     }
 
+    @Throttle({
+        default: {
+            limit: 15,
+        }
+    })
     @UseGuards(GuestGuard)
     @UseInterceptors(SendCookieInterceptor)
     @Post('login')
@@ -59,11 +72,13 @@ export class ClientAccountController {
         return this.clientAccount.login(loginRequestDto);
     }
 
+    @SkipThrottle()
     @UseInterceptors(LogoutInterceptor)
     @HttpCode(HttpStatus.NO_CONTENT)
     @Get('logout')
     logout() {}
 
+    @SkipThrottle()
     @UseGuards(SessionGuard)
     @UseInterceptors(SendCookieInterceptor)
     @Get('refresh')
@@ -71,12 +86,18 @@ export class ClientAccountController {
         return this.clientAccount.refreshSession(req.user.sub);
     }
 
+    @Throttle({
+        default: {
+            limit: 10
+        }
+    })
     @UseGuards(GuestGuard)
     @Post('request-reset')
     requestResetPassword(@Body() resetRequestDto: ResetRequestDto) {
         return this.clientAccount.requestPasswordReset(resetRequestDto);
     }
 
+    @SkipThrottle()
     @UseGuards(GuestGuard)
     @Post('reset-password')
     resetPassword(
