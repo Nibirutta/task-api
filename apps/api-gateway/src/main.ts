@@ -4,13 +4,15 @@ import { ApiGatewayModule } from './api-gateway.module';
 import { corsOptions } from './configCors';
 import { AllExceptionsFilter } from './filters/all-exception.filter';
 import * as cookieParser from 'cookie-parser';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-    const app = await NestFactory.create(ApiGatewayModule);
+    const app = await NestFactory.create<NestExpressApplication>(ApiGatewayModule);
 
     app.enableCors(corsOptions);
 
     const { httpAdapter } = app.get(HttpAdapterHost);
+    app.set('trust proxy', 1);
     app.use(cookieParser());
     app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
     app.useGlobalPipes(
