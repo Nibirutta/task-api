@@ -10,7 +10,6 @@ import {
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { CustomThrottlerGuard } from '../guard/customThrottlerGuard.guard';
-import { LoggerModule } from 'nestjs-pino';
 
 @Module({
     imports: [
@@ -23,7 +22,6 @@ import { LoggerModule } from 'nestjs-pino';
                 },
             ],
         }),
-        LoggerModule.forRoot()
     ],
     controllers: [ClientAccountController],
     providers: [

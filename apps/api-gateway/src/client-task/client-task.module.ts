@@ -7,10 +7,9 @@ import {
     TRANSPORTER_PROVIDER,
     AppConfigService,
 } from '@app/common';
-import { LoggerModule } from 'nestjs-pino';
 
 @Module({
-    imports: [AppConfigModule, LoggerModule.forRoot()],
+    imports: [AppConfigModule],
     controllers: [ClientTaskController],
     providers: [
         ClientTaskService,
