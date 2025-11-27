@@ -3,15 +3,23 @@ import {
     Catch,
     HttpException,
     HttpStatus,
+    RpcExceptionFilter,
 } from '@nestjs/common';
-import { BaseRpcExceptionFilter, RpcException } from '@nestjs/microservices';
+import { RpcException } from '@nestjs/microservices';
 import { Observable, throwError } from 'rxjs';
-import { MongoError } from 'mongodb';
+import { InjectPinoLogger, Logger } from 'nestjs-pino';
 
 @Catch()
-export class RpcExceptionFilter extends BaseRpcExceptionFilter {
+export class MicroserviceExceptionFilter implements RpcExceptionFilter {
+    constructor(@InjectPinoLogger() private readonly logger: Logger) {}
+
     catch(exception: any, host: ArgumentsHost): Observable<any> {
         if (exception instanceof HttpException) {
+            this.logger.warn(
+                { error: exception },
+                'HTTP Exception successfully captured!',
+            );
+
             return throwError(
                 () =>
                     new RpcException({
@@ -23,21 +31,10 @@ export class RpcExceptionFilter extends BaseRpcExceptionFilter {
             );
         }
 
-        if (exception instanceof MongoError) {
-            return throwError(
-                () =>
-                    new RpcException({
-                        status: HttpStatus.INTERNAL_SERVER_ERROR,
-                        response: {
-                            error: exception.name,
-                            message: 'MongoServer operation failed',
-                            statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-                        },
-                    }),
-            );
-        }
-
-        console.log(exception);
+        this.logger.error(
+            { error: exception },
+            'Not treated exception was captured!',
+        );
 
         return throwError(
             () =>
@@ -46,7 +43,7 @@ export class RpcExceptionFilter extends BaseRpcExceptionFilter {
                         exception.error.status ||
                         HttpStatus.INTERNAL_SERVER_ERROR,
                     response: {
-                        error: exception.error.error || 'UnknownError',
+                        error: exception.error.error || 'Unknown Error',
                         message:
                             exception.error.message || 'Internal server error',
                         statusCode:

@@ -34,7 +34,7 @@ export class ClientAccountController {
     @Throttle({
         default: {
             limit: 20,
-        }
+        },
     })
     @UseGuards(GuestGuard)
     @UseInterceptors(SendCookieInterceptor)
@@ -63,7 +63,7 @@ export class ClientAccountController {
     @Throttle({
         default: {
             limit: 15,
-        }
+        },
     })
     @UseGuards(GuestGuard)
     @UseInterceptors(SendCookieInterceptor)
@@ -88,8 +88,8 @@ export class ClientAccountController {
 
     @Throttle({
         default: {
-            limit: 10
-        }
+            limit: 10,
+        },
     })
     @UseGuards(GuestGuard)
     @Post('request-reset')

@@ -3,14 +3,11 @@ import {
     CanActivate,
     ExecutionContext,
     ForbiddenException,
-    OnApplicationBootstrap,
-    Inject,
 } from '@nestjs/common';
 import { Request } from 'express';
 
 @Injectable()
-export class GuestGuard implements CanActivate, OnApplicationBootstrap {
-    async onApplicationBootstrap() {}
+export class GuestGuard implements CanActivate {
 
     canActivate(context: ExecutionContext) {
         const request = context.switchToHttp().getRequest<Request>();

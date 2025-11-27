@@ -39,7 +39,7 @@ export * from './contracts/response/session-response.dto';
 export * from './pipes/validation.pipe';
 
 // Filters
-export * from './filters/rpc-exception.filter';
+export * from './filters/microservice-exception.filter';
 
 // Config
 export * from './config/config.module';

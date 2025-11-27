@@ -10,6 +10,7 @@ import {
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { CustomThrottlerGuard } from '../guard/customThrottlerGuard.guard';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
     imports: [
@@ -18,10 +19,11 @@ import { CustomThrottlerGuard } from '../guard/customThrottlerGuard.guard';
             throttlers: [
                 {
                     ttl: 60000,
-                    limit: 50
-                }
-            ]
-        })
+                    limit: 50,
+                },
+            ],
+        }),
+        LoggerModule.forRoot()
     ],
     controllers: [ClientAccountController],
     providers: [
@@ -36,8 +38,8 @@ import { CustomThrottlerGuard } from '../guard/customThrottlerGuard.guard';
         },
         {
             provide: APP_GUARD,
-            useClass: CustomThrottlerGuard
-        }
+            useClass: CustomThrottlerGuard,
+        },
     ],
 })
-export class ClientAccountModule { }
+export class ClientAccountModule {}

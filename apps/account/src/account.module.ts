@@ -8,11 +8,14 @@ import {
     AppConfigModule,
     AppConfigService,
     ENV_KEYS,
+    MicroserviceExceptionFilter,
     TRANSPORTER_PROVIDER,
 } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { ClientProxyFactory } from '@nestjs/microservices';
+import { LoggerModule, PinoLogger } from 'nestjs-pino';
+import { APP_FILTER } from '@nestjs/core';
 
 @Module({
     imports: [
@@ -21,16 +24,24 @@ import { ClientProxyFactory } from '@nestjs/microservices';
         TokenModule,
         AppConfigModule,
         MongooseModule.forRootAsync({
-            useFactory: (configService: AppConfigService) => ({
-                uri: configService.getData(ENV_KEYS.DATABASE_URL),
-                onConnectionCreate: (connection: Connection) => {
-                    console.log('Connected to mongoDB');
+            useFactory: (
+                configService: AppConfigService,
+                logger: PinoLogger,
+            ) => {
+                logger.setContext('MongooseModule - Account');
 
-                    return connection;
-                },
-            }),
-            inject: [AppConfigService],
+                return {
+                    uri: configService.getData(ENV_KEYS.DATABASE_URL),
+                    onConnectionCreate: (connection: Connection) => {
+                        logger.info('Connected to mongoose');
+
+                        return connection;
+                    },
+                };
+            },
+            inject: [AppConfigService, PinoLogger],
         }),
+        LoggerModule.forRoot(),
     ],
     controllers: [AccountController],
     providers: [
@@ -42,6 +53,10 @@ import { ClientProxyFactory } from '@nestjs/microservices';
                 return ClientProxyFactory.create(clientOptions);
             },
             inject: [AppConfigService],
+        },
+        {
+            provide: APP_FILTER,
+            useClass: MicroserviceExceptionFilter,
         },
     ],
 })

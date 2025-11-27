@@ -11,16 +11,18 @@ import {
 } from '@app/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, retry, timeout } from 'rxjs';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 @Injectable()
 export class ClientAccountService implements OnApplicationBootstrap {
     constructor(
         @Inject(TRANSPORTER_PROVIDER) private readonly transporter: ClientProxy,
+        @InjectPinoLogger() private readonly logger: PinoLogger
     ) {}
 
     async onApplicationBootstrap() {
         await this.transporter.connect();
-        console.log('Client account connected to the transporter');
+        this.logger.info('Client account connected to the transporter');
     }
 
     async register(createAccountDto: CreateAccountDto) {

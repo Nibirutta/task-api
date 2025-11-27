@@ -9,16 +9,18 @@ import {
     TaskResponseDto,
 } from '@app/common';
 import { lastValueFrom, retry, timeout } from 'rxjs';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 @Injectable()
 export class ClientTaskService implements OnApplicationBootstrap {
     constructor(
         @Inject(TRANSPORTER_PROVIDER) private readonly transporter: ClientProxy,
+        @InjectPinoLogger() private readonly logger: PinoLogger
     ) {}
 
     async onApplicationBootstrap() {
         await this.transporter.connect();
-        console.log('Client task connected to transporter');
+        this.logger.info('Client task connected to transporter');
     }
 
     async getTasks(owner: string, tasksFilterDto: TasksFilterDto) {

@@ -6,8 +6,6 @@ TaskAPI é uma aplicação baseada em arquitetura de microserviços usando NestJ
 
 **URL de Produção:** `https://nibirutta-task-api.up.railway.app/`
 
-> **⚠️ Atenção:** Esta API está em desenvolvimento ativo. Use com cautela em produção.
-
 ## 🏗️ Arquitetura
 
 ```
@@ -440,7 +438,8 @@ Observações:
 {
   "statusCode": 400,
   "message": "Validation failed",
-  "error": "Bad Request"
+  "error": "Bad Request",
+  "timestamp": "ISODate"
 }
 ```
 
@@ -448,8 +447,6 @@ Observações:
 
 ## 📜 Implementações futuras
 
-- Logger customizado
-- Rate limiting (limitação de acesso)
 - Health checks (verificação de status do servidor)
 - AI assistant (auxilio da IA para que o usuário possa se organizar melhor)
 - Outros meios de notificação
@@ -457,9 +454,16 @@ Observações:
 
 ---
 
+## ✅ Implementações pós lançamento feitas
+
+- Logger customizado
+- Rate limiting
+
+---
+
 ## 🔄 Versionamento
 
-**Versão Atual**: `1.0.0` (Early Access)  
+**Versão Atual**: `1.1.0` 
 **Branch**: `main`  
 **Última Atualização**: Novembro 2025
 
@@ -474,4 +478,4 @@ Observações:
 
 ---
 
-*Última atualização: 13/11/2025*
+*Última atualização: 26/11/2025*

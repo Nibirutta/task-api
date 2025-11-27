@@ -25,6 +25,7 @@ import {
     TASK_PATTERNS,
 } from '@app/common';
 import { pick } from 'lodash';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 @Injectable()
 export class AccountService {
@@ -34,6 +35,7 @@ export class AccountService {
         private readonly tokenService: TokenService,
         private readonly profileService: ProfileService,
         @Inject(TRANSPORTER_PROVIDER) private readonly transporter: ClientProxy,
+        @InjectPinoLogger() private readonly logger: PinoLogger
     ) {}
 
     async register(createAccountDto: CreateAccountDto) {
@@ -57,6 +59,8 @@ export class AccountService {
             newCredential.id,
             newCredential.username,
         );
+
+        this.logger.info({ userData: { newCredential, newProfile }}, 'New user created');
 
         return {
             profile: newProfile,
@@ -94,13 +98,15 @@ export class AccountService {
     }
 
     async deleteAccount(id: string) {
-        await this.credentialService.deleteCredential(id);
+        const deletedCredential = await this.credentialService.deleteCredential(id);
 
-        await this.profileService.deleteProfile(id);
+        const deletedProfile = await this.profileService.deleteProfile(id);
 
         await this.tokenService.deleteUserTokens(id);
 
         this.transporter.send(TASK_PATTERNS.DELETE_ALL, id).subscribe();
+
+        this.logger.info({ userData: { deletedCredential, deletedProfile }}, 'User successfully deleted from database');
 
         return {
             success: true,
@@ -169,6 +175,8 @@ export class AccountService {
             message: `Password request was made in ${timestamp}, if was not you, please ignore this email. If you really want to reset your password, just follow this link: ${this.configService.getData(ENV_KEYS.RESET_URL)}=${resetToken}`,
         };
 
+        this.logger.info(`A reset email was sent to ${foundCredential.email}`);
+
         this.transporter
             .send(NOTIFICATION_PATTERNS.SEND_MAIL, sendEmailDto)
             .subscribe();
@@ -181,10 +189,12 @@ export class AccountService {
     async resetPassword(token: string, resetPasswordDto: ResetPasswordDto) {
         const decodedToken = await this.validateToken(token, TokenType.RESET);
 
-        await this.credentialService.resetPassword(
+        const updatedCredential = await this.credentialService.resetPassword(
             decodedToken.sub,
             resetPasswordDto,
         );
+
+        this.logger.info(`${updatedCredential.username} successfully reseted his password`);
 
         return {
             success: true,
@@ -208,7 +218,7 @@ export class AccountService {
                 );
             }
 
-            // Sends an email to the user requesting a password change
+            this.logger.info(`Someone is trying to access ${hackedUser.username} account`);
 
             throw new ForbiddenException('Not allowed - invalid token');
         }

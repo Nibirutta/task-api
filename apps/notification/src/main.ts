@@ -1,11 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { NotificationAppModule } from './notification-app.module';
 import { AsyncMicroserviceOptions } from '@nestjs/microservices';
-import {
-    AppConfigService,
-    RpcExceptionFilter,
-    ValidationPipe,
-} from '@app/common';
+import { AppConfigService, ValidationPipe } from '@app/common';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
     const app = await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
@@ -15,11 +12,12 @@ async function bootstrap() {
                 return configService.microserviceOptions;
             },
             inject: [AppConfigService],
+            bufferLogs: true,
         },
     );
 
+    app.useLogger(app.get(Logger));
     app.useGlobalPipes(new ValidationPipe());
-    app.useGlobalFilters(new RpcExceptionFilter());
 
     await app.listen();
 }
